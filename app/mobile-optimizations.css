@@ -1,0 +1,302 @@
+/* Mobile Optimizations */
+
+/* Mobile keyboard optimizations */
+@media (max-width: 768px) {
+  /* Ensure proper viewport for mobile keyboards */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  
+  /* Prevent zoom on input focus (iOS) */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    border-radius: 8px;
+  }
+  
+  /* Better input focus states for mobile */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Ensure form elements are properly sized for touch */
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    padding: 12px 16px;
+    line-height: 1.4;
+  }
+  
+  /* Improve form layout on mobile */
+  form {
+    padding: 16px;
+  }
+  
+  /* Better spacing for form elements */
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  /* Ensure buttons are touch-friendly */
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Touch-friendly button sizes */
+@media (max-width: 768px) {
+  button, 
+  [role="button"],
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+  
+  /* Larger touch targets for links */
+  a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* Improved scrolling on mobile */
+@media (max-width: 768px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Smooth scrolling for containers */
+  .scroll-container {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Better text readability on mobile */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px; /* Prevents zoom on iOS */
+    line-height: 1.6;
+  }
+  
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.125rem; }
+  h5 { font-size: 1rem; }
+  h6 { font-size: 0.875rem; }
+}
+
+/* Improved form elements on mobile */
+@media (max-width: 768px) {
+  input, 
+  textarea, 
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+  
+  /* Better focus states */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+/* Card optimizations for mobile */
+@media (max-width: 768px) {
+  .card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+  }
+  
+  /* Better spacing */
+  .card-content {
+    padding: 16px;
+  }
+}
+
+/* Navigation improvements */
+@media (max-width: 768px) {
+  /* Bottom navigation spacing */
+  .bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Side navigation improvements */
+  .side-nav {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+/* Image optimizations */
+@media (max-width: 768px) {
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Lazy loading placeholder */
+  .lazy-image {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+  
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+}
+
+/* Modal improvements for mobile */
+@media (max-width: 768px) {
+  .modal {
+    margin: 16px;
+    border-radius: 12px;
+    max-height: calc(100vh - 32px);
+  }
+  
+  .modal-content {
+    padding: 20px;
+  }
+}
+
+/* Toast notifications for mobile */
+@media (max-width: 768px) {
+  .toast {
+    margin: 8px;
+    border-radius: 8px;
+    max-width: calc(100vw - 16px);
+  }
+}
+
+/* Loading states */
+@media (max-width: 768px) {
+  .loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid #000;
+  }
+  
+  button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  .lazy-image {
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  }
+  
+  .loading-skeleton {
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  }
+}
+
+/* Landscape mode optimizations */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero-section {
+    min-height: 60vh;
+  }
+  
+  .modal {
+    max-height: 80vh;
+  }
+}
+
+/* Safe area support for notched devices */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-left {
+    padding-left: max(16px, env(safe-area-inset-left));
+  }
+  
+  .safe-area-right {
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* Performance optimizations */
+@media (max-width: 768px) {
+  /* Reduce animations on low-end devices */
+  .low-end-device * {
+    animation-duration: 0.1s !important;
+    transition-duration: 0.1s !important;
+  }
+  
+  /* Optimize for battery saving */
+  .battery-saver * {
+    animation-play-state: paused;
+  }
+}
+
+/* Accessibility improvements */
+@media (max-width: 768px) {
+  /* Better focus indicators */
+  .focus-visible {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+  }
+  
+  /* Larger hit areas */
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+} 

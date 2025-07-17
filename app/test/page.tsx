@@ -1,30 +1,12 @@
-'use client';
+export const metadata = {
+  title: 'Test Sayfası | UniNestcy',
+  description: 'UniNestcy test sayfası. Geliştirme ve test amaçlı sayfa.',
+  keywords: 'test, geliştirme, UniNestcy',
+  robots: 'noindex, nofollow',
+};
 
-import { useState } from 'react';
+import TestClient from './TestClient';
 
-export default function TestPage() {
-  const [msg, setMsg] = useState('');
-
-  const handleClick = async () => {
-    // Mock test - gerçek veritabanı yerine
-    setMsg('✅ Test başarılı! Mock veri sistemi çalışıyor.');
-  };
-
-  return (
-    <div style={{ padding: 20 }}>
-      <h1>Test Sayfası</h1>
-      <p>Bu sayfa veritabanı bağlantısını test etmek için kullanılıyor.</p>
-      <button onClick={handleClick} style={{ 
-        padding: '10px 20px', 
-        backgroundColor: '#3b82f6', 
-        color: 'white', 
-        border: 'none', 
-        borderRadius: '5px',
-        cursor: 'pointer'
-      }}>
-        Test Ürün Ekle
-      </button>
-      <p>{msg}</p>
-    </div>
-  );
+export default function Page() {
+  return <TestClient />;
 }

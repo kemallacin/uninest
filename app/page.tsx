@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import Header from '../components/Header'
 import Hero from '../components/Hero'
@@ -8,6 +6,27 @@ import About from '../components/About'
 import AppPreview from '../components/AppPreview'
 import Contact from '../components/Contact'
 import Footer from '../components/Footer'
+
+export const metadata = {
+  title: 'UniNestcy | Kıbrıs Öğrenci Platformu',
+  description: 'Kıbrıs’ta öğrenciler için ikinci el eşya, not, etkinlik ve ev arkadaşı bulma platformu. Güvenli, hızlı, öğrenci dostu.',
+  openGraph: {
+    title: 'UniNestcy | Kıbrıs Öğrenci Platformu',
+    description: 'Kıbrıs’ta öğrenciler için ikinci el eşya, not, etkinlik ve ev arkadaşı bulma platformu. Güvenli, hızlı, öğrenci dostu.',
+    url: 'https://uninestcy.com',
+    siteName: 'UniNestcy',
+    images: [
+      {
+        url: '/logo.png',
+        width: 800,
+        height: 600,
+        alt: 'UniNestcy Logo',
+      },
+    ],
+    locale: 'tr_TR',
+    type: 'website',
+  },
+};
 
 export default function Home() {
   return (

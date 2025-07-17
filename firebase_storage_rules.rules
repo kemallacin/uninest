@@ -1,0 +1,114 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ========================================
+    // NOTLAR (PDF Dosyaları) - Güvenli Kurallar
+    // ========================================
+    match /notes/{noteId} {
+      // Okuma: Sadece kimlik doğrulanmış kullanıcılar
+      allow read: if request.auth != null;
+      
+      // Yazma: Sadece kimlik doğrulanmış kullanıcılar + dosya validasyonu
+      allow write: if request.auth != null
+                   && request.resource.size <= 10 * 1024 * 1024  // Max 10MB
+                   && request.resource.contentType == 'application/pdf'  // Sadece PDF
+                   && noteId.matches('^[a-zA-Z0-9_-]+\\.(pdf)$');  // Güvenli dosya adı
+    }
+    
+    // ========================================
+    // PROFIL RESİMLERİ - Kullanıcı Bazlı Güvenlik
+    // ========================================
+    match /profile_images/{userId}/{imageId} {
+      // Okuma: Herkes görebilir (profil resimleri public)
+      allow read: if true;
+      
+      // Yazma: Sadece kendi profil resmini yükleyebilir
+      allow write: if request.auth != null
+                   && request.auth.uid == userId
+                   && request.resource.size <= 5 * 1024 * 1024  // Max 5MB
+                   && request.resource.contentType.matches('image/.*')  // Sadece resim
+                   && imageId.matches('^[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif|webp)$');  // Güvenli uzantılar
+    }
+    
+    // ========================================
+    // GENEL DOSYALAR - Sınırlı Erişim
+    // ========================================
+    match /uploads/{userId}/{allPaths=**} {
+      // Okuma: Sadece dosya sahibi
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Yazma: Sadece dosya sahibi + güvenlik kontrolleri
+      allow write: if request.auth != null
+                   && request.auth.uid == userId
+                   && request.resource.size <= 20 * 1024 * 1024  // Max 20MB
+                   && isValidFileType(request.resource.contentType)
+                   && isValidFileName(allPaths);
+    }
+    
+    // ========================================
+    // GENEL PAYLAŞIM ALANLAR - Okuma Odaklı
+    // ========================================
+    match /public/{allPaths=**} {
+      // Okuma: Kimlik doğrulanmış kullanıcılar
+      allow read: if request.auth != null;
+      
+      // Yazma: Sadece admin kullanıcılar (custom claim ile)
+      allow write: if request.auth != null
+                   && request.auth.token.admin == true
+                   && request.resource.size <= 50 * 1024 * 1024;  // Max 50MB
+    }
+    
+    // ========================================
+    // KULLANICI DOSYALARI - Kişisel Alan
+    // ========================================
+    match /users/{userId}/files/{fileName} {
+      // Okuma ve yazma: Sadece dosya sahibi
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId
+                         && (resource == null || resource.size <= 15 * 1024 * 1024)  // Max 15MB
+                         && isValidFileType(request.resource.contentType)
+                         && fileName.matches('^[a-zA-Z0-9_.-]+$');  // Güvenli dosya adı
+    }
+    
+    // ========================================
+    // TEMİZLİK KURALI - Tüm diğer dosyalar reddedilir
+    // ========================================
+    match /{allPaths=**} {
+      allow read, write: if false;  // Varsayılan olarak her şey reddedilir
+    }
+  }
+}
+
+// ========================================
+// YARDIMCI FONKSİYONLAR
+// ========================================
+
+// Geçerli dosya türlerini kontrol et
+function isValidFileType(contentType) {
+  return contentType.matches('image/.*')          // Resimler
+      || contentType.matches('application/pdf')   // PDF dosyaları
+      || contentType.matches('text/.*')           // Metin dosyaları
+      || contentType.matches('application/msword') // Word dosyaları
+      || contentType.matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+      || contentType.matches('application/vnd.ms-excel')  // Excel dosyaları
+      || contentType.matches('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+
+// Güvenli dosya adı kontrol et
+function isValidFileName(fileName) {
+  return fileName.matches('^[a-zA-Z0-9_.-/]+$')  // Sadece güvenli karakterler
+      && !fileName.matches('.*\\.\\..*')         // Path traversal saldırılarını engelle
+      && !fileName.matches('.*<.*>.*')           // XSS saldırılarını engelle
+      && fileName.size() <= 255;                 // Dosya adı uzunluk sınırı
+}
+
+// Kullanıcının admin olup olmadığını kontrol et
+function isAdmin() {
+  return request.auth != null && request.auth.token.admin == true;
+}
+
+// Kullanıcının email doğrulanmış mı kontrol et
+function isVerifiedUser() {
+  return request.auth != null && request.auth.token.email_verified == true;
+} 

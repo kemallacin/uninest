@@ -2,6 +2,200 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet Map Styles */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px;
+  font-size: 14px;
+}
+
+.leaflet-popup-tip {
+  background: white;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Map container responsive styles */
+.map-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .map-container {
+    height: 300px;
+  }
+}
+
+/* Loading overlay for map */
+.map-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Bus schedule card styles */
+.bus-schedule-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.bus-schedule-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-time {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.schedule-type {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.schedule-destination {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+}
+
+/* University filter button styles */
+.university-filter-btn {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.university-filter-btn:hover {
+  transform: translateY(-1px);
+}
+
+.university-filter-btn.active {
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.university-filter-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3B82F6, #1D4ED8);
+}
+
+/* Route selection button styles */
+.route-selection-btn {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.route-selection-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.route-selection-btn.active {
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+}
+
+/* Day selection button styles */
+.day-selection-btn {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.day-selection-btn:hover {
+  transform: translateY(-1px);
+}
+
+.day-selection-btn.active {
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+/* Map toggle button styles */
+.map-toggle-btn {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.map-toggle-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 640px) {
+  .schedule-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .university-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .route-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .schedule-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .university-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .route-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .schedule-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  
+  .university-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .route-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Import mobile optimizations */
+@import './mobile-optimizations.css';
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {

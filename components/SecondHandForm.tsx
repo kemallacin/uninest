@@ -1,60 +1,130 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
-// Supabase ile ilgili import ve client oluşturma kaldırıldı
-
-interface SecondHandFormProps {
-  onClose: () => void
-  onSuccess?: () => void
-}
+import React, { useState, useRef, useEffect } from 'react'
+import { useFormValidation, commonValidationRules } from './useFormValidation'
 
 interface FormData {
   urun_adi: string
   kategori: string
   satis_fiyati: string
-  orijinal_fiyat: string
   urun_durumu: string
   konum: string
   telefon: string
   eposta: string
   aciklama: string
-  urun_fotograf: string | null // Artık sadece string (URL) veya null
+  urun_fotograflar: { file: File; preview: string }[]
+  iletisim_tercihleri: {
+    whatsapp: boolean
+    telefon: boolean
+    eposta: boolean
+  }
 }
 
-const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSuccess }) => {
-  const [formData, setFormData] = useState<FormData>({
-    urun_adi: '',
-    kategori: '',
-    satis_fiyati: '',
-    orijinal_fiyat: '',
-    urun_durumu: '',
-    konum: '',
-    telefon: '',
-    eposta: '',
-    aciklama: '',
-    urun_fotograf: null
-  })
+interface SecondHandFormProps {
+  onClose: () => void
+  onSubmit: (data: any) => void
+  initialValues?: any
+}
+
+const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, initialValues }) => {
+  const [formData, setFormData] = useState<FormData>(
+    initialValues
+      ? {
+          urun_adi: initialValues.title || '',
+          kategori: initialValues.category || '',
+          satis_fiyati: initialValues.price ? String(initialValues.price) : '',
+          urun_durumu: initialValues.condition || '',
+          konum: initialValues.location || '',
+          telefon: initialValues.phone || '',
+          eposta: initialValues.email || '',
+          aciklama: initialValues.description || '',
+          urun_fotograflar: initialValues.images ? initialValues.images.map((img: string) => ({
+            file: null as any,
+            preview: img
+          })) : [],
+          iletisim_tercihleri: initialValues.contactPreferences || {
+            whatsapp: true,
+            telefon: true,
+            eposta: true
+          }
+        }
+      : {
+          urun_adi: '',
+          kategori: '',
+          satis_fiyati: '',
+          urun_durumu: '',
+          konum: '',
+          telefon: '',
+          eposta: '',
+          aciklama: '',
+          urun_fotograflar: [],
+          iletisim_tercihleri: {
+            whatsapp: true,
+            telefon: true,
+            eposta: true
+          }
+        }
+  )
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Validasyon kuralları
+  const validationRules = {
+    urun_adi: commonValidationRules.title,
+    kategori: { required: true },
+    satis_fiyati: commonValidationRules.price,
+    urun_durumu: { required: true },
+    konum: { required: true },
+    telefon: commonValidationRules.phone,
+    eposta: { email: true },
+    aciklama: commonValidationRules.description
+  }
+
+  const {
+    errors,
+    touched,
+    validateForm,
+    validateField,
+    handleBlur,
+    handleChange,
+    hasErrors,
+    hasFieldError,
+    isFieldTouched,
+    sanitizeInput,
+    setErrors,
+    setTouched
+  } = useFormValidation(validationRules);
+
+  // Form değiştiğinde sürekli validasyon yap
+  useEffect(() => {
+    // Sadece en az bir alan doluysa validasyon yap
+    const hasAnyValue = Object.values(formData).some(value => 
+      typeof value === 'string' && value.trim() !== ''
+    );
+    
+    if (hasAnyValue) {
+      validateForm(formData);
+    }
+  }, [formData, validateForm]);
+
   const categories = [
-    { value: 'elektronik', label: 'Elektronik' },
-    { value: 'mobilya', label: 'Mobilya' },
-    { value: 'kitap', label: 'Kitap' },
-    { value: 'giyim', label: 'Giyim' },
-    { value: 'spor', label: 'Spor' },
-    { value: 'diger', label: 'Diğer' }
+    { value: 'electronics', label: 'Elektronik' },
+    { value: 'furniture', label: 'Mobilya' },
+    { value: 'books', label: 'Kitap' },
+    { value: 'clothing', label: 'Giyim' },
+    { value: 'sports', label: 'Spor' },
+    { value: 'other', label: 'Diğer' }
   ]
 
   const conditions = [
-    { value: 'yeni', label: 'Yeni' },
-    { value: 'çok iyi', label: 'Çok İyi' },
-    { value: 'iyi', label: 'İyi' },
-    { value: 'orta', label: 'Orta' },
-    { value: 'kötü', label: 'Kötü' }
+    { value: 'new', label: 'Sıfır' },
+    { value: 'like-new', label: 'Sıfır Gibi' },
+    { value: 'good', label: 'İyi' },
+    { value: 'fair', label: 'Orta' },
+    { value: 'old', label: 'Eski' }
   ]
 
   const locations = [
@@ -67,64 +137,104 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSuccess }) =
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    const sanitizedValue = sanitizeInput(value, name)
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: sanitizedValue
     }))
+
+    // Validasyon ve touched durumu
+    handleChange(name, sanitizedValue)
+    
+    // Alanı hemen touched olarak işaretle (değer varsa)
+    if (sanitizedValue.trim() !== '') {
+      setTouched(prev => ({ ...prev, [name]: true }))
+    }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null
-    setFormData(prev => ({
-      ...prev,
-      urun_fotograf: file ? URL.createObjectURL(file) : null
-    }))
+  // Form geçerli mi kontrol et
+  const isFormValid = () => {
+    // Tüm zorunlu alanların dolu olduğunu kontrol et
+    const requiredFieldsFilled = 
+      formData.urun_adi.trim() !== '' &&
+      formData.kategori !== '' &&
+      formData.satis_fiyati.trim() !== '' &&
+      formData.urun_durumu !== '' &&
+      formData.konum !== '' &&
+      formData.telefon.trim() !== '' &&
+      formData.aciklama.trim() !== '';
+
+    // Mevcut hataları kontrol et (validateForm zaten useEffect'te çağrılıyor)
+    const noValidationErrors = Object.keys(errors).length === 0;
+
+    return requiredFieldsFilled && noValidationErrors;
   }
 
-  // uploadImageToSupabase ve Supabase ile ilgili fonksiyonlar kaldırıldı
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    handleBlur(name, value)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
-    // Supabase ile ilgili işlemler kaldırıldı, sadece form validation ve success state bırakıldı
-    if (!formData.urun_adi || !formData.kategori || !formData.satis_fiyati || !formData.urun_durumu || !formData.konum || !formData.telefon) {
-      setError('Tüm alanlar zorunludur.')
-      setIsSubmitting(false)
-      return
-    }
 
     try {
-      // Form verilerini al
+      // Form validasyonu
+      const validationErrors = validateForm(formData);
+      if (Object.keys(validationErrors).length > 0) {
+        setError('Lütfen form hatalarını düzeltin');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Resimleri kontrol et
+      const images = formData.urun_fotograflar
+        .filter(photo => photo.file instanceof File)
+        .map(photo => photo.file);
+
       const itemData = {
         urun_adi: formData.urun_adi,
         kategori: formData.kategori,
-        satis_fiyati: parseFloat(formData.satis_fiyati),
-        orijinal_fiyat: formData.orijinal_fiyat ? parseFloat(formData.orijinal_fiyat) : null,
+        satis_fiyati: formData.satis_fiyati,
         urun_durumu: formData.urun_durumu,
         konum: formData.konum,
         telefon: formData.telefon,
         eposta: formData.eposta,
         aciklama: formData.aciklama,
-        urun_fotograf: formData.urun_fotograf ? URL.createObjectURL(formData.urun_fotograf) : null, // Yüklenen dosyanın URL'sini tut
-        created_at: new Date().toISOString()
+        iletisim_tercihleri: formData.iletisim_tercihleri,
+        images: images, // Sadece geçerli File objelerini gönder
+        // Also send English field names for compatibility
+        title: formData.urun_adi,
+        category: formData.kategori, // İngilizce id
+        price: parseFloat(formData.satis_fiyati),
+        condition: formData.urun_durumu, // İngilizce id
+        location: formData.konum,
+        phone: formData.telefon,
+        email: formData.eposta,
+        description: formData.aciklama,
+        contactPreferences: formData.iletisim_tercihleri,
+        createdAt: new Date().toISOString()
       }
 
-      // Form verilerini state'e kaydet
-      setFormData(prev => ({
-        ...prev,
-        urun_fotograf: null // Yüklenen dosyayı temizle
-      }))
+      console.log('Form data being submitted:', itemData);
 
-      // Success state'i aktif et
+      if (images.length > 4) {
+        setError('En fazla 4 fotoğraf yükleyebilirsiniz!');
+        setIsSubmitting(false);
+        return;
+      }
+
+      onSubmit(itemData)
+      setFormData(prev => ({ ...prev, urun_fotograflar: [] }))
       setSuccess(true)
       setTimeout(() => {
-        onSuccess?.()
         onClose()
       }, 2000)
-
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
+      setError(err instanceof Error ? err.message : 'Beklenmeyen bir hata oluştu')
     } finally {
       setIsSubmitting(false)
     }
@@ -136,13 +246,47 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSuccess }) =
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
-    const file = e.dataTransfer.files[0]
-    if (file && file.type.startsWith('image/')) {
-      setFormData(prev => ({
-        ...prev,
-        urun_fotograf: URL.createObjectURL(file)
-      }))
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    
+    if (formData.urun_fotograflar.length + imageFiles.length > 4) {
+      alert('En fazla 4 fotoğraf yükleyebilirsiniz!');
+      return;
     }
+    
+    // Dosyaları doğrudan ekle (base64'e çevirme)
+    const newPhotos = imageFiles.map(file => ({
+      file: file,
+      preview: URL.createObjectURL(file)
+    }));
+    
+    setFormData(prev => ({
+      ...prev,
+      urun_fotograflar: [...prev.urun_fotograflar, ...newPhotos]
+    }));
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+    
+    if (formData.urun_fotograflar.length + imageFiles.length > 4) {
+      alert('En fazla 4 fotoğraf yükleyebilirsiniz!');
+      return;
+    }
+    
+    // Dosyaları ekle
+    const newPhotos = imageFiles.map(file => ({
+      file: file,
+      preview: URL.createObjectURL(file)
+    }));
+    
+    setFormData(prev => ({
+      ...prev,
+      urun_fotograflar: [...prev.urun_fotograflar, ...newPhotos]
+    }));
   }
 
   if (success) {
@@ -175,166 +319,240 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSuccess }) =
             </svg>
           </button>
         </div>
-        
-        <form onSubmit={handleSubmit} className="p-6">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Ürün Bilgileri */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Ürün Bilgileri</h4>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Ürün Adı *
-                </label>
-                <input
-                  type="text"
-                  name="urun_adi"
-                  value={formData.urun_adi}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="Örn: MacBook Pro 2019"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Kategori *
-                </label>
-                <select
-                  name="kategori"
-                  value={formData.kategori}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="">Kategori Seçin</option>
-                  {categories.map(category => (
-                    <option key={category.value} value={category.value}>
-                      {category.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Satış Fiyatı (TL) *
-                  </label>
-                  <input
-                    type="number"
-                    name="satis_fiyati"
-                    value={formData.satis_fiyati}
-                    onChange={handleInputChange}
-                    required
-                    min="0"
-                    step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="1500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Orijinal Fiyat (TL)
-                  </label>
-                  <input
-                    type="number"
-                    name="orijinal_fiyat"
-                    value={formData.orijinal_fiyat}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="2500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Ürün Durumu *
-                </label>
-                <select
-                  name="urun_durumu"
-                  value={formData.urun_durumu}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="">Durum Seçin</option>
-                  {conditions.map(condition => (
-                    <option key={condition.value} value={condition.value}>
-                      {condition.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Ürün Bilgileri */}
+          <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Ürün Bilgileri</h4>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ürün Adı *
+              </label>
+              <input
+                type="text"
+                name="urun_adi"
+                value={formData.urun_adi}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                required
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                  hasFieldError('urun_adi') && isFieldTouched('urun_adi')
+                    ? 'border-red-400 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-primary-500'
+                }`}
+                placeholder="Ürün adını girin"
+              />
+              {hasFieldError('urun_adi') && isFieldTouched('urun_adi') && (
+                <p className="mt-1 text-sm text-red-600">{errors.urun_adi}</p>
+              )}
             </div>
 
-            {/* İletişim Bilgileri */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">İletişim Bilgileri</h4>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Konum *
-                </label>
-                <select
-                  name="konum"
-                  value={formData.konum}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="">Şehir Seçin</option>
-                  {locations.map(location => (
-                    <option key={location.value} value={location.value}>
-                      {location.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Kategori *
+              </label>
+              <select
+                name="kategori"
+                value={formData.kategori}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                required
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                  hasFieldError('kategori') && isFieldTouched('kategori')
+                    ? 'border-red-400 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-primary-500'
+                }`}
+              >
+                <option value="">Kategori Seçin</option>
+                {categories.map(category => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+              {hasFieldError('kategori') && isFieldTouched('kategori') && (
+                <p className="mt-1 text-sm text-red-600">{errors.kategori}</p>
+              )}
+            </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Satış Fiyatı (TL) *
+              </label>
+              <input
+                type="number"
+                name="satis_fiyati"
+                value={formData.satis_fiyati}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                required
+                min="0"
+                step="0.01"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                  hasFieldError('satis_fiyati') && isFieldTouched('satis_fiyati')
+                    ? 'border-red-400 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-primary-500'
+                }`}
+                placeholder="1500"
+              />
+              {hasFieldError('satis_fiyati') && isFieldTouched('satis_fiyati') && (
+                <p className="mt-1 text-sm text-red-600">{errors.satis_fiyati}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ürün Durumu *
+              </label>
+              <select
+                name="urun_durumu"
+                value={formData.urun_durumu}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                required
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                  hasFieldError('urun_durumu') && isFieldTouched('urun_durumu')
+                    ? 'border-red-400 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-primary-500'
+                }`}
+              >
+                <option value="">Durum Seçin</option>
+                {conditions.map(condition => (
+                  <option key={condition.value} value={condition.value}>
+                    {condition.label}
+                  </option>
+                ))}
+              </select>
+              {hasFieldError('urun_durumu') && isFieldTouched('urun_durumu') && (
+                <p className="mt-1 text-sm text-red-600">{errors.urun_durumu}</p>
+              )}
+            </div>
+          </div>
+
+          {/* İletişim Bilgileri */}
+          <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">İletişim Bilgileri</h4>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Konum *
+              </label>
+              <select
+                name="konum"
+                value={formData.konum}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                required
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                  hasFieldError('konum') && isFieldTouched('konum')
+                    ? 'border-red-400 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-primary-500'
+                }`}
+              >
+                <option value="">Konum Seçin</option>
+                {locations.map(location => (
+                  <option key={location.value} value={location.value}>
+                    {location.label}
+                  </option>
+                ))}
+              </select>
+              {hasFieldError('konum') && isFieldTouched('konum') && (
+                <p className="mt-1 text-sm text-red-600">{errors.konum}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Telefon *
+              </label>
+              <input
+                type="tel"
+                name="telefon"
+                value={formData.telefon}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                required
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                  hasFieldError('telefon') && isFieldTouched('telefon')
+                    ? 'border-red-400 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-primary-500'
+                }`}
+                placeholder="+90 555 123 45 67"
+              />
+              {hasFieldError('telefon') && isFieldTouched('telefon') && (
+                <p className="mt-1 text-sm text-red-600">{errors.telefon}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                E-posta
+              </label>
+              <input
+                type="email"
+                name="eposta"
+                value={formData.eposta}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                  hasFieldError('eposta') && isFieldTouched('eposta')
+                    ? 'border-red-400 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-primary-500'
+                }`}
+                placeholder="ornek@email.com"
+              />
+              {hasFieldError('eposta') && isFieldTouched('eposta') && (
+                <p className="mt-1 text-sm text-red-600">{errors.eposta}</p>
+              )}
+            </div>
+          </div>
+
+          {/* İletişim Tercihleri */}
+          <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">İletişim Tercihleri</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefon Numarası *
+                  WhatsApp
                 </label>
                 <input
-                  type="tel"
-                  name="telefon"
-                  value={formData.telefon}
+                  type="checkbox"
+                  name="iletisim_tercihleri.whatsapp"
+                  checked={formData.iletisim_tercihleri.whatsapp}
                   onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="+90 555 123 45 67"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 />
               </div>
-
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Telefon
+                </label>
+                <input
+                  type="checkbox"
+                  name="iletisim_tercihleri.telefon"
+                  checked={formData.iletisim_tercihleri.telefon}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   E-posta
                 </label>
                 <input
-                  type="email"
-                  name="eposta"
-                  value={formData.eposta}
+                  type="checkbox"
+                  name="iletisim_tercihleri.eposta"
+                  checked={formData.iletisim_tercihleri.eposta}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="ornek@email.com"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 />
               </div>
             </div>
           </div>
 
           {/* Açıklama */}
-          <div className="mt-6">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Ürün Açıklaması *
             </label>
@@ -342,17 +560,25 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSuccess }) =
               name="aciklama"
               value={formData.aciklama}
               onChange={handleInputChange}
+              onBlur={handleInputBlur}
               required
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent resize-none ${
+                hasFieldError('aciklama') && isFieldTouched('aciklama')
+                  ? 'border-red-400 focus:ring-red-400'
+                  : 'border-gray-300 focus:ring-primary-500'
+              }`}
               placeholder="Ürününüzün detaylı açıklamasını yazın..."
             />
+            {hasFieldError('aciklama') && isFieldTouched('aciklama') && (
+              <p className="mt-1 text-sm text-red-600">{errors.aciklama}</p>
+            )}
           </div>
 
           {/* Fotoğraf Yükleme */}
-          <div className="mt-6">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ürün Fotoğrafı
+              Ürün Fotoğrafları (En fazla 4 adet)
             </label>
             <div 
               className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary-400 transition-colors"
@@ -360,76 +586,80 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSuccess }) =
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
             >
-              {formData.urun_fotograf ? (
-                <div>
-                  <img 
-                    src={formData.urun_fotograf} 
-                    alt="Preview" 
-                    className="mx-auto h-32 w-32 object-cover rounded-lg mb-4"
-                  />
-                  <p className="text-sm text-gray-600">
-                    {formData.urun_fotograf.name}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setFormData(prev => ({ ...prev, urun_fotograf: null }))
-                    }}
-                    className="mt-2 text-red-600 hover:text-red-800 text-sm"
-                  >
-                    Fotoğrafı Kaldır
-                  </button>
+              {formData.urun_fotograflar.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {formData.urun_fotograflar.map((photo, index) => (
+                    <div key={index} className="relative">
+                      <img 
+                        src={photo.preview} 
+                        alt={`Preview ${index + 1}`} 
+                        className="h-24 w-full object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setFormData(prev => ({
+                            ...prev,
+                            urun_fotograflar: prev.urun_fotograflar.filter((_, i) => i !== index)
+                          }))
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {formData.urun_fotograflar.length < 4 && (
+                    <div className="h-24 w-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-400 text-sm">+ Ekle</span>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <>
+                <div>
                   <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <p className="mt-2 text-sm text-gray-600">
                     Fotoğraf yüklemek için tıklayın veya sürükleyin
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    PNG, JPG, GIF maksimum 10MB
+                  <p className="mt-1 text-xs text-gray-500">
+                    PNG, JPG, GIF (max. 4 adet, her biri max. 10MB)
                   </p>
-                </>
+                </div>
               )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              className="hidden"
+            />
           </div>
 
-          {/* Buttons */}
-          <div className="flex justify-end space-x-3 mt-6 pt-6 border-t">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          <div className="flex justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
-              disabled={isSubmitting}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
             >
               İptal
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center"
+              disabled={isSubmitting || !isFormValid()}
+              className="px-6 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
             >
-              {isSubmitting ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Yükleniyor...
-                </>
-              ) : (
-                'İlanı Yayınla'
-              )}
+              {isSubmitting ? 'Yayınlanıyor...' : 'İlanı Yayınla'}
             </button>
           </div>
         </form>

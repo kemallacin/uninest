@@ -1,9 +1,51 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
+import { db } from '../lib/firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { useToast } from './ToastProvider'
 
 const AppPreview = () => {
+  const [email, setEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { showToast } = useToast()
+
+  const handleEarlyAccessSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!email.trim()) {
+      showToast('Lütfen e-posta adresinizi girin', 'error')
+      return
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      showToast('Lütfen geçerli bir e-posta adresi girin', 'error')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // Firebase'e erken erişim kaydını ekle
+      await addDoc(collection(db, 'early_access_registrations'), {
+        email: email.trim(),
+        timestamp: serverTimestamp(),
+        status: 'pending'
+      })
+
+      showToast('Erken erişim kaydınız alındı! Mobil uygulama çıktığında size haber vereceğiz.', 'success')
+      setEmail('')
+    } catch (error) {
+      console.error('Erken erişim kaydı hatası:', error)
+      showToast('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.', 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <section className="py-20 bg-gradient-to-br from-purple-50 to-indigo-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,56 +58,169 @@ const AppPreview = () => {
           </p>
         </div>
         <div className="flex flex-col lg:flex-row items-center justify-center gap-16">
-          {/* Telefon Mockup */}
-          <div className="relative w-[270px] h-[540px] flex items-center justify-center">
-            {/* Telefon gövdesi */}
-            <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-gray-200 to-gray-400 shadow-2xl border-4 border-white" />
-            {/* Ekran */}
-            <div className="absolute top-3 left-3 right-3 bottom-3 rounded-[2rem] bg-gradient-to-br from-indigo-600 to-purple-500 overflow-hidden flex flex-col items-center justify-between">
-              {/* Üst bar */}
-              <div className="w-full flex items-center justify-between px-6 pt-6">
-                <span className="text-white font-bold text-lg tracking-wide">UniNestCy</span>
-                <span className="flex space-x-1">
-                  <span className="w-2 h-2 bg-white rounded-full"></span>
-                  <span className="w-2 h-2 bg-white rounded-full"></span>
-                  <span className="w-2 h-2 bg-white rounded-full"></span>
-                </span>
+          {/* Gerçekçi Telefon Mockup */}
+          <div className="relative w-[300px] h-[600px] flex items-center justify-center">
+            {/* Telefon gövdesi - iPhone benzeri */}
+            <div className="absolute inset-0 rounded-[3rem] bg-gradient-to-b from-gray-800 to-gray-900 shadow-2xl border border-gray-700">
+              {/* Telefon çerçevesi */}
+              <div className="absolute inset-[3px] rounded-[2.8rem] bg-black">
+                {/* Ekran */}
+                <div className="absolute top-[12px] left-[12px] right-[12px] bottom-[12px] rounded-[2.5rem] bg-white overflow-hidden">
+                  {/* Status Bar */}
+                  <div className="w-full h-8 bg-[#3B1E6D] flex items-center justify-between px-6 text-white text-xs font-medium">
+                    <span>9:41</span>
+                    <div className="flex items-center space-x-1">
+                      <div className="flex space-x-1">
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                      </div>
+                      <span className="text-xs">100%</span>
+                      <div className="w-6 h-3 border border-white rounded-sm">
+                        <div className="w-full h-full bg-green-400 rounded-sm"></div>
+                      </div>
                     </div>
-              {/* Ana ikonlar */}
-              <div className="flex-1 flex flex-col items-center justify-center gap-8">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="flex flex-col items-center">
-                    <span className="text-4xl">🏠</span>
-                    <span className="text-white font-semibold mt-2">Ev Arkadaşı</span>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-4xl">🛍️</span>
-                    <span className="text-white font-semibold mt-2">2. El Eşya</span>
+
+                  {/* App Header */}
+                  <div className="bg-gradient-to-r from-[#3B1E6D] to-[#4F46E5] px-6 py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
+                          <span className="text-[#3B1E6D] font-bold text-lg">🏠</span>
+                        </div>
+                        <div>
+                          <h1 className="text-white font-bold text-lg">UniNestcy</h1>
+                          <p className="text-white/80 text-xs">Kıbrıs'ta Öğrenci Hayatı</p>
+                        </div>
+                      </div>
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* App Content - Ev Arkadaşı Kartı */}
+                  <div className="p-4 bg-gray-50 flex-1">
+                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-800 mb-1">Zeynep Özkan</h3>
+                          <p className="text-sm text-gray-600">Yakın Doğu Üniversitesi</p>
+                          <p className="text-xs text-gray-500">Tıp</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-yellow-400 text-sm">⭐</span>
+                          <span className="text-sm text-gray-600 font-medium">4.7</span>
+                        </div>
+                      </div>
+
+                      {/* Doğrulanmış Badge */}
+                      <div className="mb-3">
+                        <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+                          ✓ Doğrulanmış
+                        </span>
+                      </div>
+
+                      {/* Tip ve Fiyat */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          Ev Arıyor
+                        </span>
+                        <div className="flex items-center text-blue-600 font-bold text-sm">
+                          <span>£ 450 GBP</span>
+                        </div>
+                      </div>
+
+                      {/* Konum ve Tarih */}
+                      <div className="space-y-1 mb-3">
+                        <div className="flex items-center text-xs text-gray-600">
+                          <span className="mr-2">📍</span>
+                          <span>Lefkoşa</span>
+                        </div>
+                        <div className="flex items-center text-xs text-gray-600">
+                          <span className="mr-2">📅</span>
+                          <span>Müsait: 2024-01-20</span>
+                        </div>
+                        <div className="flex items-center text-xs text-gray-600">
+                          <span className="mr-2">🏠</span>
+                          <span>Tek kişilik oda</span>
+                        </div>
+                      </div>
+
+                      {/* Açıklama */}
+                      <p className="text-gray-600 text-xs mb-3 leading-relaxed">
+                        Tıp öğrencisi olduğum için çok çalışıyorum. Anlayışlı bir ev arkadaşı arıyorum.
+                      </p>
+
+                      {/* İlgi Alanları */}
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">Tıp</span>
+                        <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">Müzik</span>
+                        <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">Spor</span>
+                      </div>
+
+                      {/* Tercihler */}
+                      <div className="flex items-center gap-3 mb-4 text-xs text-gray-500">
+                        <span className="text-green-600">🚭 Sigara İçmez</span>
+                        <span className="text-gray-500">🚫 Evcil Hayvan Yok</span>
+                      </div>
+
+                      {/* Butonlar */}
+                      <div className="flex gap-2">
+                        <button className="flex-1 flex items-center justify-center gap-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-xs font-medium">
+                          👁️ Detay
+                        </button>
+                        <button className="flex-1 flex items-center justify-center gap-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white py-2 px-3 rounded-lg text-xs font-medium">
+                          💬 İletişim
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Alt kısımda diğer kartların başlangıcı */}
+                    <div className="bg-white rounded-t-2xl h-8 shadow-lg"></div>
+                  </div>
+
+                  {/* Bottom Navigation */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3">
+                    <div className="flex items-center justify-around">
+                      <div className="flex flex-col items-center">
+                        <span className="text-lg">🏠</span>
+                        <span className="text-xs text-purple-600 font-medium">Ev Arkadaşı</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-lg opacity-50">🛍️</span>
+                        <span className="text-xs text-gray-400">2. El Eşya</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-lg opacity-50">🚌</span>
+                        <span className="text-xs text-gray-400">Dolmuş</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-lg opacity-50">🎉</span>
+                        <span className="text-xs text-gray-400">Etkinlikler</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-4xl">🚌</span>
-                    <span className="text-white font-semibold mt-2">Dolmuş</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-4xl">🎉</span>
-                    <span className="text-white font-semibold mt-2">Etkinlikler</span>
-                  </div>
+
+                {/* Notch (Çentik) */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl flex items-center justify-center">
+                  <div className="w-12 h-1 bg-gray-600 rounded-full"></div>
                 </div>
-              </div>
-              {/* Alt bar */}
-              <div className="w-full flex items-center justify-center pb-6">
-                <span className="bg-white bg-opacity-30 text-white px-4 py-1 rounded-full text-sm font-medium shadow">Yakında Sizlerle!</span>
+
+                {/* Home Indicator */}
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-600 rounded-full"></div>
               </div>
             </div>
-            {/* Üstte hoparlör */}
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 w-16 h-2 rounded-full bg-gray-300 opacity-70" />
-            {/* Altta home butonu */}
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-gray-300 opacity-70" />
-            {/* Animasyonlu renkli daireler */}
-            <div className="absolute -top-6 -right-6 w-10 h-10 bg-yellow-400 rounded-full blur-xl opacity-60 animate-pulse" />
-            <div className="absolute -bottom-6 -left-6 w-8 h-8 bg-blue-400 rounded-full blur-xl opacity-60 animate-pulse" />
+
+            {/* Gölge ve Işık Efektleri */}
+            <div className="absolute -inset-4 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-[4rem] blur-2xl -z-10"></div>
+            <div className="absolute top-0 left-8 w-20 h-20 bg-yellow-300/20 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute bottom-8 right-8 w-16 h-16 bg-blue-300/20 rounded-full blur-xl animate-pulse delay-1000"></div>
           </div>
-          {/* Özellikler */}
+
+          {/* Özellikler - Aynı kalıyor */}
           <div className="space-y-8 max-w-lg">
             <div>
               <h3 className="text-2xl font-bold text-gray-900 mb-6">
@@ -125,16 +280,23 @@ const AppPreview = () => {
               <p className="text-primary-100 mb-4">
                 Mobil uygulama çıktığında ilk kullananlardan biri ol ve özel avantajlardan yararlan
               </p>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <form onSubmit={handleEarlyAccessSubmit} className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
                   placeholder="E-posta adresiniz"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="flex-1 px-4 py-2 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  disabled={isSubmitting}
                 />
-                <Link href="/hesap-olustur" className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-6 py-2 rounded-lg transition-colors duration-200">
-                  Kayıt Ol
-                </Link>
-              </div>
+                <button
+                  type="submit"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-6 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Kayıt Ediliyor...' : 'Kayıt Ol'}
+                </button>
+              </form>
             </div>
           </div>
         </div>
