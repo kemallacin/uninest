@@ -19,7 +19,6 @@ interface Note {
   fileName?: string;
   uploader: string;
   uploaderEmail: string;
-  date: string;
   fileSize: string;
   pageCount: number;
   downloadCount: number;
@@ -510,7 +509,9 @@ const NotlarClient = () => {
         return a.title.localeCompare(b.title);
       case 'date':
       default:
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+        return dateB.getTime() - dateA.getTime();
     }
   });
 
@@ -990,7 +991,15 @@ const NotlarClient = () => {
                         <div className="mr-2 text-purple-500">
                           <FaCalendar size={14} />
                         </div>
-                        <span>{new Date(note.date).toLocaleDateString('tr-TR')}</span>
+                        <span>
+                          {note.createdAt ? (
+                            note.createdAt.toDate ? 
+                              note.createdAt.toDate().toLocaleDateString('tr-TR') :
+                              new Date(note.createdAt).toLocaleDateString('tr-TR')
+                          ) : (
+                            'Tarih belirtilmemiş'
+                          )}
+                        </span>
                       </div>
                     </div>
 
