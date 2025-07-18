@@ -14,7 +14,6 @@ const nextConfig = {
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['@heroicons/react', 'lucide-react', 'framer-motion'],
-    optimizeCss: true,
     turbo: {
       rules: {
         '*.svg': {
