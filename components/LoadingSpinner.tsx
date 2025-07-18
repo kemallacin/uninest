@@ -4,12 +4,16 @@ interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   color?: 'primary' | 'white' | 'gray';
   className?: string;
+  fullScreen?: boolean;
+  text?: string;
 }
 
 export default function LoadingSpinner({ 
   size = 'md', 
   color = 'primary',
-  className = '' 
+  className = '',
+  fullScreen = false,
+  text
 }: LoadingSpinnerProps) {
   const sizeClasses = {
     sm: 'w-4 h-4',
@@ -23,9 +27,21 @@ export default function LoadingSpinner({
     gray: 'text-gray-500'
   };
 
+  if (fullScreen) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+        <div className="text-center">
+          <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-current ${sizeClasses[size]} ${colorClasses[color]} mb-4`} />
+          {text && <p className="text-gray-600 dark:text-gray-400">{text}</p>}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`flex items-center justify-center ${className}`}>
       <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-current ${sizeClasses[size]} ${colorClasses[color]}`} />
+      {text && <span className="ml-2 text-gray-600 dark:text-gray-400">{text}</span>}
     </div>
   );
 }
