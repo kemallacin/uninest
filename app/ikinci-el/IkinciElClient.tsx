@@ -28,6 +28,9 @@ interface SecondHandItem {
   createdAt: any;
   createdBy: string;
   isApproved: boolean;
+  isPremium?: boolean;
+  premiumAt?: any;
+  premiumBy?: string;
   approvedAt?: any;
   approvedBy?: string;
   status: string;
@@ -218,6 +221,15 @@ const IkinciElClient = () => {
     // Durum (id ile karşılaştır)
     const conditionMatch = !activeCondition || (item.condition && item.condition.toLowerCase() === activeCondition.toLowerCase());
     return searchMatch && priceMatch && categoryMatch && conditionMatch;
+  }).sort((a, b) => {
+    // Premium ilanları öne çıkar
+    if (a.isPremium && !b.isPremium) return -1;
+    if (!a.isPremium && b.isPremium) return 1;
+    
+    // Sonra tarihe göre sırala (en yeni önce)
+    const dateA = a.createdAt?.seconds || 0;
+    const dateB = b.createdAt?.seconds || 0;
+    return dateB - dateA;
   });
 
   // Onay bekleyen ilan sayısı
@@ -650,7 +662,7 @@ const IkinciElClient = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
       <PullToRefresh onRefresh={handleRefresh} className="min-h-screen">
         {/* Hero Section */}
@@ -721,7 +733,7 @@ const IkinciElClient = () => {
         {/* Search and Filter Section */}
         <div className="container mx-auto px-4 py-8">
           {/* Ana filtreleme bölümü */}
-          <div className="bg-white rounded-xl shadow-sm p-6 mx-4 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mx-4 mb-6">
             {/* Kategori filtreleri */}
             <div className="flex flex-wrap gap-3 mb-6">
               {categories.map((category) => (
@@ -731,7 +743,7 @@ const IkinciElClient = () => {
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     activeCategory === category.id
                       ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   <span className="text-lg">{category.icon}</span>
@@ -742,13 +754,13 @@ const IkinciElClient = () => {
             
             {/* Admin Onay Bekleyen İlanlar Butonu */}
             {isAdmin && (
-              <div className="mb-6 pt-4 border-t border-gray-200">
+              <div className="mb-6 pt-4 border-t border-gray-200 dark:border-gray-600">
                 <TouchButton
                   onClick={() => setShowPendingOnly(!showPendingOnly)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     showPendingOnly
                       ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
-                      : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                      : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/50'
                   }`}
                 >
                   <Clock size={16} />
@@ -764,24 +776,24 @@ const IkinciElClient = () => {
           </div>
 
           {/* Search and Filter Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
                   <input
                     type="text"
                     placeholder="Ürün adı, açıklama veya kategori ara..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                   />
                 </div>
               </div>
               <div className="flex flex-col md:flex-row gap-6 items-center">
                 {/* Fiyat Aralığı Slider */}
                 <div className="w-full md:w-1/2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Fiyat Aralığı</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fiyat Aralığı</label>
                   <input
                     type="range"
                     min="0"
@@ -791,18 +803,18 @@ const IkinciElClient = () => {
                     onChange={(e) => setPriceRangeValue(Number(e.target.value))}
                     className="w-full accent-blue-500"
                   />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                     <span>0 TL</span>
                     <span>10.000 TL</span>
                   </div>
                 </div>
                 {/* Kategori Dropdown */}
                 <div className="w-full md:w-1/4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
                   <select
                     value={activeCategory}
                     onChange={(e) => setActiveCategory(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="all">Tüm Kategoriler</option>
                     {categories.filter(c => c.id !== 'all').map(category => (
@@ -812,11 +824,11 @@ const IkinciElClient = () => {
                 </div>
                 {/* Durum Dropdown */}
                 <div className="w-full md:w-1/4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Durum</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Durum</label>
                   <select
                     value={activeCondition}
                     onChange={(e) => setActiveCondition(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="">Tüm Durumlar</option>
                     <option value="new">Sıfır</option>
@@ -830,7 +842,7 @@ const IkinciElClient = () => {
               <div className="flex flex-row gap-4 justify-end">
                 <button
                   onClick={handleClearFilters}
-                  className="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 transition"
+                  className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                 >
                   Filtreleri Temizle
                 </button>
@@ -847,7 +859,7 @@ const IkinciElClient = () => {
 
           {/* Results Count */}
           <div className="mb-6">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               {filteredItems.length} sonuç bulundu
             </p>
           </div>
@@ -860,7 +872,15 @@ const IkinciElClient = () => {
               const discount = item.originalPrice ? calculateDiscount(item.originalPrice, item.price) : 0;
               
               return (
-                <div key={item.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div key={item.id} className={`rounded-2xl transition-all duration-300 overflow-hidden relative ${
+                  item.isPremium 
+                    ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105' 
+                    : 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl'
+                }`}>
+                  {/* Premium Glow Effect */}
+                  {item.isPremium && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 via-purple-400/10 to-indigo-400/10 rounded-2xl pointer-events-none"></div>
+                  )}
                   {/* Image Section */}
                   <div className="relative h-48">
                     <img
@@ -872,9 +892,26 @@ const IkinciElClient = () => {
                       }}
                     />
                     
+                    {/* Premium Badge */}
+                    {item.isPremium && (
+                      <div className="absolute top-3 right-3 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-xl border border-white/20 backdrop-blur-sm">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        <span className="text-white drop-shadow-sm">👑 PREMIUM</span>
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      </div>
+                    )}
+                    
                     {/* Onay durumu badge */}
-                    {!item.isApproved && (
+                    {!item.isApproved && !item.isPremium && (
                       <div className="absolute top-3 left-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                        <Clock size={12} />
+                        Onay Bekliyor
+                      </div>
+                    )}
+                    
+                    {/* Onay durumu badge for Premium */}
+                    {!item.isApproved && item.isPremium && (
+                      <div className="absolute top-12 left-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                         <Clock size={12} />
                         Onay Bekliyor
                       </div>
@@ -896,25 +933,31 @@ const IkinciElClient = () => {
                   </div>
 
                   {/* Content Section */}
-                  <div className="p-6">
+                  <div className={`p-6 relative ${item.isPremium ? 'bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-900/20 dark:via-purple-900/10 dark:to-indigo-900/20' : ''}`}>
+                    {/* Premium Corner Decoration */}
+                    {item.isPremium && (
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-pink-400/20 to-transparent rounded-bl-full"></div>
+                    )}
                     {/* Title and Price */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-800 mb-1 line-clamp-2">{item.title}</h3>
-                        <p className="text-sm text-gray-600">{item.category}</p>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1 line-clamp-2">{item.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{item.category}</p>
                       </div>
                       <div className="flex flex-col items-end">
                         {/* İndirim varsa önceki fiyatı göster */}
                         {item.previousPrice && item.previousPrice > item.price && (
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm text-gray-400 line-through">{item.previousPrice} TL</span>
+                            <span className="text-sm text-gray-400 dark:text-gray-500 line-through">{item.previousPrice} TL</span>
                             <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">
                               %{calculateDiscount(item.previousPrice, item.price)} İndirim
                             </span>
                           </div>
                         )}
-                        <div className="flex items-center text-blue-600 font-bold text-lg">
+                        <div className={`flex items-center font-bold text-lg ${item.isPremium ? 'text-purple-600 dark:text-purple-400' : 'text-blue-600 dark:text-blue-400'}`}>
+                          {item.isPremium && <span className="text-pink-500 mr-1">💎</span>}
                           <span>{item.price} TL</span>
+                          {item.isPremium && <span className="text-pink-500 ml-1">💎</span>}
                         </div>
                       </div>
                     </div>
@@ -922,10 +965,10 @@ const IkinciElClient = () => {
                     {/* Condition Badge */}
                     <div className="mb-3">
                       <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                        item.condition === 'new' ? 'bg-green-100 text-green-700' : 
-                        item.condition === 'like-new' ? 'bg-blue-100 text-blue-700' :
-                        item.condition === 'good' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'
+                        item.condition === 'new' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 
+                        item.condition === 'like-new' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                        item.condition === 'good' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
+                        'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                       }`}>
                         {item.condition === 'new' ? 'Sıfır' :
                          item.condition === 'like-new' ? 'Sıfır Gibi' :
@@ -936,11 +979,11 @@ const IkinciElClient = () => {
 
                     {/* Location and Date */}
                     <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <MapPin size={14} className="mr-2" />
                         <span>{item.location || 'Konum belirtilmemiş'}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <Calendar size={14} className="mr-2" />
                         <span>
                           {item.createdAt?.toDate ? 
@@ -952,15 +995,15 @@ const IkinciElClient = () => {
                     </div>
 
                     {/* Description */}
-                    <p className="text-gray-600 text-sm mb-4 whitespace-pre-line">{item.description}</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 whitespace-pre-line">{item.description}</p>
 
                     {/* Onay durumu (sadece ilan sahibi veya admin görsün) */}
                     {(isOwner || isAdmin) && (
                       <div className="mb-4">
                         <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
                           item.isApproved 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' 
+                            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
                         }`}>
                           {item.isApproved ? (
                             <>
@@ -985,7 +1028,7 @@ const IkinciElClient = () => {
                           setShowDetailsModal(true);
                           setCurrentImageIndex(0);
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition"
+                        className="flex-1 flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium transition"
                       >
                         <Eye size={16} />
                         Detay
@@ -1011,8 +1054,8 @@ const IkinciElClient = () => {
                         onClick={() => toggleFavorite(item)}
                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition ${
                           favorites.includes(item.id)
-                            ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                         }`}
                       >
                         <Heart size={16} fill={favorites.includes(item.id) ? 'currentColor' : 'none'} />
@@ -1020,7 +1063,7 @@ const IkinciElClient = () => {
                       </button>
                       <button
                         onClick={() => handleShare(item)}
-                        className="flex items-center justify-center gap-2 bg-blue-100 text-blue-600 hover:bg-blue-200 py-2 px-4 rounded-lg font-medium transition"
+                        className="flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg font-medium transition"
                       >
                         <Share2 size={16} />
                       </button>
@@ -1093,8 +1136,8 @@ const IkinciElClient = () => {
           {filteredItems.length === 0 && (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🛍️</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Sonuç Bulunamadı</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Sonuç Bulunamadı</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Arama kriterlerinize uygun ürün bulunamadı.
               </p>
               <TouchButton
@@ -1114,23 +1157,23 @@ const IkinciElClient = () => {
         {/* Contact Modal */}
         {showContactModal && selectedItem && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">İletişime Geç</h3>
                 <TouchButton
                   onClick={() => setShowContactModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                 >
                   <X size={24} />
                 </TouchButton>
               </div>
               <div className="mb-6">
-                <h4 className="font-medium text-gray-900 text-lg">{selectedItem.title}</h4>
-                <p className="text-xl font-bold text-green-600 mt-2">{selectedItem.price} TL</p>
+                <h4 className="font-medium text-gray-900 dark:text-white text-lg">{selectedItem.title}</h4>
+                <p className="text-xl font-bold text-green-600 dark:text-green-400 mt-2">{selectedItem.price} TL</p>
               </div>
               <div className="space-y-6">
-                <div className="flex items-center gap-2 text-gray-600 bg-gray-50 p-3 rounded-lg">
-                  <MapPin size={18} className="text-gray-500" />
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <MapPin size={18} className="text-gray-500 dark:text-gray-400" />
                   <span className="font-medium">{selectedItem.location}</span>
                 </div>
                 
@@ -1174,7 +1217,7 @@ const IkinciElClient = () => {
               <div className="mt-6">
                 <TouchButton
                   onClick={() => setShowContactModal(false)}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 px-4 rounded-xl font-medium transition-colors"
+                  className="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 py-3 px-4 rounded-xl font-medium transition-colors"
                 >
                   Kapat
                 </TouchButton>
@@ -1186,7 +1229,7 @@ const IkinciElClient = () => {
         {/* Details Modal with Image Gallery */}
         {showDetailsModal && selectedItem && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="relative">
                 {(() => {
                   const images = selectedItem.images || [selectedItem.image];
@@ -1236,23 +1279,23 @@ const IkinciElClient = () => {
               </div>
               
               <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedItem.title}</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{selectedItem.title}</h2>
                 <div className="flex items-center gap-4 mb-4">
-                  <span className="text-2xl font-bold text-green-600">{selectedItem.price} TL</span>
+                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">{selectedItem.price} TL</span>
                   {selectedItem.originalPrice && (
-                    <span className="text-lg text-gray-400 line-through">{selectedItem.originalPrice} TL</span>
+                    <span className="text-lg text-gray-400 dark:text-gray-500 line-through">{selectedItem.originalPrice} TL</span>
                   )}
                   {/* İndirim oranı */}
                   {selectedItem.originalPrice && selectedItem.price < selectedItem.originalPrice && (
-                    <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
+                    <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-sm font-semibold">
                       %{calculateDiscount(selectedItem.originalPrice, selectedItem.price)} indirim
                     </span>
                   )}
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
                     {selectedItem.condition}
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-4 mb-4 text-gray-600">
+                <div className="flex flex-wrap items-center gap-4 mb-4 text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <MapPin size={16} />
                     <span>{selectedItem.location}</span>
@@ -1263,18 +1306,18 @@ const IkinciElClient = () => {
                   </div>
                   {/* Paylaşan kullanıcı ve saat */}
                   {(selectedItem.userName || selectedItem.userEmail) && (
-                    <div className="flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded">
-                      <span className="font-semibold text-gray-700">Paylaşan:</span>
-                      <span className="text-gray-800">{selectedItem.userName || '-'}</span>
-                      <span className="text-gray-400">/</span>
-                      <span className="text-gray-600">{selectedItem.userEmail || '-'}</span>
+                    <div className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                      <span className="font-semibold text-gray-700 dark:text-gray-300">Paylaşan:</span>
+                      <span className="text-gray-800 dark:text-gray-200">{selectedItem.userName || '-'}</span>
+                      <span className="text-gray-400 dark:text-gray-500">/</span>
+                      <span className="text-gray-600 dark:text-gray-400">{selectedItem.userEmail || '-'}</span>
                       {selectedItem.createdAt && (
-                        <span className="ml-2 text-gray-500">{new Date(selectedItem.createdAt?.toDate?.() || selectedItem.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="ml-2 text-gray-500 dark:text-gray-400">{new Date(selectedItem.createdAt?.toDate?.() || selectedItem.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
                       )}
                     </div>
                   )}
                 </div>
-                <p className="text-gray-700 mb-6 leading-relaxed whitespace-pre-line">{selectedItem.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed whitespace-pre-line">{selectedItem.description}</p>
                 
                 {/* Aksiyon butonları */}
                 <div className="flex gap-2">
@@ -1296,7 +1339,7 @@ const IkinciElClient = () => {
                   </TouchButton>
                   <TouchButton
                     onClick={() => setShowDetailsModal(false)}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 px-6 rounded-lg font-medium"
+                    className="flex-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 py-3 px-6 rounded-lg font-medium"
                   >
                     Kapat
                   </TouchButton>

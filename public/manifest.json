@@ -1,0 +1,139 @@
+{
+  "name": "UniNestcy - Kıbrıs Üniversite Öğrenci Platformu",
+  "short_name": "UniNestcy",
+  "description": "Kıbrıs üniversite öğrencileri için ev arkadaşı bulma, ikinci el eşya alım-satım, etkinlik paylaşımı ve daha fazlası",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "tr",
+  "dir": "ltr",
+  "categories": ["education", "social", "lifestyle"],
+  "icons": [
+    {
+      "src": "/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ev Arkadaşı Ara",
+      "short_name": "Ev Arkadaşı",
+      "description": "Ev arkadaşı ilanlarını görüntüle",
+      "url": "/ev-arkadasi",
+      "icons": [
+        {
+          "src": "/icons/home-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "İkinci El Eşya",
+      "short_name": "2. El",
+      "description": "İkinci el eşya alım-satım",
+      "url": "/ikinci-el",
+      "icons": [
+        {
+          "src": "/icons/shopping-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Etkinlikler",
+      "short_name": "Etkinlikler",
+      "description": "Etkinlikleri görüntüle",
+      "url": "/etkinlikler",
+      "icons": [
+        {
+          "src": "/icons/calendar-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Not Paylaşımı",
+      "short_name": "Notlar",
+      "description": "Ders notlarını paylaş",
+      "url": "/notlar",
+      "icons": [
+        {
+          "src": "/icons/notes-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ana Sayfa - Mobil"
+    },
+    {
+      "src": "/screenshots/home-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Ana Sayfa - Masaüstü"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "protocol_handlers": [
+    {
+      "protocol": "web+uninestcy",
+      "url": "/%s"
+    }
+  ]
+} 

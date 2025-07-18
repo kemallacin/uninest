@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "../../../lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
+import Image from "next/image";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 
@@ -120,7 +121,15 @@ export default function RoommateDetailPage() {
         <h1 className="text-2xl font-bold mb-6">Ev Arkadaşı İlan Detayı</h1>
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
           {roommate.image && (
-            <img src={roommate.image} alt={roommate.name} className="w-full h-64 object-cover rounded mb-6" />
+            <Image 
+              src={roommate.image} 
+              alt={roommate.name} 
+              width={800}
+              height={400}
+              className="w-full h-64 object-cover rounded mb-6"
+              priority={true}
+              quality={85}
+            />
           )}
           <h2 className="text-xl font-semibold mb-2">{roommate.name}</h2>
           <p className="text-gray-700 mb-4">{roommate.description}</p>

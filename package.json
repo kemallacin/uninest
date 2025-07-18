@@ -6,7 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "analyze": "ANALYZE=true npm run build",
+    "analyze:win": "set ANALYZE=true && npm run build",
+    "build:prod": "NODE_ENV=production npm run build",
+    "build:win": "set NODE_ENV=production && npm run build",
+    "lighthouse": "lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html",
+    "performance": "npm run build && npm run lighthouse",
+    "test:performance": "node scripts/test-performance.js",
+    "test:all": "npm run build && npm run test:performance",
+    "test:quick": "lighthouse http://localhost:3000 --output=json --output-path=./quick-test.json --only-categories=performance"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
@@ -31,6 +40,7 @@
     "zustand": "^4.4.6"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.4.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

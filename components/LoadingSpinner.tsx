@@ -1,49 +1,52 @@
-import React from 'react'
+import React from 'react';
 
 interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  color?: 'primary' | 'white' | 'gray'
-  text?: string
-  fullScreen?: boolean
+  size?: 'sm' | 'md' | 'lg';
+  color?: 'primary' | 'white' | 'gray';
+  className?: string;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
+export default function LoadingSpinner({ 
   size = 'md', 
-  color = 'primary', 
-  text,
-  fullScreen = false 
-}) => {
+  color = 'primary',
+  className = '' 
+}: LoadingSpinnerProps) {
   const sizeClasses = {
     sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16'
-  }
+    md: 'w-6 h-6',
+    lg: 'w-8 h-8'
+  };
 
   const colorClasses = {
-    primary: 'text-primary-600',
+    primary: 'text-purple-500',
     white: 'text-white',
-    gray: 'text-gray-600'
-  }
+    gray: 'text-gray-500'
+  };
 
-  const spinner = (
-    <div className="flex flex-col items-center justify-center">
-      <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-current ${sizeClasses[size]} ${colorClasses[color]}`}></div>
-      {text && (
-        <p className="mt-3 text-sm text-gray-600 font-medium">{text}</p>
-      )}
+  return (
+    <div className={`flex items-center justify-center ${className}`}>
+      <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-current ${sizeClasses[size]} ${colorClasses[color]}`} />
     </div>
-  )
-
-  if (fullScreen) {
-    return (
-      <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
-        {spinner}
-      </div>
-    )
-  }
-
-  return spinner
+  );
 }
 
-export default LoadingSpinner 
+// Page loading component
+export function PageLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+      <div className="text-center">
+        <LoadingSpinner size="lg" color="primary" className="mb-4" />
+        <p className="text-gray-600 dark:text-gray-400">Yükleniyor...</p>
+      </div>
+    </div>
+  );
+}
+
+// Inline loading component
+export function InlineLoading() {
+  return (
+    <div className="flex items-center justify-center py-4">
+      <LoadingSpinner size="md" color="primary" />
+    </div>
+  );
+} 

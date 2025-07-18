@@ -1,19 +1,17 @@
-export const metadata = {
-  title: 'Admin Paneli | UniNestcy',
-  description: 'UniNestcy admin paneli. Kullanıcıları, ilanları ve platform içeriklerini yönetin.',
-  keywords: 'admin, yönetim paneli, UniNestcy, yönetici',
-  robots: 'noindex, nofollow',
-  openGraph: {
-    title: 'Admin Paneli | UniNestcy',
-    description: 'UniNestcy admin paneli. Kullanıcıları, ilanları ve platform içeriklerini yönetin.',
-    type: 'website',
-    locale: 'tr_TR',
-    siteName: 'UniNestcy',
-  },
-};
+import dynamic from 'next/dynamic'
+import { Suspense } from 'react'
+import { PageLoading } from '../../components/LoadingSpinner'
 
-import AdminClient from './AdminClient';
+// Dynamically import the heavy client component
+const AdminClient = dynamic(() => import('./AdminClient'), {
+  loading: () => <PageLoading />,
+  ssr: false
+})
 
 export default function AdminPage() {
-  return <AdminClient />;
+  return (
+    <Suspense fallback={<PageLoading />}>
+      <AdminClient />
+    </Suspense>
+  )
 } 

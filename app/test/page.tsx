@@ -6,7 +6,13 @@ export const metadata = {
 };
 
 import TestClient from './TestClient';
+import { ThemeDebug } from '../../components/ThemeDebug';
 
 export default function Page() {
-  return <TestClient />;
+  return (
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
+      <TestClient />
+      <ThemeDebug />
+    </div>
+  );
 }

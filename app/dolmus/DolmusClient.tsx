@@ -299,8 +299,7 @@ const DolmusClient = () => {
         { time: '16:00', type: 'normal' as const },
         { time: '17:00', type: 'normal' as const },
         { time: '18:00', type: 'normal' as const },
-        { time: '19:00', type: 'normal' as const },
-        { time: '20:00', type: 'normal' as const }
+        { time: '19:00', type: 'normal' as const }
       ]
     },
     'lefke-gazimagusa': {
@@ -413,7 +412,7 @@ const DolmusClient = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <Header />
       
       {/* Hero Section */}
@@ -451,15 +450,15 @@ const DolmusClient = () => {
           {/* University Information Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* NEU Card */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-3xl">🚌</span>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">Yakın Doğu Üniversitesi</h3>
-                  <p className="text-gray-600">Güncel otobüs saatleri</p>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white">Yakın Doğu Üniversitesi</h3>
+                  <p className="text-gray-600 dark:text-gray-400">Güncel otobüs saatleri</p>
                 </div>
               </div>
-              <p className="text-gray-700 mb-4">
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Kampüs servisleri ve şehirler arası otobüs saatlerini görüntüleyin.
               </p>
               <a
@@ -476,19 +475,19 @@ const DolmusClient = () => {
             </div>
 
             {/* Other Universities Card */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-gray-300">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-l-4 border-gray-300 dark:border-gray-600">
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-3xl">⏳</span>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">Diğer Üniversiteler</h3>
-                  <p className="text-gray-600">Yakında eklenecek</p>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white">Diğer Üniversiteler</h3>
+                  <p className="text-gray-600 dark:text-gray-400">Yakında eklenecek</p>
                 </div>
               </div>
-              <p className="text-gray-700 mb-4">
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Avrupa Üniversitesi, Kıbrıs Uluslararası Üniversitesi ve diğer üniversitelerin 
                 otobüs saatleri yakında burada olacak.
               </p>
-              <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-500 px-6 py-3 rounded-lg font-medium">
+              <div className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-6 py-3 rounded-lg font-medium">
                 <span className="text-sm">Geliştirme aşamasında</span>
                 <span className="text-lg">🔧</span>
               </div>
@@ -496,19 +495,19 @@ const DolmusClient = () => {
           </div>
 
           {/* Additional Information */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Önemli Bilgiler</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Önemli Bilgiler</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-semibold text-gray-700 mb-2">📅 Güncellemeler</h4>
-                <p className="text-gray-600 text-sm">
+                <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">📅 Güncellemeler</h4>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
                   Otobüs saatleri düzenli olarak güncellenir. 
                   En güncel bilgiler için üniversitelerin resmi sitelerini takip edin.
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-700 mb-2">⚠️ Önemli Not</h4>
-                <p className="text-gray-600 text-sm">
+                <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">⚠️ Önemli Not</h4>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
                   Sefer saatleri hava durumu, trafik ve özel durumlara göre değişebilir. 
                   Yolculuk öncesi son kontrolü yapmanızı öneririz.
                 </p>

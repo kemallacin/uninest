@@ -2,8 +2,12 @@ import React from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import './mobile-optimizations.css'
+import { AuthProvider } from '../lib/auth/AuthContext'
 import ToastProvider from '../components/ToastProvider'
-import ErrorBoundary from '../components/ErrorBoundary'
+import { SimpleNotificationProvider } from '../components/SimpleNotificationSystem'
+import { ThemeProvider } from '../components/ThemeProvider'
+import PerformanceMonitor from '../components/PerformanceMonitor'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,6 +20,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://uninestcy.com'),
   title: 'UniNestcy | Kibris Ogrenci Platformu',
   description: 'Kibris\'ta ogrenciler icin ikinci el esya, not, etkinlik ve ev arkadasi bulma platformu. Guvenli, hizli, ogrenci dostu.',
   openGraph: {
@@ -75,12 +80,41 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body className={`${inter.className} bg-white text-black min-h-screen antialiased`}>
-        <ErrorBoundary>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
-        </ErrorBoundary>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "UniNestcy",
+              "description": "Kıbrıs'ta öğrenciler için ikinci el eşya, not, etkinlik ve ev arkadaşı bulma platformu",
+              "url": "https://uninestcy.com",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://uninestcy.com/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "UniNestcy",
+                "url": "https://uninestcy.com"
+              }
+            })
+          }}
+        />
+      </head>
+      <body className={`${inter.className} bg-white dark:bg-gray-900 text-black dark:text-white min-h-screen antialiased transition-colors duration-200`}>
+        <ThemeProvider>
+          <AuthProvider>
+            <SimpleNotificationProvider>
+              <ToastProvider>
+                {children}
+                <PerformanceMonitor />
+              </ToastProvider>
+            </SimpleNotificationProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

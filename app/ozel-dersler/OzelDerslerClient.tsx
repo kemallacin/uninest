@@ -197,6 +197,15 @@ const OzelDerslerClient = () => {
         checkBudgetRange(item.budget, priceRange));
       
       return matchesSearch && matchesSubject && matchesLocation && matchesPrice;
+    }).sort((a, b) => {
+      // Premium ilanları öne çıkar
+      if (a.isPremium && !b.isPremium) return -1;
+      if (!a.isPremium && b.isPremium) return 1;
+      
+      // Sonra tarihe göre sırala (en yeni önce)
+      const dateA = a.createdAt?.seconds || 0;
+      const dateB = b.createdAt?.seconds || 0;
+      return dateB - dateA;
     });
   };
 
@@ -521,7 +530,7 @@ const OzelDerslerClient = () => {
   const filteredItems = getFilteredItems();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
       
       {/* Hero Section */}
@@ -574,7 +583,7 @@ const OzelDerslerClient = () => {
       {/* Search and Filter Section */}
       <div className="container mx-auto px-4 py-8">
         {/* Ana filtreleme bölümü */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mx-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mx-4 mb-6">
           {/* Arama çubuğu */}
           <div className="relative flex-1 mb-6">
             <input
@@ -582,9 +591,9 @@ const OzelDerslerClient = () => {
               placeholder={`${activeTab === 'veren' ? 'Öğretmen' : 'Öğrenci'} veya ders ara...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
             />
-            <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
           </div>
 
           {/* Filtre seçenekleri */}
@@ -593,7 +602,7 @@ const OzelDerslerClient = () => {
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">Ders Seçin</option>
               {subjects.slice(1).map(subject => (
@@ -607,7 +616,7 @@ const OzelDerslerClient = () => {
             <select
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">Konum Seçin</option>
               {locations.slice(1).map(location => (
@@ -621,7 +630,7 @@ const OzelDerslerClient = () => {
             <select
               value={priceRange}
               onChange={(e) => setPriceRange(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">Fiyat Seçin</option>
               <option value="0-100">0-100 TL</option>
@@ -640,7 +649,7 @@ const OzelDerslerClient = () => {
                 setSelectedLocation('');
                 setPriceRange('');
               }}
-              className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+              className="px-6 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
             >
               Filtreleri Temizle
             </button>
@@ -656,7 +665,7 @@ const OzelDerslerClient = () => {
 
         {/* Results Count */}
         <div className="mb-6">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             {filteredItems.length} sonuç bulundu
           </p>
         </div>
@@ -667,10 +676,10 @@ const OzelDerslerClient = () => {
         {filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📚</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               {activeTab === 'veren' ? 'Öğretmen bulunamadı' : 'Öğrenci bulunamadı'}
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               Arama kriterlerinize uygun {activeTab === 'veren' ? 'öğretmen' : 'öğrenci'} bulunamadı.
             </p>
             <TouchButton
@@ -688,21 +697,41 @@ const OzelDerslerClient = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                {/* Profile Content */}
-                <div className="p-6">
+              <div key={item.id} className={`rounded-2xl transition-all duration-300 overflow-hidden relative ${
+                item.isPremium 
+                  ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105' 
+                  : 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl'
+              }`}>
+                {/* Premium Glow Effect */}
+                {item.isPremium && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 via-purple-400/10 to-indigo-400/10 rounded-2xl pointer-events-none"></div>
+                )}
+                                  {/* Profile Content */}
+                  <div className={`p-6 relative ${item.isPremium ? 'bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-900/20 dark:via-purple-900/10 dark:to-indigo-900/20' : ''}`}>
+                    {/* Premium Corner Decoration */}
+                    {item.isPremium && (
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-pink-400/20 to-transparent rounded-bl-full"></div>
+                    )}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800 mb-1">{item.name}</h3>
-                      <p className="text-sm text-gray-600">{item.university}</p>
-                      <p className="text-xs text-gray-500">{item.department}</p>
+                      <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1">{item.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{item.university}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">{item.department}</p>
                     </div>
+                    {/* Premium Badge */}
+                    {item.isPremium && (
+                      <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-xl border border-white/20 backdrop-blur-sm">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        <span className="text-white drop-shadow-sm">👑 PREMIUM</span>
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Verification Badge */}
                   {item.isVerified && (
                     <div className="mb-3">
-                      <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                      <span className="inline-block bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1 rounded-full text-sm font-medium">
                         ✓ Doğrulanmış
                       </span>
                     </div>
@@ -710,31 +739,33 @@ const OzelDerslerClient = () => {
 
                   {/* Type and Price */}
                   <div className="flex items-center justify-between mb-3">
-                    <span className="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="inline-block bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
                       {item.subject}
                     </span>
-                    <div className="flex items-center text-blue-600 font-bold">
+                    <div className={`flex items-center font-bold ${item.isPremium ? 'text-purple-600 dark:text-purple-400' : 'text-blue-600 dark:text-blue-400'}`}>
+                      {item.isPremium && <span className="text-pink-500 mr-1">💎</span>}
                       <DollarSign size={16} className="mr-1" />
                       {activeTab === 'veren' ? `${item.price} TL/saat` : `${item.budget} TL/saat`}
+                      {item.isPremium && <span className="text-pink-500 ml-1">💎</span>}
                     </div>
                   </div>
 
                   {/* Location and Additional Info */}
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                       <MapPin size={14} className="mr-2" />
                       <span>{item.location}</span>
                     </div>
                     {activeTab === 'veren' ? (
                       <>
-                        <div className="flex items-center text-sm text-gray-600">
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                           <Clock size={14} className="mr-2" />
                           <span>Deneyim: {item.experience}</span>
                         </div>
 
                       </>
                     ) : (
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <Clock size={14} className="mr-2" />
                         <span>Son Tarih: {item.deadline}</span>
                       </div>
@@ -742,18 +773,18 @@ const OzelDerslerClient = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">{item.description}</p>
 
                   {/* Additional Features */}
                   <div className="flex flex-wrap gap-1 mb-4">
                     {activeTab === 'veren' && item.online && (
-                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                      <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded text-xs">
                         Online Ders Uygun
                       </span>
                     )}
                     {activeTab === 'alan' && (
                       <span className={`px-2 py-1 rounded text-xs ${
-                        item.urgency === 'Acil' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                        item.urgency === 'Acil' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                       }`}>
                         {item.urgency}
                       </span>
@@ -765,12 +796,12 @@ const OzelDerslerClient = () => {
                     <div className="flex items-center gap-2 mb-4">
                       <div className="flex items-center">
                         {renderStars(item.rating, item.id, true)}
-                        <span className="ml-1 text-sm font-medium">
+                        <span className="ml-1 text-sm font-medium text-gray-800 dark:text-white">
                           {userRatings[item.id] || item.rating || 0}
                         </span>
                       </div>
-                      <span className="text-gray-400 text-sm">({item.reviews_count || 0} değerlendirme)</span>
-                      <span className="text-xs text-blue-600">(Tıklayarak değerlendirin)</span>
+                      <span className="text-gray-400 dark:text-gray-500 text-sm">({item.reviews_count || 0} değerlendirme)</span>
+                      <span className="text-xs text-blue-600 dark:text-blue-400">(Tıklayarak değerlendirin)</span>
                     </div>
                   )}
 
@@ -778,7 +809,7 @@ const OzelDerslerClient = () => {
                   <div className="flex gap-2 mb-3">
                     <button
                       onClick={() => handleDetailsClick(item)}
-                      className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition"
+                      className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium transition"
                     >
                       <Eye size={16} />
                       Detay
@@ -798,8 +829,8 @@ const OzelDerslerClient = () => {
                       onClick={() => toggleFavorite(item)}
                       className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition ${
                         favorites.includes(item.id.toString())
-                          ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       <Heart size={16} fill={favorites.includes(item.id.toString()) ? 'currentColor' : 'none'} />
@@ -807,7 +838,7 @@ const OzelDerslerClient = () => {
                     </button>
                     <button
                       onClick={() => handleShare(item)}
-                      className="flex items-center justify-center gap-2 bg-blue-100 text-blue-600 hover:bg-blue-200 py-2 px-4 rounded-lg font-medium transition"
+                      className="flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg font-medium transition"
                     >
                       <Share2 size={16} />
                     </button>
@@ -818,14 +849,14 @@ const OzelDerslerClient = () => {
                     <div className="mt-2 flex gap-2">
                       <TouchButton
                         onClick={() => handleEdit(item)}
-                        className="flex-1 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 py-2 text-sm"
+                        className="flex-1 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 py-2 text-sm"
                       >
                         <Edit size={16} />
                         İlanı Düzenle
                       </TouchButton>
                       <TouchButton
                         onClick={() => handleDelete(item.id)}
-                        className="flex-1 flex items-center justify-center gap-2 text-red-600 hover:text-red-800 py-2 text-sm"
+                        className="flex-1 flex items-center justify-center gap-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 py-2 text-sm"
                       >
                         <Trash2 size={16} />
                         İlanı Sil
@@ -842,34 +873,34 @@ const OzelDerslerClient = () => {
       {/* Contact Modal */}
       {showContactModal && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white">
                   {activeTab === 'veren' ? 'İletişime Geç' : 'Teklif Ver'}
                 </h3>
                 <button
                   onClick={handleModalClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition"
                 >
-                  <X size={20} />
+                  <X size={20} className="text-gray-600 dark:text-gray-400" />
                 </button>
               </div>
               
-              <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-semibold">{selectedItem.name}</h4>
-                <p className="text-sm text-gray-600">{selectedItem.subject} - {selectedItem.location}</p>
+              <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <h4 className="font-semibold text-gray-800 dark:text-white">{selectedItem.name}</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{selectedItem.subject} - {selectedItem.location}</p>
               </div>
 
               <form onSubmit={handleContactSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Mesajınız
                   </label>
                   <textarea
                     required
                     rows={4}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                     placeholder={activeTab === 'veren' ? 'Merhaba, dersleriniz hakkında bilgi almak istiyorum...' : 'Merhaba, size özel ders vermek istiyorum...'}
                   />
                 </div>
@@ -878,7 +909,7 @@ const OzelDerslerClient = () => {
                   <button
                     type="button"
                     onClick={handleModalClose}
-                    className="flex-1 py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                    className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-gray-700 dark:text-gray-300"
                   >
                     İptal
                   </button>
@@ -898,15 +929,15 @@ const OzelDerslerClient = () => {
       {/* Details Modal */}
       {showDetailsModal && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold">Detaylı Bilgiler</h3>
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Detaylı Bilgiler</h3>
                 <button
                   onClick={handleModalClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition"
                 >
-                  <X size={20} />
+                  <X size={20} className="text-gray-600 dark:text-gray-400" />
                 </button>
               </div>
               
@@ -917,23 +948,23 @@ const OzelDerslerClient = () => {
                     {selectedItem.name.charAt(0)}
                   </div>
                   <div className="ml-4">
-                    <h4 className="text-xl font-bold">{selectedItem.name}</h4>
-                    <p className="text-gray-600">{selectedItem.university}</p>
-                    <p className="text-gray-500">{selectedItem.department} - {selectedItem.year}</p>
+                    <h4 className="text-xl font-bold text-gray-800 dark:text-white">{selectedItem.name}</h4>
+                    <p className="text-gray-600 dark:text-gray-400">{selectedItem.university}</p>
+                    <p className="text-gray-500 dark:text-gray-500">{selectedItem.department} - {selectedItem.year}</p>
                   </div>
                 </div>
 
                 {/* Subject and Location */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h5 className="font-semibold text-gray-700 mb-2">Ders</h5>
-                    <span className="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+                    <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Ders</h5>
+                    <span className="inline-block bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full">
                       {selectedItem.subject}
                     </span>
                   </div>
                   <div>
-                    <h5 className="font-semibold text-gray-700 mb-2">Konum</h5>
-                    <div className="flex items-center text-gray-600">
+                    <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Konum</h5>
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <MapPin size={16} className="mr-1" />
                       {selectedItem.location}
                     </div>
@@ -942,8 +973,8 @@ const OzelDerslerClient = () => {
 
                 {/* Description */}
                 <div>
-                  <h5 className="font-semibold text-gray-700 mb-2">Açıklama</h5>
-                  <p className="text-gray-600">{selectedItem.description}</p>
+                  <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Açıklama</h5>
+                  <p className="text-gray-600 dark:text-gray-400">{selectedItem.description}</p>
                 </div>
 
                 {activeTab === 'veren' ? (
@@ -951,24 +982,24 @@ const OzelDerslerClient = () => {
                     {/* Rating and Price */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h5 className="font-semibold text-gray-700 mb-2">Değerlendirme</h5>
+                        <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Değerlendirme</h5>
                         <div className="flex items-center">
                           {renderStars(selectedItem.rating)}
-                          <span className="ml-2 text-gray-600">({selectedItem.reviews_count || 0} değerlendirme)</span>
+                          <span className="ml-2 text-gray-600 dark:text-gray-400">({selectedItem.reviews_count || 0} değerlendirme)</span>
                         </div>
                       </div>
                       <div>
-                        <h5 className="font-semibold text-gray-700 mb-2">Fiyat</h5>
-                        <span className="text-green-600 font-bold text-lg">{selectedItem.price} TL/saat</span>
+                        <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Fiyat</h5>
+                        <span className="text-green-600 dark:text-green-400 font-bold text-lg">{selectedItem.price} TL/saat</span>
                       </div>
                     </div>
 
                     {/* Availability */}
                     <div>
-                      <h5 className="font-semibold text-gray-700 mb-2">Müsaitlik</h5>
+                      <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Müsaitlik</h5>
                       <div className="flex flex-wrap gap-2">
                         {selectedItem.availability.map((day: string, index: number) => (
-                          <span key={index} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                          <span key={index} className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full text-sm">
                             {day}
                           </span>
                         ))}
@@ -977,10 +1008,10 @@ const OzelDerslerClient = () => {
 
                     {/* Languages */}
                     <div>
-                      <h5 className="font-semibold text-gray-700 mb-2">Diller</h5>
+                      <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Diller</h5>
                       <div className="flex flex-wrap gap-2">
                         {selectedItem.languages.map((lang: string, index: number) => (
-                          <span key={index} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                          <span key={index} className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">
                             {lang}
                           </span>
                         ))}
@@ -989,10 +1020,10 @@ const OzelDerslerClient = () => {
 
                     {/* Contact Info */}
                     <div>
-                      <h5 className="font-semibold text-gray-700 mb-2">İletişim</h5>
+                      <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">İletişim</h5>
                       <div className="space-y-2">
-                        <p className="text-gray-600">📞 {selectedItem.phone}</p>
-                        <p className="text-gray-600">📧 {selectedItem.email}</p>
+                        <p className="text-gray-600 dark:text-gray-400">📞 {selectedItem.phone}</p>
+                        <p className="text-gray-600 dark:text-gray-400">📧 {selectedItem.email}</p>
                       </div>
                     </div>
                   </>
@@ -1001,20 +1032,20 @@ const OzelDerslerClient = () => {
                     {/* Budget and Deadline */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h5 className="font-semibold text-gray-700 mb-2">Bütçe</h5>
-                        <span className="text-green-600 font-bold">{selectedItem.budget} TL/saat</span>
+                        <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Bütçe</h5>
+                        <span className="text-green-600 dark:text-green-400 font-bold">{selectedItem.budget} TL/saat</span>
                       </div>
                       <div>
-                        <h5 className="font-semibold text-gray-700 mb-2">Son Tarih</h5>
-                        <span className="text-gray-600">{selectedItem.deadline}</span>
+                        <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Son Tarih</h5>
+                        <span className="text-gray-600 dark:text-gray-400">{selectedItem.deadline}</span>
                       </div>
                     </div>
 
                     {/* Urgency */}
                     <div>
-                      <h5 className="font-semibold text-gray-700 mb-2">Aciliyet</h5>
+                      <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Aciliyet</h5>
                       <span className={`inline-block px-3 py-1 rounded-full ${
-                        selectedItem.urgency === 'Acil' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                        selectedItem.urgency === 'Acil' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                       }`}>
                         {selectedItem.urgency}
                       </span>
@@ -1023,7 +1054,7 @@ const OzelDerslerClient = () => {
                 )}
               </div>
 
-              <div className="mt-6 pt-6 border-t">
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
                 <button
                   onClick={() => {
                     setShowDetailsModal(false);
@@ -1042,21 +1073,21 @@ const OzelDerslerClient = () => {
       {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold">İlan Ver</h3>
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white">İlan Ver</h3>
                 <button
                   onClick={handleModalClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition"
                 >
-                  <X size={20} />
+                  <X size={20} className="text-gray-600 dark:text-gray-400" />
                 </button>
               </div>
               
               {/* İlan Türü Seçimi */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                   İlan Türü *
                 </label>
                 <div className="grid grid-cols-2 gap-4">
@@ -1065,30 +1096,30 @@ const OzelDerslerClient = () => {
                     onClick={() => setActiveTab('veren')}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       activeTab === 'veren'
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2">
                       <BookOpen size={20} />
                       <span className="font-medium">Ders Veriyorum</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Öğretmen olarak ilan ver</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Öğretmen olarak ilan ver</p>
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab('alan')}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       activeTab === 'alan'
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2">
                       <Users size={20} />
                       <span className="font-medium">Ders Arıyorum</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Öğrenci olarak ilan ver</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Öğrenci olarak ilan ver</p>
                   </button>
                 </div>
               </div>
@@ -1099,8 +1130,8 @@ const OzelDerslerClient = () => {
                 {/* Seçilen İlan Türü Bilgisi */}
                 <div className={`p-4 rounded-lg border-l-4 ${
                   activeTab === 'veren' 
-                    ? 'bg-purple-50 border-purple-500 text-purple-700' 
-                    : 'bg-blue-50 border-blue-500 text-blue-700'
+                    ? 'bg-purple-50 dark:bg-purple-900/30 border-purple-500 text-purple-700 dark:text-purple-300' 
+                    : 'bg-blue-50 dark:bg-blue-900/30 border-blue-500 text-blue-700 dark:text-blue-300'
                 }`}>
                   <div className="flex items-center gap-2">
                     {activeTab === 'veren' ? <BookOpen size={20} /> : <Users size={20} />}
@@ -1118,19 +1149,19 @@ const OzelDerslerClient = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Adınız
                     </label>
                     <input
                       type="text"
                       name="name"
                       required
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                       placeholder="Adınız Soyadınız"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Ders
                     </label>
                     <select
@@ -1138,7 +1169,7 @@ const OzelDerslerClient = () => {
                       value={selectedSubject}
                       onChange={(e) => setSelectedSubject(e.target.value)}
                       required
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="">Ders Seçin</option>
                       {subjects.slice(1).map(subject => (
@@ -1155,7 +1186,7 @@ const OzelDerslerClient = () => {
                           value={customSubject}
                           onChange={(e) => setCustomSubject(e.target.value)}
                           placeholder="Ders adını yazın (örn: Müzik, Resim, Spor...)"
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                           required
                         />
                       </div>
@@ -1165,25 +1196,25 @@ const OzelDerslerClient = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Üniversite
                     </label>
                     <input
                       type="text"
                       name="university"
                       required
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                       placeholder="Üniversite Adı"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Konum
                     </label>
                     <select
                       name="location"
                       required
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="">Konum Seçin</option>
                       {locations.slice(1).map(location => (
@@ -1195,7 +1226,7 @@ const OzelDerslerClient = () => {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {activeTab === 'veren' ? 'Saatlik Ücret' : 'Bütçe'}
                     </label>
                     <input
@@ -1204,17 +1235,17 @@ const OzelDerslerClient = () => {
                       required
                       min="0"
                       step="0.01"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                       placeholder={activeTab === 'veren' ? '150' : '100'}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Para Birimi
                     </label>
                     <select
                       name="currency"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="TL">TL</option>
                       <option value="GBP">GBP</option>
@@ -1222,12 +1253,12 @@ const OzelDerslerClient = () => {
                   </div>
                   {activeTab === 'alan' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Aciliyet
                       </label>
                       <select
                         name="urgency"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       >
                         <option value="Normal">Normal</option>
                         <option value="Acil">Acil</option>
@@ -1238,13 +1269,13 @@ const OzelDerslerClient = () => {
 
                 {activeTab === 'veren' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Deneyim
                     </label>
                     <input
                       type="text"
                       name="experience"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                       placeholder="Örn: 3 yıl"
                     />
                   </div>
@@ -1252,51 +1283,51 @@ const OzelDerslerClient = () => {
 
                 {activeTab === 'alan' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Son Tarih
                     </label>
                     <input
                       type="date"
                       name="deadline"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Açıklama
                   </label>
                   <textarea
                     name="description"
                     required
                     rows={4}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                     placeholder="Deneyiminiz, özel alanlarınız veya ihtiyaçlarınız hakkında bilgi verin..."
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       E-posta
                     </label>
                     <input
                       type="email"
                       name="email"
                       required
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                       placeholder="email@example.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Telefon
                     </label>
                     <input
                       type="tel"
                       name="phone"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                       placeholder="+90 533 123 45 67"
                     />
                   </div>
@@ -1310,7 +1341,7 @@ const OzelDerslerClient = () => {
                       id="online"
                       className="rounded"
                     />
-                    <label htmlFor="online" className="text-sm text-gray-700">
+                    <label htmlFor="online" className="text-sm text-gray-700 dark:text-gray-300">
                       Online ders verebilirim
                     </label>
                   </div>
@@ -1320,7 +1351,7 @@ const OzelDerslerClient = () => {
                   <button
                     type="button"
                     onClick={handleModalClose}
-                    className="flex-1 py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                    className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-gray-700 dark:text-gray-300"
                   >
                     İptal
                   </button>

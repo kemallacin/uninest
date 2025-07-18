@@ -308,120 +308,120 @@ export default function RehberClient() {
       </div>
 
       {/* Main Content */}
-      <div className="bg-gradient-to-b from-gray-50 to-white">
+      <div className="bg-gradient-to-b from-gray-50 dark:from-gray-900 to-white dark:to-gray-800">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
 
-                        {/* Search Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <div className="relative max-w-md mx-auto">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                placeholder="Rehberde ara..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          {/* Categories */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Kategoriler</h3>
-            <div className="flex flex-wrap gap-3">
-              {categories.map(category => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    activeCategory === category.id
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <span className="mr-2">{category.icon}</span>
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Content Grid */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredContent.length === 0 ? (
-              <div className="col-span-full text-center py-16">
-                <div className="bg-white rounded-2xl p-8 shadow-lg">
-                  <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
+            {/* Search Bar */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+              <div className="relative max-w-md mx-auto">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Sonuç Bulunamadı</h3>
-                  <p className="text-gray-500">Aradığınız kriterlere uygun bilgi bulunamadı.</p>
                 </div>
+                <input
+                  type="text"
+                  placeholder="Rehberde ara..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                />
               </div>
-            ) : (
-              filteredContent.map((item, idx) => (
-                <div key={idx} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                  {/* Card Header */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${categories.find(c => c.id === activeCategory)?.color} flex items-center justify-center text-white text-lg shadow-lg`}>
-                      {categories.find(c => c.id === activeCategory)?.icon}
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 leading-tight">{item.title}</h3>
-                  </div>
+            </div>
 
-                  {/* Content */}
-                  <div className="text-gray-600 leading-relaxed mb-4 text-sm">
-                    {item.content}
-                  </div>
-
-                  {/* Tips Section */}
-                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <h4 className="text-sm font-semibold text-blue-900">Önemli İpuçları</h4>
-                    </div>
-                    <ul className="space-y-2">
-                      {item.tips.map((tip, tipIndex) => (
-                        <li key={tipIndex} className="flex items-start gap-2">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-blue-800 text-sm font-medium">{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-              
-              {/* Footer Section */}
-              <div className="mt-16 text-center">
-                <div className="bg-white rounded-2xl shadow-lg p-8">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">Daha Fazla Bilgi İçin</h3>
-                  <p className="text-gray-600 mb-6">
-                    Kıbrıs'ta öğrenci yaşamı hakkında daha detaylı bilgi almak için 
-                    diğer öğrencilerle iletişime geçebilir veya forum sayfamızı ziyaret edebilirsiniz.
-                  </p>
-                  <TouchButton
-                    onClick={() => {}}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-2xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+            {/* Categories */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Kategoriler</h3>
+              <div className="flex flex-wrap gap-3">
+                {categories.map(category => (
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveCategory(category.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      activeCategory === category.id
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
                   >
-                    Topluluğa Katıl
-                  </TouchButton>
+                    <span className="mr-2">{category.icon}</span>
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Content Grid */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredContent.length === 0 ? (
+                <div className="col-span-full text-center py-16">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+                    <svg className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
+                    </svg>
+                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Sonuç Bulunamadı</h3>
+                    <p className="text-gray-500 dark:text-gray-400">Aradığınız kriterlere uygun bilgi bulunamadı.</p>
+                  </div>
                 </div>
+              ) : (
+                filteredContent.map((item, idx) => (
+                  <div key={idx} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                    {/* Card Header */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${categories.find(c => c.id === activeCategory)?.color} flex items-center justify-center text-white text-lg shadow-lg`}>
+                        {categories.find(c => c.id === activeCategory)?.icon}
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-800 dark:text-white leading-tight">{item.title}</h3>
+                    </div>
+
+                    {/* Content */}
+                    <div className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 text-sm">
+                      {item.content}
+                    </div>
+
+                    {/* Tips Section */}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">Önemli İpuçları</h4>
+                      </div>
+                      <ul className="space-y-2">
+                        {item.tips.map((tip, tipIndex) => (
+                          <li key={tipIndex} className="flex items-start gap-2">
+                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-blue-800 dark:text-blue-200 text-sm font-medium">{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+                  
+            {/* Footer Section */}
+            <div className="mt-16 text-center">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Daha Fazla Bilgi İçin</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Kıbrıs'ta öğrenci yaşamı hakkında daha detaylı bilgi almak için 
+                  diğer öğrencilerle iletişime geçebilir veya forum sayfamızı ziyaret edebilirsiniz.
+                </p>
+                <TouchButton
+                  onClick={() => {}}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-2xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                >
+                  Topluluğa Katıl
+                </TouchButton>
               </div>
             </div>
           </div>
         </div>
-      </>
-    );
+      </div>
+    </>
+  );
 } 

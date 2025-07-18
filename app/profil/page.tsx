@@ -304,15 +304,15 @@ const Profil = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center max-w-md mx-auto p-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <HeartIcon className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Giriş Gerekli</h2>
-            <p className="text-gray-600 mb-6">Profil sayfasını görmek için giriş yapmanız gerekiyor.</p>
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+      <Header />
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <HeartIcon className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Giriş Gerekli</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">Profil sayfasını görmek için giriş yapmanız gerekiyor.</p>
             <a
               href="/giris"
               className="inline-block bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105"
@@ -327,21 +327,21 @@ const Profil = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
       <Header />
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Kullanıcı Bilgileri */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                 {user.displayName ? user.displayName.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">{user.displayName || 'Kullanıcı'}</h1>
-                <p className="text-gray-600">{user.email}</p>
-                <p className="text-sm text-gray-500">
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{user.displayName || 'Kullanıcı'}</h1>
+                <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Üye olma tarihi: {user.metadata.creationTime 
                     ? new Date(user.metadata.creationTime).toLocaleDateString('tr-TR')
                     : 'Bilinmiyor'
@@ -353,16 +353,16 @@ const Profil = () => {
 
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Favorilerim */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
                 <HeartIcon className="w-5 h-5 mr-2 text-red-500" />
                 Favorilerim ({favorites.length})
               </h2>
               
               {favorites.length === 0 ? (
                 <div className="text-center py-8">
-                  <HeartIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">Henüz favori ürününüz yok.</p>
+                  <HeartIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">Henüz favori ürününüz yok.</p>
                   <a
                     href="/ikinci-el"
                     className="inline-block bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-300"
@@ -373,7 +373,7 @@ const Profil = () => {
               ) : (
                 <div className="space-y-4">
                   {favorites.map((fav) => (
-                    <div key={fav.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={fav.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50 dark:bg-gray-700">
                       <div className="flex items-center gap-4">
                         <img 
                           src={fav.image || '/placeholder-image.jpg'} 
@@ -384,16 +384,16 @@ const Profil = () => {
                           }}
                         />
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800">{fav.title}</h3>
-                          <p className="text-gray-600 text-sm mb-1">{fav.description}</p>
-                          <p className="text-purple-600 font-bold">
+                          <h3 className="font-semibold text-gray-800 dark:text-white">{fav.title}</h3>
+                          <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">{fav.description}</p>
+                          <p className="text-purple-600 dark:text-purple-400 font-bold">
                             {fav.contentType === 'event' ? `${fav.price} TL` :
                              fav.contentType === 'note' ? `${fav.price}` :
                              fav.contentType === 'roommate' ? `${fav.price} TL` :
                              fav.contentType === 'tutor' ? `${fav.price} TL` :
                              `${fav.price?.toLocaleString()} TL`}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             {fav.contentType === 'event' ? 'Etkinlik' :
                              fav.contentType === 'note' ? 'Not' :
                              fav.contentType === 'roommate' ? 'Ev Arkadaşı' :
@@ -404,7 +404,7 @@ const Profil = () => {
                         <div className="flex flex-col gap-2">
                           <button
                             onClick={() => removeFromFavorites(fav.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                             title="Favoriden çıkar"
                           >
                             <TrashIcon className="w-4 h-4" />
@@ -415,7 +415,7 @@ const Profil = () => {
                                   fav.contentType === 'roommate' ? `/ev-arkadasi/${fav.id}` :
                                   fav.contentType === 'tutor' ? `/ozel-dersler/${fav.id}` :
                                   `/ikinci-el/${fav.id}`}
-                            className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                             title="İçeriği görüntüle"
                           >
                             <EyeIcon className="w-4 h-4" />
@@ -429,8 +429,8 @@ const Profil = () => {
             </div>
 
             {/* İlanlarım */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
                 <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
@@ -439,10 +439,10 @@ const Profil = () => {
               
               {myItems.length === 0 ? (
                 <div className="text-center py-8">
-                  <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
-                  <p className="text-gray-500 mb-4">Henüz ilanınız yok.</p>
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">Henüz ilanınız yok.</p>
                   <a
                     href="/ikinci-el"
                     className="inline-block bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-green-600 hover:to-blue-600 transition-all duration-300"
@@ -453,7 +453,7 @@ const Profil = () => {
               ) : (
                 <div className="space-y-4">
                   {myItems.map((item) => (
-                    <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={item.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50 dark:bg-gray-700">
                       <div className="flex items-center gap-4">
                         <img 
                           src={item.imageUrl || item.urun_fotograf || item.image || '/placeholder-image.jpg'} 
@@ -464,13 +464,13 @@ const Profil = () => {
                           }}
                         />
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800">{item.displayTitle}</h3>
-                          <p className="text-gray-600 text-sm mb-1">{item.displayDescription || item.description || item.aciklama || 'Açıklama yok'}</p>
-                          <p className="text-green-600 font-bold">
+                          <h3 className="font-semibold text-gray-800 dark:text-white">{item.displayTitle}</h3>
+                          <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">{item.displayDescription || item.description || item.aciklama || 'Açıklama yok'}</p>
+                          <p className="text-green-600 dark:text-green-400 font-bold">
                             {item.displayPrice?.toLocaleString()} TL
                           </p>
-                          <p className="text-xs text-gray-500">{item.displayCategory}</p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{item.displayCategory}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
                             {item.createdAt?.toDate ? 
                               item.createdAt.toDate().toLocaleDateString('tr-TR') : 
                               item.createdAt ? 
@@ -486,7 +486,7 @@ const Profil = () => {
                                   item.contentType === 'roommate' ? `/ev-arkadasi/${item.id}` :
                                   item.contentType === 'tutor' ? `/ozel-dersler/${item.id}` :
                                   `/ikinci-el/${item.id}`}
-                            className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                             title="İlanı düzenle"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -499,7 +499,7 @@ const Profil = () => {
                                   item.contentType === 'roommate' ? `/ev-arkadasi/${item.id}` :
                                   item.contentType === 'tutor' ? `/ozel-dersler/${item.id}` :
                                   `/ikinci-el/${item.id}`}
-                            className="p-2 text-green-500 hover:bg-green-50 rounded-lg transition-colors"
+                            className="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
                             title="İlanı görüntüle"
                           >
                             <EyeIcon className="w-4 h-4" />

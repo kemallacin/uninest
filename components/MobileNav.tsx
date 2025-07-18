@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { XMarkIcon, Bars3Icon, HomeIcon, UserGroupIcon, ShoppingBagIcon, BusIcon, CalendarIcon, AcademicCapIcon, DocumentTextIcon, MapIcon } from '@heroicons/react/24/outline'
+import { XMarkIcon, Bars3Icon, HomeIcon, UserGroupIcon, ShoppingBagIcon, CalendarIcon, AcademicCapIcon, DocumentTextIcon, MapIcon } from '@heroicons/react/24/outline'
 
 interface MobileNavProps {
   isOpen: boolean
@@ -31,7 +31,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose, user, onSignOut 
     { name: 'Ana Sayfa', href: '/', icon: HomeIcon },
     { name: 'Ev Arkadaşı', href: '/ev-arkadasi', icon: UserGroupIcon },
     { name: '2.El Eşya', href: '/ikinci-el', icon: ShoppingBagIcon },
-    { name: 'Dolmuş Saatleri', href: '/dolmus', icon: BusIcon },
+    { name: 'Dolmuş Saatleri', href: '/dolmus', icon: MapIcon }, // BusIcon yerine MapIcon kullanıldı
     { name: 'Etkinlikler', href: '/etkinlikler', icon: CalendarIcon },
     { name: 'Özel Dersler', href: '/ozel-dersler', icon: AcademicCapIcon },
     { name: 'Not Paylaşımı', href: '/notlar', icon: DocumentTextIcon },

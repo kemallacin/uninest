@@ -521,6 +521,18 @@ export default function EtkinliklerClient() {
       return matchesSearch && matchesCategory && matchesLocation;
     });
     
+    // Premium etkinlikleri öne çıkar
+    filtered.sort((a, b) => {
+      // Önce premium durumuna göre sırala
+      if (a.isPremium && !b.isPremium) return -1;
+      if (!a.isPremium && b.isPremium) return 1;
+      
+      // Sonra tarihe göre sırala (en yeni önce)
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateB.getTime() - dateA.getTime();
+    });
+    
     setFilteredEvents(filtered);
   };
 
@@ -825,7 +837,7 @@ export default function EtkinliklerClient() {
         rating: 0,
         reviews: 0,
         isVerified: false,
-        isApproved: false, // Admin onayı gerekli
+        isApproved: true, // Otomatik onay
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
         status: 'pending',
         imageUrl: imageUrl || ''
@@ -908,7 +920,7 @@ export default function EtkinliklerClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
         <Header />
         <LoadingSpinner />
         <Footer />
@@ -917,7 +929,7 @@ export default function EtkinliklerClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
       <Header />
       
       <PullToRefresh onRefresh={handleRefresh}>
@@ -974,12 +986,12 @@ export default function EtkinliklerClient() {
         {/* Filters Section */}
         {showFilters && (
           <div className="container mx-auto px-4 mb-8">
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-800">Filtreler</h3>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white">Filtreler</h3>
                 <TouchButton
                   onClick={() => setShowFilters(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
                   <X size={24} />
                 </TouchButton>
@@ -988,30 +1000,30 @@ export default function EtkinliklerClient() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Search */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Ara
                   </label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Etkinlik ara..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                     />
                   </div>
                 </div>
                 
                 {/* Category */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Kategori
                   </label>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     {categories.map(category => (
                       <option key={category} value={category}>{category}</option>
@@ -1021,17 +1033,17 @@ export default function EtkinliklerClient() {
                 
                 {/* Location */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Konum
                   </label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
                     <input
                       type="text"
                       value={selectedLocation}
                       onChange={(e) => setSelectedLocation(e.target.value)}
                       placeholder="Konum ara..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
                     />
                   </div>
                 </div>
@@ -1040,7 +1052,7 @@ export default function EtkinliklerClient() {
               <div className="flex justify-end mt-6">
                 <TouchButton
                   onClick={clearFilters}
-                  className="px-6 py-2 text-purple-600 hover:text-purple-700 font-medium"
+                  className="px-6 py-2 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-medium"
                 >
                   Filtreleri Temizle
                 </TouchButton>
@@ -1054,13 +1066,21 @@ export default function EtkinliklerClient() {
           {filteredEvents.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🎭</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Etkinlik Bulunamadı</h3>
-              <p className="text-gray-600">Arama kriterlerinizi değiştirmeyi deneyin.</p>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Etkinlik Bulunamadı</h3>
+              <p className="text-gray-600 dark:text-gray-400">Arama kriterlerinizi değiştirmeyi deneyin.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEvents.map((event) => (
-                <div key={event.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div key={event.id} className={`rounded-2xl transition-all duration-300 overflow-hidden relative ${
+                  event.isPremium 
+                    ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105' 
+                    : 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl'
+                }`}>
+                  {/* Premium Glow Effect */}
+                  {event.isPremium && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 via-purple-400/10 to-indigo-400/10 rounded-2xl pointer-events-none"></div>
+                  )}
                   {/* Event Image */}
                   <div className="relative h-48 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center overflow-hidden">
                     {event.imageUrl ? (
@@ -1084,14 +1104,35 @@ export default function EtkinliklerClient() {
                     
                     {/* Category Badge */}
                     <div className="absolute top-4 left-4">
-                      <span className="inline-block bg-white/90 text-purple-700 text-xs px-3 py-1 rounded-full font-medium">
+                      <span className="inline-block bg-white/90 dark:bg-gray-800/90 text-purple-700 dark:text-purple-300 text-xs px-3 py-1 rounded-full font-medium">
                         {event.category}
                       </span>
                     </div>
                     
-                    {/* Verified Badge */}
-                    {event.isVerified && (
+                    {/* Premium Badge */}
+                    {event.isPremium && (
                       <div className="absolute top-4 right-4">
+                        <span className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white text-xs px-4 py-2 rounded-full font-bold shadow-xl border border-white/20 backdrop-blur-sm">
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                          <span className="text-white drop-shadow-sm">👑 PREMIUM</span>
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Verified Badge */}
+                    {event.isVerified && !event.isPremium && (
+                      <div className="absolute top-4 right-4">
+                        <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                          <CheckCircle size={12} />
+                          Doğrulanmış
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Verified Badge for Premium */}
+                    {event.isVerified && event.isPremium && (
+                      <div className="absolute top-12 right-4">
                         <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                           <CheckCircle size={12} />
                           Doğrulanmış
@@ -1101,48 +1142,54 @@ export default function EtkinliklerClient() {
                   </div>
                   
                   {/* Event Content */}
-                  <div className="p-6">
+                  <div className={`p-6 relative ${event.isPremium ? 'bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-900/20 dark:via-purple-900/10 dark:to-indigo-900/20' : ''}`}>
+                    {/* Premium Corner Decoration */}
+                    {event.isPremium && (
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-pink-400/20 to-transparent rounded-bl-full"></div>
+                    )}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-800 mb-1 line-clamp-2">{event.title}</h3>
-                        <p className="text-sm text-gray-600">Düzenleyen: {event.organizer}</p>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1 line-clamp-2">{event.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Düzenleyen: {event.organizer}</p>
                       </div>
                     </div>
 
                     {/* Price */}
                     <div className="flex items-center justify-between mb-3">
-                      <span className="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+                      <span className="inline-block bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
                         {event.category}
                       </span>
-                      <div className="flex items-center text-green-600 font-bold">
+                      <div className={`flex items-center font-bold ${event.isPremium ? 'text-purple-600 dark:text-purple-400' : 'text-green-600 dark:text-green-400'}`}>
+                        {event.isPremium && <span className="text-pink-500 mr-1">💎</span>}
                         <DollarSign size={16} className="mr-1" />
                         {event.price === 0 ? 'Ücretsiz' : `${event.price} ${event.currency}`}
+                        {event.isPremium && <span className="text-pink-500 ml-1">💎</span>}
                       </div>
                     </div>
 
                     {/* Event Details */}
                     <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <Calendar size={14} className="mr-2" />
                         <span>{event.date} - {event.time}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <MapPin size={14} className="mr-2" />
                         <span>{event.location}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <Users size={14} className="mr-2" />
                         <span>{event.attendees}/{event.maxAttendees} katılımcı</span>
                       </div>
                     </div>
 
                     {/* Description */}
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{event.description}</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">{event.description}</p>
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1 mb-4">
                       {(event.tags || []).slice(0, 3).map((tag, index) => (
-                        <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                        <span key={index} className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs">
                           {tag}
                         </span>
                       ))}
@@ -1152,9 +1199,9 @@ export default function EtkinliklerClient() {
                     <div className="flex items-center gap-2 mb-4">
                       <div className="flex items-center">
                         <Star size={16} className="text-yellow-400 fill-current" />
-                        <span className="ml-1 text-sm font-medium">{event.rating}</span>
+                        <span className="ml-1 text-sm font-medium text-gray-800 dark:text-white">{event.rating}</span>
                       </div>
-                      <span className="text-gray-400 text-sm">({event.reviews} değerlendirme)</span>
+                      <span className="text-gray-400 dark:text-gray-500 text-sm">({event.reviews} değerlendirme)</span>
                     </div>
 
                     {/* Actions */}
@@ -1164,7 +1211,7 @@ export default function EtkinliklerClient() {
                           setSelectedEvent(event);
                           setShowDetailModal(true);
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition"
+                        className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium transition"
                       >
                         <Eye size={16} />
                         Detay
@@ -1187,7 +1234,7 @@ export default function EtkinliklerClient() {
                         onClick={() => toggleParticipation(event)}
                         className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition ${
                           participations.includes(event.id)
-                            ? 'bg-green-100 text-green-700 hover:bg-green-200 border-2 border-green-300'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 border-2 border-green-300 dark:border-green-600'
                             : 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white'
                         }`}
                       >
@@ -1203,8 +1250,8 @@ export default function EtkinliklerClient() {
                         onClick={() => toggleFavorite(event)}
                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition ${
                           favorites.includes(event.id)
-                            ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                         }`}
                       >
                         <svg 
@@ -1220,7 +1267,7 @@ export default function EtkinliklerClient() {
                       </button>
                       <button
                         onClick={() => handleShare(event)}
-                        className="flex items-center justify-center gap-2 bg-blue-100 text-blue-600 hover:bg-blue-200 py-2 px-4 rounded-lg font-medium transition"
+                        className="flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg font-medium transition"
                       >
                         <Share2 size={16} />
                       </button>
@@ -1231,14 +1278,14 @@ export default function EtkinliklerClient() {
                       <div className="mt-2 flex gap-2">
                         <TouchButton
                           onClick={() => handleEditEvent(event)}
-                          className="flex-1 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 py-2 text-sm"
+                          className="flex-1 flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 py-2 text-sm"
                         >
                           <Edit size={16} />
                           İlanı Düzenle
                         </TouchButton>
                         <TouchButton
                           onClick={() => handleDeleteEvent(event.id)}
-                          className="flex-1 flex items-center justify-center gap-2 text-red-600 hover:text-red-800 py-2 text-sm"
+                          className="flex-1 flex items-center justify-center gap-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 py-2 text-sm"
                         >
                           <Trash2 size={16} />
                           İlanı Sil
@@ -1255,13 +1302,13 @@ export default function EtkinliklerClient() {
         {/* Add Event Modal */}
         {showAddModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold text-gray-800">Etkinlik Oluştur</h3>
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Etkinlik Oluştur</h3>
                   <TouchButton
                     onClick={() => setShowAddModal(false)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                   >
                     <X size={24} />
                   </TouchButton>
@@ -1270,26 +1317,26 @@ export default function EtkinliklerClient() {
                 <form onSubmit={handleAddSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Etkinlik Adı *
                       </label>
                       <input
                         type="text"
                         value={formData.title}
                         onChange={(e) => setFormData({...formData, title: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         required
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Kategori *
                       </label>
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData({...formData, category: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         required
                       >
                         {categories.slice(1).map(category => (
@@ -1300,83 +1347,83 @@ export default function EtkinliklerClient() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Açıklama *
                     </label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
                       rows={4}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Tarih *
                       </label>
                       <input
                         type="date"
                         value={formData.date}
                         onChange={(e) => setFormData({...formData, date: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         required
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Saat *
                       </label>
                       <input
                         type="time"
                         value={formData.time}
                         onChange={(e) => setFormData({...formData, time: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         required
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Konum *
                     </label>
                     <input
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData({...formData, location: e.target.value})}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Maksimum Katılımcı *
                       </label>
                       <input
                         type="number"
                         value={formData.maxAttendees}
                         onChange={(e) => setFormData({...formData, maxAttendees: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         required
                         min="1"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Fiyat
                       </label>
                       <input
                         type="number"
                         value={formData.price}
                         onChange={(e) => setFormData({...formData, price: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         min="0"
                         step="0.01"
                         placeholder="0 (Ücretsiz)"
@@ -1384,13 +1431,13 @@ export default function EtkinliklerClient() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Para Birimi
                       </label>
                       <select
                         value={formData.currency}
                         onChange={(e) => setFormData({...formData, currency: e.target.value})}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       >
                         <option value="TL">TL</option>
                         <option value="USD">USD</option>
@@ -1401,7 +1448,7 @@ export default function EtkinliklerClient() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       İletişim Bilgisi *
                     </label>
                     <input
@@ -1409,13 +1456,13 @@ export default function EtkinliklerClient() {
                       value={formData.organizerContact}
                       onChange={(e) => setFormData({...formData, organizerContact: e.target.value})}
                       placeholder="E-posta veya telefon"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Etiketler
                     </label>
                     <input
@@ -1423,13 +1470,13 @@ export default function EtkinliklerClient() {
                       value={formData.tags}
                       onChange={(e) => setFormData({...formData, tags: e.target.value})}
                       placeholder="Virgülle ayırın (örn: müzik, dans, eğlence)"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                   
                   {/* Photo Upload */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Etkinlik Fotoğrafı
                     </label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors relative">
@@ -1755,7 +1802,7 @@ export default function EtkinliklerClient() {
         {/* Event Detail Modal */}
         {showDetailModal && selectedEvent && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
               <div className="relative">
                 {/* Event Image */}
                 <div className="h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center overflow-hidden">
@@ -1781,14 +1828,14 @@ export default function EtkinliklerClient() {
                 {/* Close Button */}
                 <TouchButton
                   onClick={() => setShowDetailModal(false)}
-                  className="absolute top-4 right-4 p-2 bg-white/80 rounded-full text-gray-600 hover:bg-white"
+                  className="absolute top-4 right-4 p-2 bg-white/80 dark:bg-gray-800/80 rounded-full text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700"
                 >
                   <X size={24} />
                 </TouchButton>
                 
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4">
-                  <span className="inline-block bg-white/90 text-purple-700 text-sm px-3 py-1 rounded-full font-medium">
+                  <span className="inline-block bg-white/90 dark:bg-gray-800/90 text-purple-700 dark:text-purple-300 text-sm px-3 py-1 rounded-full font-medium">
                     {selectedEvent.category}
                   </span>
                 </div>
@@ -1796,11 +1843,11 @@ export default function EtkinliklerClient() {
               
               <div className="p-6">
                 <div className="mb-6">
-                  <h2 className="text-3xl font-bold text-gray-800 mb-2">{selectedEvent.title}</h2>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">{selectedEvent.title}</h2>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <span>Düzenleyen: {selectedEvent.organizer}</span>
                     {selectedEvent.isVerified && (
-                      <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full">
                         <CheckCircle size={12} />
                         Doğrulanmış
                       </span>
@@ -1810,29 +1857,29 @@ export default function EtkinliklerClient() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">Etkinlik Detayları</h3>
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Etkinlik Detayları</h3>
                     
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
                         <Calendar className="text-purple-500" size={20} />
                         <div>
-                          <div className="font-medium">{selectedEvent.date}</div>
-                          <div className="text-sm text-gray-600">{selectedEvent.time}</div>
+                          <div className="font-medium text-gray-800 dark:text-white">{selectedEvent.date}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">{selectedEvent.time}</div>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-3">
                         <MapPin className="text-purple-500" size={20} />
                         <div>
-                          <div className="font-medium">{selectedEvent.location}</div>
+                          <div className="font-medium text-gray-800 dark:text-white">{selectedEvent.location}</div>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-3">
                         <Users className="text-purple-500" size={20} />
                         <div>
-                          <div className="font-medium">{selectedEvent.attendees}/{selectedEvent.maxAttendees} Katılımcı</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="font-medium text-gray-800 dark:text-white">{selectedEvent.attendees}/{selectedEvent.maxAttendees} Katılımcı</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
                             {selectedEvent.maxAttendees - selectedEvent.attendees} kişi daha katılabilir
                           </div>
                         </div>
@@ -1841,7 +1888,7 @@ export default function EtkinliklerClient() {
                       <div className="flex items-center gap-3">
                         <DollarSign className="text-purple-500" size={20} />
                         <div>
-                          <div className="font-medium text-green-600">
+                          <div className="font-medium text-green-600 dark:text-green-400">
                             {selectedEvent.price === 0 ? 'Ücretsiz' : `${selectedEvent.price} ${selectedEvent.currency}`}
                           </div>
                         </div>
@@ -1850,23 +1897,23 @@ export default function EtkinliklerClient() {
                       <div className="flex items-center gap-3">
                         <Star className="text-yellow-500" size={20} />
                         <div>
-                          <div className="font-medium">{selectedEvent.rating}/5.0</div>
-                          <div className="text-sm text-gray-600">{selectedEvent.reviews} değerlendirme</div>
+                          <div className="font-medium text-gray-800 dark:text-white">{selectedEvent.rating}/5.0</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">{selectedEvent.reviews} değerlendirme</div>
                         </div>
                       </div>
                     </div>
                   </div>
                   
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">Açıklama</h3>
-                    <p className="text-gray-600 leading-relaxed mb-6">{selectedEvent.description}</p>
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Açıklama</h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">{selectedEvent.description}</p>
                     
                     {selectedEvent.tags && selectedEvent.tags.length > 0 && (
                       <div>
-                        <h4 className="font-medium text-gray-800 mb-3">Etiketler</h4>
+                        <h4 className="font-medium text-gray-800 dark:text-white mb-3">Etiketler</h4>
                         <div className="flex flex-wrap gap-2">
                           {selectedEvent.tags.map((tag, index) => (
-                            <span key={index} className="bg-purple-100 text-purple-700 text-sm px-3 py-1 rounded-full">
+                            <span key={index} className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm px-3 py-1 rounded-full">
                               {tag}
                             </span>
                           ))}
@@ -1876,7 +1923,7 @@ export default function EtkinliklerClient() {
                   </div>
                 </div>
                 
-                <div className="flex justify-center gap-4 mt-8 pt-6 border-t">
+                <div className="flex justify-center gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
                   <TouchButton
                     onClick={() => {
                       setSelectedEvent(selectedEvent);
@@ -1901,13 +1948,13 @@ export default function EtkinliklerClient() {
         {/* Contact Modal */}
         {showContactModal && selectedEvent && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold text-gray-800">İletişim Bilgileri</h3>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white">İletişim Bilgileri</h3>
                   <TouchButton
                     onClick={() => setShowContactModal(false)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                   >
                     <X size={24} />
                   </TouchButton>
@@ -1915,16 +1962,16 @@ export default function EtkinliklerClient() {
                 
                 <div className="space-y-4">
                   <div className="text-center mb-6">
-                    <h4 className="font-medium text-gray-800 mb-2">{selectedEvent.title}</h4>
-                    <p className="text-sm text-gray-600">Düzenleyen: {selectedEvent.organizer}</p>
+                    <h4 className="font-medium text-gray-800 dark:text-white mb-2">{selectedEvent.title}</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Düzenleyen: {selectedEvent.organizer}</p>
                   </div>
                   
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                       <Mail className="text-purple-500" size={20} />
                       <div>
-                        <div className="font-medium">E-posta</div>
-                        <div className="text-sm text-gray-600">{selectedEvent.organizerContact}</div>
+                        <div className="font-medium text-gray-800 dark:text-white">E-posta</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">{selectedEvent.organizerContact}</div>
                       </div>
                     </div>
                     

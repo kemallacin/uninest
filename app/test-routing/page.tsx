@@ -1,10 +1,3 @@
-export const metadata = {
-  title: 'Routing Test | UniNestcy',
-  description: 'UniNestcy routing test sayfası. Sayfa yönlendirmelerinin test edilmesi için kullanılır.',
-  keywords: 'routing test, test, UniNestcy',
-  robots: 'noindex, nofollow',
-};
-
 'use client'
 
 import React from 'react'

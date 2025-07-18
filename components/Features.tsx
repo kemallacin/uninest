@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Star, MapPin, Clock, Heart, Eye, Crown, Zap } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Star, MapPin, Clock, Heart, Eye, Crown, Zap, Search, X } from 'lucide-react'
 import Link from 'next/link'
 
 interface AdItem {
@@ -41,8 +41,12 @@ interface AdItem {
 const Features = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [premiumAds, setPremiumAds] = useState<AdItem[]>([])
+  const [filteredAds, setFilteredAds] = useState<AdItem[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('Tümü')
+  const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -72,10 +76,14 @@ const Features = () => {
 
         console.log('🔥 Firebase bağlantısı kuruldu')
 
-        // Önce sadece secondhand koleksiyonunu test edelim
+        // Tüm koleksiyonları dahil et
         const testCollections = [
           { name: 'secondhand', type: 'İkinci El', icon: '🛍️', color: 'from-green-500 to-emerald-500' },
-          { name: 'roommates', type: 'Ev Arkadaşı', icon: '🏠', color: 'from-blue-500 to-cyan-500' }
+          { name: 'roommates', type: 'Ev Arkadaşı', icon: '🏠', color: 'from-blue-500 to-cyan-500' },
+          { name: 'events', type: 'Etkinlik', icon: '🎉', color: 'from-purple-500 to-pink-500' },
+          { name: 'tutors', type: 'Özel Ders', icon: '📚', color: 'from-red-500 to-rose-500' },
+          { name: 'students', type: 'Özel Ders', icon: '📚', color: 'from-red-500 to-rose-500' },
+          { name: 'notes', type: 'Not', icon: '📝', color: 'from-indigo-500 to-blue-500' }
         ]
 
         const allAds: AdItem[] = []
@@ -84,10 +92,9 @@ const Features = () => {
           try {
             console.log(`📊 ${col.name} koleksiyonu kontrol ediliyor...`)
             
-            // Index sorunu için orderBy'ı kaldırıyoruz
+            // Premium ilanları çek - onay durumuna bakmaksızın
             const simpleQuery = query(
               collection(db, col.name),
-              where('isApproved', '==', true),
               where('isPremium', '==', true),
               limit(20)
             )
@@ -132,6 +139,7 @@ const Features = () => {
         console.log('🏆 Toplam premium ilan sayısı:', allAds.length)
         console.log('🎯 Premium ilanlar:', allAds)
         setPremiumAds(allAds)
+        setFilteredAds(allAds) // İlk yüklemede tüm ilanları göster
       } catch (error) {
         console.error('💥 Premium ilanları çekerken hata:', error)
         setPremiumAds([])
@@ -156,7 +164,8 @@ const Features = () => {
              { name: 'secondhand', type: 'İkinci El', icon: '🛍️', color: 'from-green-500 to-emerald-500' },
              { name: 'roommates', type: 'Ev Arkadaşı', icon: '🏠', color: 'from-blue-500 to-cyan-500' },
              { name: 'events', type: 'Etkinlik', icon: '🎉', color: 'from-purple-500 to-pink-500' },
-             { name: 'tutoring', type: 'Özel Ders', icon: '📚', color: 'from-red-500 to-rose-500' },
+             { name: 'tutors', type: 'Özel Ders', icon: '📚', color: 'from-red-500 to-rose-500' },
+             { name: 'students', type: 'Özel Ders', icon: '📚', color: 'from-red-500 to-rose-500' },
              { name: 'notes', type: 'Not', icon: '📝', color: 'from-indigo-500 to-blue-500' }
            ]
 
@@ -166,7 +175,6 @@ const Features = () => {
                          try {
                const q = query(
                  collection(db, col.name),
-                 where('isApproved', '==', true),
                  where('isPremium', '==', true),
                  limit(10)
                )
@@ -335,13 +343,45 @@ const Features = () => {
     return ad.telefon || ad.email || 'İletişim bilgisi yok'
   }
 
+  // Filtreleme fonksiyonu
+  const applyFilters = () => {
+    let filtered = premiumAds.filter(ad => {
+      const matchesSearch = getAdTitle(ad).toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           getAdDescription(ad).toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           getAdLocation(ad).toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesCategory = selectedCategory === 'Tümü' || ad.type === selectedCategory
+      
+      return matchesSearch && matchesCategory
+    })
+    
+    setFilteredAds(filtered)
+    setCurrentSlide(0) // Filtreleme sonrası ilk slide'a dön
+  }
+
+  // Filtreleri temizle
+  const clearFilters = () => {
+    setSearchTerm('')
+    setSelectedCategory('Tümü')
+    setFilteredAds(premiumAds)
+    setCurrentSlide(0)
+  }
+
+  // Filtreleme değişikliklerini izle
+  useEffect(() => {
+    applyFilters()
+  }, [searchTerm, selectedCategory, premiumAds])
+
+  // Kategori listesi
+  const categories = ['Tümü', 'İkinci El', 'Ev Arkadaşı', 'Etkinlik', 'Özel Ders', 'Not']
+
   return (
-    <section id="features-section" className="py-24 bg-gradient-to-br from-gray-50 via-white to-gray-50 relative overflow-hidden">
+    <section id="features-section" className="py-24 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden transition-colors duration-200">
       {/* Background decoration */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute -bottom-8 left-1/3 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{animationDelay: '4s'}}></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-200 dark:bg-purple-800 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-200 dark:bg-yellow-800 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute -bottom-8 left-1/3 w-96 h-96 bg-pink-200 dark:bg-pink-800 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{animationDelay: '4s'}}></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -371,14 +411,71 @@ const Features = () => {
                 </p>
               </div>
 
+              {/* Arama ve Filtreleme Bölümü */}
+              <div className="mb-8">
+                {/* Arama Çubuğu */}
+                <div className="relative mb-6">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-200 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Premium ilanlarda ara..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all duration-300"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-200 hover:text-white transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Kategori Filtreleri */}
+                <div className="flex flex-wrap justify-center gap-3 mb-6">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 ${
+                        selectedCategory === category
+                          ? 'bg-white text-blue-600 shadow-lg scale-105'
+                          : 'bg-white/20 text-white hover:bg-white/30 hover:scale-105'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Filtreleme Bilgileri */}
+                <div className="flex justify-between items-center text-blue-100 text-sm">
+                  <div className="flex items-center space-x-4">
+                    <span>Toplam: {premiumAds.length} ilan</span>
+                    <span>Gösterilen: {filteredAds.length} ilan</span>
+                  </div>
+                  {(searchTerm || selectedCategory !== 'Tümü') && (
+                    <button
+                      onClick={clearFilters}
+                      className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition-all duration-300"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Filtreleri Temizle</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
               {loading ? (
                 <div className="flex justify-center items-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-200"></div>
                 </div>
-              ) : premiumAds.length > 0 ? (
+              ) : filteredAds.length > 0 ? (
                 <div className="relative">
                   {/* Navigation Buttons */}
-                  {premiumAds.length > 4 && (
+                  {filteredAds.length > 4 && (
                     <>
                       <button
                         onClick={prevSlide}
@@ -403,20 +500,20 @@ const Features = () => {
                         transform: `translateX(-${currentSlide * 100}%)`
                       }}
                     >
-                      {Array.from({ length: Math.ceil(premiumAds.length / 4) }).map((_, slideIndex) => (
+                      {Array.from({ length: Math.ceil(filteredAds.length / 4) }).map((_, slideIndex) => (
                         <div key={slideIndex} className="w-full flex-shrink-0">
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {premiumAds.slice(slideIndex * 4, (slideIndex + 1) * 4).map((ad, index) => (
+                            {filteredAds.slice(slideIndex * 4, (slideIndex + 1) * 4).map((ad, index) => (
                               <div
                                 key={ad.id}
-                                className="group bg-white rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02] border-2 border-blue-300/30 hover:border-blue-400/50 relative overflow-hidden"
+                                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02] border-2 border-blue-300/30 hover:border-blue-400/50 dark:border-gray-600 dark:hover:border-gray-500 relative overflow-hidden"
                               >
                                 {/* Premium Shine Effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-200/20 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
                                 {/* Ad Image */}
                                 <div className="relative">
-                                  <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                                  <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 overflow-hidden">
                                     {getAdImage(ad) ? (
                                       <img
                                         src={getAdImage(ad)}
@@ -424,7 +521,7 @@ const Features = () => {
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                       />
                                     ) : (
-                                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600">
                                         <span className="text-6xl">{ad.icon}</span>
                                       </div>
                                     )}
@@ -452,33 +549,33 @@ const Features = () => {
                                 {/* Card Content */}
                                 <div className="p-6">
                                   {/* Title */}
-                                  <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+                                  <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                                     {getAdTitle(ad)}
                                   </h4>
                                   
                                   {/* Description */}
-                                  <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
                                     {getAdDescription(ad)}
                                   </p>
 
                                   {/* Price */}
                                   <div className="mb-4">
                                     {getAdPrice(ad) && (
-                                      <div className="text-2xl font-bold text-green-600">
+                                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                                         {getAdPrice(ad)}₺
                                       </div>
                                     )}
                                   </div>
 
                                   {/* Location */}
-                                  <div className="flex items-center text-gray-500 mb-4">
+                                  <div className="flex items-center text-gray-500 dark:text-gray-400 mb-4">
                                     <MapPin className="w-4 h-4 mr-2 text-blue-500" />
                                     <span className="text-sm font-medium">{getAdLocation(ad)}</span>
                                   </div>
 
                                   {/* Additional Info for Roommate */}
                                   {ad.collection === 'roommates' && (
-                                    <div className="flex items-center space-x-4 text-xs text-gray-500 mb-4">
+                                    <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
                                       {ad.cinsiyet && <span className="flex items-center"><span className="mr-1">👤</span>{ad.cinsiyet}</span>}
                                       {ad.yas && <span className="flex items-center"><span className="mr-1">🎂</span>{ad.yas} yaş</span>}
                                       {ad.meslek && <span className="flex items-center"><span className="mr-1">💼</span>{ad.meslek}</span>}
@@ -486,14 +583,14 @@ const Features = () => {
                                   )}
 
                                   {/* Time and Status */}
-                                  <div className="flex items-center justify-between mb-6 text-xs text-gray-500">
+                                  <div className="flex items-center justify-between mb-6 text-xs text-gray-500 dark:text-gray-400">
                                     <div className="flex items-center">
                                       <Clock className="w-3 h-3 mr-1" />
                                       <span>{formatTimeAgo(ad.createdAt)}</span>
                                     </div>
                                     <div className="flex items-center">
                                       <Zap className="w-3 h-3 mr-1 text-blue-500" />
-                                      <span className="text-blue-600 font-medium">Premium</span>
+                                      <span className="text-blue-600 dark:text-blue-400 font-medium">Premium</span>
                                     </div>
                                   </div>
 
@@ -516,9 +613,9 @@ const Features = () => {
                   </div>
 
                   {/* Dots Indicator */}
-                  {premiumAds.length > 4 && (
+                  {filteredAds.length > 4 && (
                     <div className="flex justify-center mt-12 space-x-3">
-                      {Array.from({ length: Math.ceil(premiumAds.length / 4) }).map((_, index) => (
+                                              {Array.from({ length: Math.ceil(filteredAds.length / 4) }).map((_, index) => (
                         <button
                           key={index}
                           onClick={() => setCurrentSlide(index)}
@@ -534,9 +631,26 @@ const Features = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Crown className="w-16 h-16 text-blue-200 mx-auto mb-4" />
-                  <p className="text-blue-100 text-lg">Henüz premium ilan bulunmuyor</p>
-                  <p className="text-blue-200 text-sm mt-2">İlk premium ilanları vermek için admin panelini kullanın!</p>
+                  <div className="text-6xl mb-4">
+                    {premiumAds.length === 0 ? '👑' : '🔍'}
+                  </div>
+                  <h3 className="text-xl font-semibold text-blue-100 mb-2">
+                    {premiumAds.length === 0 ? 'Henüz premium ilan bulunmuyor' : 'Arama kriterlerinize uygun ilan bulunamadı'}
+                  </h3>
+                  <p className="text-blue-200 text-sm mt-2">
+                    {premiumAds.length === 0 
+                      ? 'İlk premium ilanları vermek için admin panelini kullanın!' 
+                      : 'Farklı arama kriterleri deneyin veya filtreleri temizleyin.'
+                    }
+                  </p>
+                  {premiumAds.length > 0 && (
+                    <button
+                      onClick={clearFilters}
+                      className="mt-4 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-full transition-all duration-300"
+                    >
+                      Filtreleri Temizle
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -545,12 +659,12 @@ const Features = () => {
 
         {/* Section Header */}
         <div className={`text-center mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Özellikler
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
             UniNestcy ile öğrenci hayatınızı kolaylaştırın. Tüm ihtiyaçlarınız tek platformda!
           </p>
         </div>
@@ -560,7 +674,7 @@ const Features = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className={`group relative bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 border border-gray-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+              className={`group relative bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
               style={{transitionDelay: `${feature.delay + 400}ms`}}
             >
               {/* Background gradient */}
@@ -573,10 +687,10 @@ const Features = () => {
               
               {/* Content */}
               <div className="relative">
-                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-800 transition-colors duration-300">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors duration-300">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 mb-6 leading-relaxed font-light">
+                <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed font-light">
                   {feature.description}
                 </p>
                 

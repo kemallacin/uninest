@@ -648,23 +648,23 @@ const NotlarClient = () => {
       <div className="container mx-auto px-4 mb-8">
         <div className="max-w-6xl mx-auto">
           {/* Search Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <div className="relative flex-1">
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">
                   <FaSearch size={16} />
                 </div>
                 <input
                   type="text"
                   placeholder="Not başlığı, açıklama veya yükleyen kişi ara..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />
               </div>
               <div className="flex gap-2">
                 <select
-                  className="border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
                 >
@@ -674,7 +674,7 @@ const NotlarClient = () => {
                 </select>
                 <button
                   onClick={clearFilters}
-                  className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors"
+                  className="px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl transition-colors"
                 >
                   Filtreleri Temizle
                 </button>
@@ -683,19 +683,19 @@ const NotlarClient = () => {
           </div>
 
           {/* Filtreleme Seçenekleri */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Filtreleme Seçenekleri</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Filtreleme Seçenekleri</h3>
             
             {/* Ders Kategorileri */}
             <div className="mb-6">
-              <h4 className="text-md font-medium text-gray-700 mb-3">Ders Kategorileri</h4>
+              <h4 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-3">Ders Kategorileri</h4>
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => setSelectedSubject('Tüm Dersler')}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Tüm Dersler' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   📚 Tüm Dersler
@@ -705,7 +705,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Matematik' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   📐 Matematik
@@ -715,7 +715,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Fizik' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   ⚡ Fizik
@@ -725,7 +725,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Kimya' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   🧪 Kimya
@@ -735,7 +735,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Biyoloji' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   🧬 Biyoloji
@@ -745,7 +745,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Bilgisayar' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   💻 Bilgisayar
@@ -755,7 +755,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'İngilizce' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   🇬🇧 İngilizce
@@ -765,7 +765,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Tıp' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   🏥 Tıp
@@ -775,7 +775,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Hukuk' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   ⚖️ Hukuk
@@ -785,7 +785,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'İktisat' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   📊 İktisat
@@ -795,7 +795,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Mühendislik' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   🔧 Mühendislik
@@ -805,7 +805,7 @@ const NotlarClient = () => {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedSubject === 'Diğer' 
                       ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   📚 Diğer
@@ -816,9 +816,9 @@ const NotlarClient = () => {
             {/* Dropdown Filtreler */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Ders Seçin</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ders Seçin</label>
                 <select
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   value={selectedSubject}
                   onChange={e => setSelectedSubject(e.target.value)}
                 >
@@ -828,9 +828,9 @@ const NotlarClient = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Bölüm Seçin</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bölüm Seçin</label>
                 <select
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   value={selectedDepartment}
                   onChange={e => setSelectedDepartment(e.target.value)}
                 >
@@ -840,9 +840,9 @@ const NotlarClient = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Üniversite Seçin</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Üniversite Seçin</label>
                 <select
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   value={selectedUniversity}
                   onChange={e => setSelectedUniversity(e.target.value)}
                 >
@@ -854,11 +854,9 @@ const NotlarClient = () => {
             </div>
           </div>
 
-
-
           {/* Results Info */}
           <div className="mb-6">
-            <p className="text-gray-600 font-medium">
+            <p className="text-gray-600 dark:text-gray-400 font-medium">
               {loading ? 'Yükleniyor...' : `${filteredNotes.length} not bulundu`}
             </p>
           </div>
@@ -868,20 +866,20 @@ const NotlarClient = () => {
             {loading ? (
               <div className="col-span-full text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-500">Notlar yükleniyor...</p>
+                <p className="text-gray-500 dark:text-gray-400">Notlar yükleniyor...</p>
               </div>
             ) : filteredNotes.length === 0 ? (
               <div className="col-span-full text-center py-12">
-                <div className="mx-auto text-6xl text-gray-300 mb-4">
+                <div className="mx-auto text-6xl text-gray-300 dark:text-gray-600 mb-4">
                   <FaFilePdf size={64} />
                 </div>
-                <p className="text-gray-500 text-lg">Aradığınız kriterlere uygun not bulunamadı.</p>
+                <p className="text-gray-500 dark:text-gray-400 text-lg">Aradığınız kriterlere uygun not bulunamadı.</p>
               </div>
             ) : (
               filteredNotes.map(note => (
                 <div
                   key={note.id}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
+                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
                 >
                   {/* Favorite, Share, Report Buttons */}
                   <div className="absolute top-4 right-4 flex gap-2 z-10">
@@ -890,7 +888,7 @@ const NotlarClient = () => {
                       className={`p-2 rounded-full transition-all duration-300 ${
                         favorites.includes(note.id)
                           ? 'bg-red-500 text-white shadow-lg'
-                          : 'bg-white/90 text-gray-600 hover:bg-red-500 hover:text-white'
+                          : 'bg-white/90 dark:bg-gray-700/90 text-gray-600 dark:text-gray-400 hover:bg-red-500 hover:text-white'
                       }`}
                       title={`${favorites.includes(note.id) ? 'Favorilerden çıkar' : 'Favorilere ekle'} (ID: ${note.id}, Favorites: ${favorites.join(', ')})`}
                     >
@@ -902,7 +900,7 @@ const NotlarClient = () => {
                     </button>
                     <button
                       onClick={() => handleShare(note)}
-                      className="p-2 rounded-full bg-white/90 text-gray-600 hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-lg"
+                      className="p-2 rounded-full bg-white/90 dark:bg-gray-700/90 text-gray-600 dark:text-gray-400 hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-lg"
                     >
                       <FaShare size={16} />
                     </button>
@@ -911,12 +909,12 @@ const NotlarClient = () => {
                         const reportModal = document.createElement('div');
                         reportModal.innerHTML = `
                           <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-                              <h2 class="text-xl font-bold text-gray-900 mb-4">Notu Şikayet Et</h2>
-                              <p class="text-gray-600 text-sm mb-4">Bu not neden uygunsuz olduğunu açıklayın.</p>
-                              <textarea id="report-reason" class="w-full border border-gray-300 rounded-lg p-3 mb-4 resize-none" placeholder="Şikayet sebebinizi yazın..." rows="4"></textarea>
+                            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6">
+                              <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Notu Şikayet Et</h2>
+                              <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Bu not neden uygunsuz olduğunu açıklayın.</p>
+                              <textarea id="report-reason" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 mb-4 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400" placeholder="Şikayet sebebinizi yazın..." rows="4"></textarea>
                               <div class="flex justify-end gap-3">
-                                <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 text-gray-600 hover:text-gray-800">İptal</button>
+                                <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">İptal</button>
                                 <button id="submit-report" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg">Gönder</button>
                               </div>
                             </div>
@@ -940,7 +938,7 @@ const NotlarClient = () => {
                           reportModal.remove();
                         });
                       }}
-                      className="p-2 rounded-full bg-white/90 text-gray-600 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-lg"
+                      className="p-2 rounded-full bg-white/90 dark:bg-gray-700/90 text-gray-600 dark:text-gray-400 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-lg"
                     >
                       <FaFlag size={16} />
                     </button>
@@ -948,7 +946,7 @@ const NotlarClient = () => {
                     {user && note.uploadedBy === user.uid && (
                       <button
                         onClick={() => handleDeleteNote(note)}
-                        className="p-2 rounded-full bg-white/90 text-gray-600 hover:bg-red-500 hover:text-white transition-all duration-300 shadow-lg"
+                        className="p-2 rounded-full bg-white/90 dark:bg-gray-700/90 text-gray-600 dark:text-gray-400 hover:bg-red-500 hover:text-white transition-all duration-300 shadow-lg"
                         title="Notu Sil"
                       >
                         <FaTrash size={16} />
@@ -964,30 +962,30 @@ const NotlarClient = () => {
                           <div className="text-red-500 text-xl">
                             <FaFilePdf size={20} />
                           </div>
-                          <span className="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
+                          <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs px-2 py-1 rounded-full font-medium">
                             {note.subject}
                           </span>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">{note.title}</h3>
-                        <p className="text-sm text-gray-600 line-clamp-3 mb-3">{note.description}</p>
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">{note.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">{note.description}</p>
                       </div>
                     </div>
 
                     {/* Note Info */}
                     <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <div className="mr-2 text-blue-500">
                           <FaUniversity size={14} />
                         </div>
                         <span className="truncate">{note.university}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <div className="mr-2 text-green-500">
                           <FaUser size={14} />
                         </div>
                         <span>Yükleyen: {note.uploader}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <div className="mr-2 text-purple-500">
                           <FaCalendar size={14} />
                         </div>
@@ -1004,7 +1002,7 @@ const NotlarClient = () => {
                     </div>
 
                     {/* File Stats */}
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-4 bg-gray-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                       <span>{note.fileSize}</span>
                       <span>{note.pageCount} sayfa</span>
                       <span>{note.downloadCount} indirme</span>
@@ -1038,11 +1036,11 @@ const NotlarClient = () => {
       {/* PDF Viewer Modal */}
       {showPdfViewer && selectedNote && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-800 truncate">{selectedNote.title}</h3>
-                <p className="text-sm text-gray-600">{selectedNote.uploader} - {selectedNote.university}</p>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-white truncate">{selectedNote.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{selectedNote.uploader} - {selectedNote.university}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -1054,7 +1052,7 @@ const NotlarClient = () => {
                 </button>
                 <button
                   onClick={() => setShowPdfViewer(false)}
-                  className="text-gray-400 hover:text-gray-600 p-2"
+                  className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-2"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1076,11 +1074,11 @@ const NotlarClient = () => {
       {/* Upload Modal */}
       {showUpload && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-2xl font-bold text-gray-800">Not Yükle</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Not Yükle</h2>
               <button
-                className="text-gray-400 hover:text-gray-600 p-2"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-2"
                 onClick={() => setShowUpload(false)}
                 disabled={uploading}
               >
@@ -1090,27 +1088,27 @@ const NotlarClient = () => {
               </button>
             </div>
             
-                          <form onSubmit={handleRealUpload} className="p-6 space-y-6">
-                {/* User Authentication Status */}
-                <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${user ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                      <span className="text-sm font-medium text-gray-700">
-                        {user ? `Giriş yapıldı: ${user.email}` : 'Giriş yapılmadı'}
-                      </span>
-                    </div>
-                    {!user && (
-                      <span className="text-xs text-red-600">PDF yüklemek için giriş yapın</span>
-                    )}
+            <form onSubmit={handleRealUpload} className="p-6 space-y-6">
+              {/* User Authentication Status */}
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${user ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {user ? `Giriş yapıldı: ${user.email}` : 'Giriş yapılmadı'}
+                    </span>
                   </div>
-                  <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                    ✅ PDF dosyaları base64 formatında güvenli şekilde yükleniyor
-                  </div>
+                  {!user && (
+                    <span className="text-xs text-red-600 dark:text-red-400">PDF yüklemek için giriş yapın</span>
+                  )}
                 </div>
+                <div className="mt-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                  ✅ PDF dosyaları base64 formatında güvenli şekilde yükleniyor
+                </div>
+              </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Not Başlığı *
                 </label>
                 <input
@@ -1118,7 +1116,7 @@ const NotlarClient = () => {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="Örn: Matematik 1 - Vize Notları"
                   disabled={uploading}
                 />
@@ -1126,14 +1124,14 @@ const NotlarClient = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Ders *
                   </label>
                   <select
                     required
                     value={formData.subject}
                     onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     disabled={uploading}
                   >
                     <option value="">Ders Seçin</option>
@@ -1143,13 +1141,13 @@ const NotlarClient = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Bölüm
                   </label>
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     disabled={uploading}
                   >
                     <option value="">Bölüm Seçin</option>
@@ -1159,14 +1157,14 @@ const NotlarClient = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Üniversite *
                   </label>
                   <select
                     required
                     value={formData.university}
                     onChange={(e) => setFormData(prev => ({ ...prev, university: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     disabled={uploading}
                   >
                     <option value="">Üniversite Seçin</option>
@@ -1178,7 +1176,7 @@ const NotlarClient = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Açıklama *
                 </label>
                 <textarea
@@ -1186,26 +1184,26 @@ const NotlarClient = () => {
                   required
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="Notlar hakkında detaylı açıklama yazın..."
                   disabled={uploading}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   PDF Dosyası *
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
-                  <div className="mx-auto text-4xl text-gray-400 mb-4">
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+                  <div className="mx-auto text-4xl text-gray-400 dark:text-gray-500 mb-4">
                     <FaFilePdf size={48} />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="file-upload" className="cursor-pointer">
-                      <span className="text-blue-600 hover:text-blue-700 font-medium">
+                      <span className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
                         PDF dosyasını seçin
                       </span>
-                      <span className="text-gray-600"> veya sürükleyip bırakın</span>
+                      <span className="text-gray-600 dark:text-gray-400"> veya sürükleyip bırakın</span>
                       <input 
                         id="file-upload" 
                         name="file-upload" 
@@ -1216,11 +1214,11 @@ const NotlarClient = () => {
                         disabled={uploading}
                       />
                     </label>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Maksimum dosya boyutu: 10MB
                     </p>
                     {formData.file && (
-                      <p className="text-sm text-green-600 font-medium">
+                      <p className="text-sm text-green-600 dark:text-green-400 font-medium">
                         Seçilen dosya: {formData.file.name}
                       </p>
                     )}
@@ -1230,7 +1228,7 @@ const NotlarClient = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Yükleyen Adı *
                   </label>
                   <input
@@ -1238,13 +1236,13 @@ const NotlarClient = () => {
                     required
                     value={formData.uploader}
                     onChange={(e) => setFormData(prev => ({ ...prev, uploader: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="Adınız Soyadınız"
                     disabled={uploading}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     E-posta *
                   </label>
                   <input
@@ -1252,7 +1250,7 @@ const NotlarClient = () => {
                     required
                     value={formData.uploaderEmail}
                     onChange={(e) => setFormData(prev => ({ ...prev, uploaderEmail: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="email@example.com"
                     disabled={uploading}
                   />
@@ -1262,11 +1260,11 @@ const NotlarClient = () => {
               {/* Upload Progress */}
               {uploading && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                     <span>Yükleniyor...</span>
                     <span>{uploadProgress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div 
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
@@ -1279,7 +1277,7 @@ const NotlarClient = () => {
                 <button
                   type="button"
                   onClick={() => setShowUpload(false)}
-                  className="flex-1 py-3 px-6 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                  className="flex-1 py-3 px-6 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-gray-700 dark:text-gray-300"
                   disabled={uploading}
                 >
                   İptal
@@ -1289,14 +1287,14 @@ const NotlarClient = () => {
                   className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   disabled={uploading}
                 >
-                                     {uploading ? (
-                     <>
-                       <div className="animate-spin">
-                         <FaSpinner />
-                       </div>
-                       Yükleniyor...
-                     </>
-                   ) : (
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin">
+                        <FaSpinner />
+                      </div>
+                      Yükleniyor...
+                    </>
+                  ) : (
                     <>
                       <FaUpload />
                       Yükle
