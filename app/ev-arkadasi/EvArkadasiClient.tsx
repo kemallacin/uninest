@@ -969,6 +969,8 @@ export default function EvArkadasiClient() {
                       {roommate.isPremium && <span className="text-pink-500 mr-1">💎</span>}
                       {roommate.currency === 'GBP' ? (
                         <PoundSterling size={16} className="mr-1" />
+                      ) : roommate.currency === 'TL' ? (
+                        <span className="mr-1 text-sm font-bold">₺</span>
                       ) : (
                         <DollarSign size={16} className="mr-1" />
                       )}
@@ -1652,6 +1654,8 @@ export default function EvArkadasiClient() {
                 <div className="flex items-center gap-2 text-blue-600 font-bold">
                   {selectedRoommate.currency === 'GBP' ? (
                     <PoundSterling size={16} />
+                  ) : selectedRoommate.currency === 'TL' ? (
+                    <span className="text-sm font-bold">₺</span>
                   ) : (
                     <DollarSign size={16} />
                   )}
