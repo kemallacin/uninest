@@ -146,7 +146,7 @@ export default function EvArkadasiClient() {
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [mobileViewMode, setMobileViewMode] = useState<'grid' | 'scroll'>('grid'); // grid: 2x2, scroll: yan kaydırma
+  const [mobileViewMode, setMobileViewMode] = useState<'grid' | 'scroll'>('scroll'); // scroll: yan kaydırma, grid: alt alta
 
   // Add form state
   const [addForm, setAddForm] = useState({
@@ -798,13 +798,13 @@ export default function EvArkadasiClient() {
                 </TouchButton>
 
                 {/* View Mode Toggle */}
-                <div className="flex bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-0.5">
+                <div className="flex bg-black/20 backdrop-blur-sm rounded-lg border border-white/30 p-1 shadow-lg">
                   <TouchButton
                     onClick={() => setMobileViewMode('grid')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded text-xs font-medium transition-all duration-200 touch-manipulation ${
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-md text-xs font-medium transition-all duration-200 touch-manipulation ${
                       mobileViewMode === 'grid' 
-                        ? 'bg-yellow-500 text-white shadow-lg scale-105' 
-                        : `text-white/70 ${isMobile ? '' : 'hover:text-white/90'}`
+                        ? 'bg-white text-purple-600 shadow-lg font-bold transform scale-105' 
+                        : `text-white/80 bg-white/10 ${isMobile ? '' : 'hover:text-white hover:bg-white/20'}`
                     }`}
                   >
                     <div className="grid grid-cols-2 gap-0.5 w-3 h-3">
@@ -813,22 +813,22 @@ export default function EvArkadasiClient() {
                       <div className="bg-current w-1 h-1 rounded-sm"></div>
                       <div className="bg-current w-1 h-1 rounded-sm"></div>
                     </div>
-                    <span className={mobileViewMode === 'grid' ? 'font-bold' : ''}>Grid</span>
+                    <span>Grid</span>
                   </TouchButton>
                   <TouchButton
                     onClick={() => setMobileViewMode('scroll')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded text-xs font-medium transition-all duration-200 touch-manipulation ${
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-md text-xs font-medium transition-all duration-200 touch-manipulation ${
                       mobileViewMode === 'scroll' 
-                        ? 'bg-yellow-500 text-white shadow-lg scale-105' 
-                        : `text-white/70 ${isMobile ? '' : 'hover:text-white/90'}`
+                        ? 'bg-white text-purple-600 shadow-lg font-bold transform scale-105' 
+                        : `text-white/80 bg-white/10 ${isMobile ? '' : 'hover:text-white hover:bg-white/20'}`
                     }`}
                   >
                     <div className="flex gap-0.5 w-3 h-3 items-center">
-                      <div className="bg-current w-1.5 h-2 rounded-sm"></div>
-                      <div className="bg-current w-1.5 h-2 rounded-sm"></div>
-                      <div className="bg-current w-1.5 h-2 rounded-sm"></div>
+                      <div className="bg-current w-1 h-2 rounded-sm"></div>
+                      <div className="bg-current w-1 h-2 rounded-sm"></div>
+                      <div className="bg-current w-1 h-2 rounded-sm"></div>
                     </div>
-                    <span className={mobileViewMode === 'scroll' ? 'font-bold' : ''}>Kaydır</span>
+                    <span>Kaydır</span>
                   </TouchButton>
                 </div>
               </div>
