@@ -1967,8 +1967,8 @@ export default function EvArkadasiClient() {
       {/* Detail Modal */}
       {showDetailsModal && selectedRoommate && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justify-center z-50 p-2 md:p-4"
-          style={{ paddingTop: modalPosition ? `${Math.max(modalPosition.top, 80)}px` : '80px' }}
+          className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center z-50 p-2 md:p-4 ${isMobile ? 'items-start' : 'items-center'}`}
+          style={isMobile && modalPosition ? { paddingTop: `${Math.max(modalPosition.top, 80)}px` } : {}}
         >
           <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[80vh] md:max-h-[85vh] overflow-y-auto p-4 md:p-6 shadow-xl">
             <div className="flex items-center justify-between mb-6">
@@ -1996,6 +1996,28 @@ export default function EvArkadasiClient() {
                 <div className="flex items-center gap-2 text-green-600">
                   <CheckCircle size={20} />
                   <span className="font-medium">Doğrulanmış Kullanıcı</span>
+                </div>
+              )}
+
+              {/* Fotoğraflar */}
+              {selectedRoommate.images && selectedRoommate.images.length > 0 && (
+                <div className="mt-6">
+                  <h5 className="text-lg font-bold text-gray-800 dark:text-white mb-3">Fotoğraflar</h5>
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedRoommate.images.map((image, index) => (
+                      <div key={index} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                        <img
+                          src={image}
+                          alt={`Fotoğraf ${index + 1}`}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                          onClick={() => {
+                            setCurrentImageIndex(index);
+                            setShowImageLightbox(true);
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -2028,7 +2050,75 @@ export default function EvArkadasiClient() {
                 </div>
               </div>
 
-              <div>
+              {/* Kişisel Bilgiler */}
+              <div className="mt-6">
+                <h5 className="text-lg font-bold text-gray-800 dark:text-white mb-3">Kişisel Bilgiler</h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {selectedRoommate.age && (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <Users size={16} />
+                      <span>Yaş: {selectedRoommate.age}</span>
+                    </div>
+                  )}
+                  {selectedRoommate.gender && (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <span className="w-4 h-4 text-center">👤</span>
+                      <span>Cinsiyet: {selectedRoommate.gender === 'male' ? 'Erkek' : selectedRoommate.gender === 'female' ? 'Kadın' : 'Belirtilmemiş'}</span>
+                    </div>
+                  )}
+                  {selectedRoommate.department && (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <span className="w-4 h-4 text-center">📚</span>
+                      <span>Bölüm: {selectedRoommate.department}</span>
+                    </div>
+                  )}
+                  {selectedRoommate.smoking !== undefined && (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <span className="w-4 h-4 text-center">{selectedRoommate.smoking ? '🚬' : '🚭'}</span>
+                      <span>Sigara: {selectedRoommate.smoking ? 'İçer' : 'İçmez'}</span>
+                    </div>
+                  )}
+                  {selectedRoommate.pets !== undefined && (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <span className="w-4 h-4 text-center">🐾</span>
+                      <span>Evcil Hayvan: {selectedRoommate.pets ? 'Var' : 'Yok'}</span>
+                    </div>
+                  )}
+                  {selectedRoommate.urgency && selectedRoommate.urgency !== 'normal' && (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <span className="w-4 h-4 text-center">⏰</span>
+                      <span>Aciliyet: {selectedRoommate.urgency === 'urgent' ? 'Acil' : selectedRoommate.urgency === 'high' ? 'Yüksek' : 'Normal'}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* İlgi Alanları */}
+              {selectedRoommate.interests && Array.isArray(selectedRoommate.interests) && selectedRoommate.interests.length > 0 && (
+                <div className="mt-6">
+                  <h5 className="text-lg font-bold text-gray-800 dark:text-white mb-3">İlgi Alanları</h5>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedRoommate.interests.map((interest, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-medium"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Depozito Bilgisi */}
+              {selectedRoommate.deposit && (
+                <div className="mt-6">
+                  <h5 className="text-lg font-bold text-gray-800 dark:text-white mb-2">Depozito</h5>
+                  <p className="text-gray-600 dark:text-gray-300">{selectedRoommate.deposit}</p>
+                </div>
+              )}
+
+              <div className="mt-6">
                 <h5 className="font-medium text-gray-800 dark:text-white mb-2">Açıklama</h5>
                 <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line">{selectedRoommate.description}</p>
               </div>
