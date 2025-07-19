@@ -870,7 +870,7 @@ export default function EvArkadasiClient() {
                       onChange={(e) => setSelectedUniversity(e.target.value)}
                       className="flex-1 px-3 py-2 border border-yellow-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm focus:ring-2 focus:ring-yellow-400/50"
                     >
-                      <option value="all" className="text-gray-900">🎓 Tüm Üniversiteler</option>
+                      <option value="all" className="text-gray-900">🎓 Tümü</option>
                       <option value="DAÜ" className="text-gray-900">DAÜ</option>
                       <option value="GAÜ" className="text-gray-900">GAÜ</option>
                       <option value="UKÜ" className="text-gray-900">UKÜ</option>
@@ -1297,8 +1297,8 @@ export default function EvArkadasiClient() {
 
       {/* Add/Edit Modal */}
       {showListingModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-2 md:p-4 pt-4 md:pt-0">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto p-4 md:p-6 shadow-xl mt-4 md:mt-0">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
                 {editItem ? 'İlanı Düzenle' : 'Yeni İlan Ver'}
@@ -1783,8 +1783,8 @@ export default function EvArkadasiClient() {
 
       {/* Detail Modal */}
       {showDetailsModal && selectedRoommate && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-2 md:p-4 pt-4 md:pt-0">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto p-4 md:p-6 shadow-xl mt-4 md:mt-0">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-800 dark:text-white">İlan Detayları</h3>
               <TouchButton
@@ -1873,7 +1873,7 @@ export default function EvArkadasiClient() {
 
       {/* Contact Modal */}
       {showContactModal && selectedRoommate && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-4 pt-8 md:pt-0">
           <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">İletişime Geç</h3>
