@@ -276,11 +276,6 @@ export default function EvArkadasiClient() {
 
         console.log('Toplam ev arkadaşı ilan sayısı:', roommatesData.length);
         console.log('Onay bekleyen ilan sayısı:', roommatesData.filter(item => !item.isApproved).length);
-        
-        // Para birimi debug
-        roommatesData.forEach(roommate => {
-          console.log(`İlan ${roommate.id}: Para birimi = ${roommate.currency}`);
-        });
 
         setRoommates(roommatesData);
       } catch (error) {
@@ -624,8 +619,7 @@ export default function EvArkadasiClient() {
         console.log(`Toplam ${imageUrls.length} resim başarıyla işlendi`);
       }
 
-      console.log('Form verileri:', addForm);
-      console.log('Seçilen para birimi:', addForm.currency);
+
       
       const roommateData = {
         name: addForm.name,
@@ -663,8 +657,7 @@ export default function EvArkadasiClient() {
         // Update existing listing - preserve approval status
         const docRef = doc(db, 'roommates', editItem.id);
         
-        console.log('Güncellenecek ilan ID:', editItem.id);
-        console.log('Güncellenecek para birimi:', addForm.currency);
+
         
         // Only update the form fields, preserve other fields
         await updateDoc(docRef, {
@@ -982,10 +975,12 @@ export default function EvArkadasiClient() {
                         <PoundSterling size={16} className="mr-1" />
                       ) : roommate.currency === 'TL' ? (
                         <span className="mr-1 text-sm font-bold">₺</span>
-                      ) : (
+                      ) : roommate.currency === 'USD' ? (
                         <DollarSign size={16} className="mr-1" />
+                      ) : (
+                        <span className="mr-1 text-sm font-bold">₺</span>
                       )}
-                      {roommate.price} {roommate.currency}
+                      {roommate.price} {roommate.currency || 'TL'}
                       {roommate.isPremium && <span className="text-pink-500 ml-1">💎</span>}
                     </div>
                   </div>
@@ -1667,10 +1662,12 @@ export default function EvArkadasiClient() {
                     <PoundSterling size={16} />
                   ) : selectedRoommate.currency === 'TL' ? (
                     <span className="text-sm font-bold">₺</span>
-                  ) : (
+                  ) : selectedRoommate.currency === 'USD' ? (
                     <DollarSign size={16} />
+                  ) : (
+                    <span className="text-sm font-bold">₺</span>
                   )}
-                  <span>{selectedRoommate.price} {selectedRoommate.currency}</span>
+                  <span>{selectedRoommate.price} {selectedRoommate.currency || 'TL'}</span>
                 </div>
               </div>
 
