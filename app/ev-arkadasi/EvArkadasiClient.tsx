@@ -180,7 +180,7 @@ export default function EvArkadasiClient() {
   });
 
   const { isMobile } = useMobileOptimization();
-  const itemsPerPage = isMobile ? 6 : 9; // Mobilde 6, desktop'ta 9 ilan per sayfa
+  const itemsPerPage = isMobile ? 10 : 9; // Mobilde 10, desktop'ta 9 ilan per sayfa
 
   // Memoized filtered roommates
   const filteredRoommates = useMemo(() => {
@@ -1017,12 +1017,12 @@ export default function EvArkadasiClient() {
             isMobile 
               ? mobileViewMode === 'scroll' 
                 ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide mobile-horizontal-scroll' 
-                : 'flex flex-col gap-4 items-center'
+                : 'grid grid-cols-1 gap-3'
               : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
           } ${isMobile ? 'mobile-content-area' : ''}`}>
                           {paginatedRoommates.map((roommate) => (
                 <div key={roommate.id} className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
-                  isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start mobile-card-touch' : 'w-[280px]') : ''
+                  isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start mobile-card-touch' : '') : ''
                 } ${
                   roommate.isPremium 
                     ? `bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl ${isMobile ? '' : 'hover:shadow-pink-500/25 transform hover:scale-105'}`
@@ -1321,8 +1321,8 @@ export default function EvArkadasiClient() {
           )}
 
           {/* Pagination - Sadece grid modda göster */}
-          {mobileViewMode === 'grid' && totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-8 mb-4 px-4">
+          {mobileViewMode === 'grid' && filteredRoommates.length > 0 && (
+            <div className={`flex justify-center items-center gap-2 mt-8 mb-4 ${isMobile ? 'px-2' : 'px-4'}`}>
               <TouchButton
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
@@ -1337,6 +1337,9 @@ export default function EvArkadasiClient() {
               </TouchButton>
 
               <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-500 mr-2">
+                  {paginatedRoommates.length}/{filteredRoommates.length} ilan, Sayfa {currentPage}/{totalPages}
+                </span>
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                   let pageNum;
                   if (totalPages <= 5) {
