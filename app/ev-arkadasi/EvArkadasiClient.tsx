@@ -989,8 +989,8 @@ export default function EvArkadasiClient() {
           <div className={`${
             isMobile 
               ? mobileViewMode === 'scroll' 
-                ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide touch-pan-x' 
-                : 'flex flex-col gap-4 items-center touch-pan-y'
+                ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide' 
+                : 'flex flex-col gap-4 items-center'
               : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
           } ${isMobile ? 'mobile-content-area' : ''}`}>
                           {filteredRoommates.map((roommate) => (
@@ -1000,7 +1000,7 @@ export default function EvArkadasiClient() {
                   roommate.isPremium 
                     ? `bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl ${isMobile ? '' : 'hover:shadow-pink-500/25 transform hover:scale-105'}`
                     : `bg-white dark:bg-gray-800 shadow-lg ${isMobile ? '' : 'hover:shadow-xl'}`
-                } ${isMobile ? 'mobile-card-touch' : ''}`}>
+                }`}>
                 {/* Premium Glow Effect */}
                 {roommate.isPremium && (
                   <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 via-purple-400/10 to-indigo-400/10 rounded-2xl pointer-events-none"></div>
