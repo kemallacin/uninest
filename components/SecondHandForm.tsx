@@ -43,9 +43,9 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
             preview: img
           })) : [],
           iletisim_tercihleri: initialValues.contactPreferences || {
-            whatsapp: true,
-            telefon: true,
-            eposta: true
+            whatsapp: false,
+            telefon: false,
+            eposta: false
           }
         }
       : {
@@ -59,9 +59,9 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
           aciklama: '',
           urun_fotograflar: [],
           iletisim_tercihleri: {
-            whatsapp: true,
-            telefon: true,
-            eposta: true
+            whatsapp: false,
+            telefon: false,
+            eposta: false
           }
         }
   )
@@ -165,10 +165,16 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
       formData.telefon.trim() !== '' &&
       formData.aciklama.trim() !== '';
 
+    // En az bir iletişim tercihi seçili olmalı
+    const hasContactPreference = 
+      formData.iletisim_tercihleri.whatsapp ||
+      formData.iletisim_tercihleri.telefon ||
+      formData.iletisim_tercihleri.eposta;
+
     // Mevcut hataları kontrol et (validateForm zaten useEffect'te çağrılıyor)
     const noValidationErrors = Object.keys(errors).length === 0;
 
-    return requiredFieldsFilled && noValidationErrors;
+    return requiredFieldsFilled && hasContactPreference && noValidationErrors;
   }
 
   const handleInputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -307,7 +313,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto mobile-scroll-container" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center p-6 border-b">
           <h3 className="text-xl font-semibold text-gray-900">Yeni İlan Ver</h3>
           <button 
@@ -511,43 +517,52 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
           {/* İletişim Tercihleri */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">İletişim Tercihleri</h4>
+            <p className="text-sm text-gray-600 mb-4">Hangi yöntemlerle iletişime geçilmesini istiyorsunuz? (En az bir seçenek seçiniz)</p>
+            {!formData.iletisim_tercihleri.whatsapp && 
+             !formData.iletisim_tercihleri.telefon && 
+             !formData.iletisim_tercihleri.eposta && (
+              <div className="text-red-600 text-sm mb-2">⚠️ En az bir iletişim yöntemi seçmelisiniz</div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  WhatsApp
-                </label>
+              <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                 <input
                   type="checkbox"
                   name="iletisim_tercihleri.whatsapp"
                   checked={formData.iletisim_tercihleri.whatsapp}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefon
-                </label>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-600">📱</span>
+                  <span className="text-sm font-medium text-gray-700">WhatsApp</span>
+                </div>
+              </label>
+              <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                 <input
                   type="checkbox"
                   name="iletisim_tercihleri.telefon"
                   checked={formData.iletisim_tercihleri.telefon}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  E-posta
-                </label>
+                <div className="flex items-center space-x-2">
+                  <span className="text-blue-600">📞</span>
+                  <span className="text-sm font-medium text-gray-700">Telefon</span>
+                </div>
+              </label>
+              <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                 <input
                   type="checkbox"
                   name="iletisim_tercihleri.eposta"
                   checked={formData.iletisim_tercihleri.eposta}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                 />
-              </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-purple-600">📧</span>
+                  <span className="text-sm font-medium text-gray-700">E-posta</span>
+                </div>
+              </label>
             </div>
           </div>
 
