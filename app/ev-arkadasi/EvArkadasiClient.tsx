@@ -1063,7 +1063,21 @@ export default function EvArkadasiClient() {
                 : 'grid grid-cols-1 gap-3'
               : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
           } ${isMobile ? 'mobile-content-area' : ''}`}>
-                          {paginatedRoommates.map((roommate) => (
+                          {paginatedRoommates.map((roommate, index) => (
+                <div key={roommate.id}>
+                  {/* Row indicator for scroll mode */}
+                  {isMobile && mobileViewMode === 'scroll' && index > 0 && index % 3 === 0 && (
+                    <div className="flex items-center justify-center min-w-[60px] bg-blue-50 dark:bg-blue-900/20 rounded-xl border-2 border-dashed border-blue-300 dark:border-blue-600">
+                      <div className="text-center p-3">
+                        <div className="text-blue-600 dark:text-blue-400 text-sm font-medium mb-1">
+                          Satır {Math.floor(index / 3) + 1}
+                        </div>
+                        <div className="text-xs text-blue-500 dark:text-blue-400">
+                          → Kaydır
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 <div key={roommate.id} id={`card-${roommate.id}`} data-card className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
                   isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start mobile-card-touch' : '') : ''
                 } ${
@@ -1388,6 +1402,7 @@ export default function EvArkadasiClient() {
 
                 </div>
               </div>
+                </div>
             ))}
           </div>
 
@@ -2229,7 +2244,7 @@ export default function EvArkadasiClient() {
 
       {/* Image Lightbox Modal */}
       {showImageLightbox && selectedRoommate && selectedRoommate.images && selectedRoommate.images.length > 0 && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[60] p-2 md:p-4">
           <div className="relative max-w-4xl w-full max-h-[90vh]">
             {/* Close Button */}
             <button
