@@ -798,13 +798,13 @@ export default function EvArkadasiClient() {
                 </TouchButton>
 
                 {/* View Mode Toggle */}
-                <div className="flex bg-black/20 backdrop-blur-sm rounded-lg border border-white/30 p-1 shadow-lg">
+                <div className="flex bg-white/15 backdrop-blur-sm rounded-xl border border-yellow-400/30 p-1 shadow-lg">
                   <TouchButton
                     onClick={() => setMobileViewMode('grid')}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-md text-xs font-medium transition-all duration-200 touch-manipulation ${
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 touch-manipulation ${
                       mobileViewMode === 'grid' 
-                        ? 'bg-white text-purple-600 shadow-lg font-bold transform scale-105' 
-                        : `text-white/80 bg-white/10 ${isMobile ? '' : 'hover:text-white hover:bg-white/20'}`
+                        ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 shadow-xl font-bold' 
+                        : `text-white/90 bg-transparent ${isMobile ? '' : 'hover:text-white hover:bg-white/10'}`
                     }`}
                   >
                     <div className="grid grid-cols-2 gap-0.5 w-3 h-3">
@@ -817,10 +817,10 @@ export default function EvArkadasiClient() {
                   </TouchButton>
                   <TouchButton
                     onClick={() => setMobileViewMode('scroll')}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-md text-xs font-medium transition-all duration-200 touch-manipulation ${
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 touch-manipulation ${
                       mobileViewMode === 'scroll' 
-                        ? 'bg-white text-purple-600 shadow-lg font-bold transform scale-105' 
-                        : `text-white/80 bg-white/10 ${isMobile ? '' : 'hover:text-white hover:bg-white/20'}`
+                        ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 shadow-xl font-bold' 
+                        : `text-white/90 bg-transparent ${isMobile ? '' : 'hover:text-white hover:bg-white/10'}`
                     }`}
                   >
                     <div className="flex gap-0.5 w-3 h-3 items-center">
