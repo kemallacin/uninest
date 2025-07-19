@@ -144,7 +144,8 @@ export default function EvArkadasiClient() {
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
-  const [selectedType, setSelectedType] = useState('all');
+  const [selectedType, setSelectedType] = useState('all'); // all, seeking, offering
+  const [selectedUniversity, setSelectedUniversity] = useState('all'); // üniversite filtresi için ayrı state
   const [showFilters, setShowFilters] = useState(false);
   const [mobileViewMode, setMobileViewMode] = useState<'grid' | 'scroll'>('scroll'); // scroll: yan kaydırma, grid: alt alta
 
@@ -211,9 +212,14 @@ export default function EvArkadasiClient() {
       filtered = filtered.filter(roommate => roommate.gender === selectedGender);
     }
 
-    // University filter
+    // Type filter (seeking/offering)
     if (selectedType !== 'all') {
-      filtered = filtered.filter(roommate => roommate.university.includes(selectedType));
+      filtered = filtered.filter(roommate => roommate.type === selectedType);
+    }
+
+    // University filter
+    if (selectedUniversity !== 'all') {
+      filtered = filtered.filter(roommate => roommate.university.includes(selectedUniversity));
     }
 
     // Premium sıralama
@@ -227,7 +233,7 @@ export default function EvArkadasiClient() {
       const dateB = b.createdAt?.getTime?.() || 0;
       return dateB - dateA;
     });
-  }, [roommates, searchTerm, selectedLocation, selectedGender, selectedType, isAdmin, user]);
+  }, [roommates, searchTerm, selectedLocation, selectedGender, selectedType, selectedUniversity, isAdmin, user]);
 
   // Firebase auth state listener ve admin kontrolü
   useEffect(() => {
@@ -352,6 +358,7 @@ export default function EvArkadasiClient() {
     setSelectedLocation('');
     setSelectedGender('');
     setSelectedType('all');
+    setSelectedUniversity('all');
   };
 
   const toggleFavorite = useCallback(async (roommate: RoommateItem) => {
@@ -860,8 +867,8 @@ export default function EvArkadasiClient() {
                       <option value="Kadın" className="text-gray-900">👩 Kadın</option>
                     </select>
                     <select
-                      value={selectedType}
-                      onChange={(e) => setSelectedType(e.target.value)}
+                      value={selectedUniversity}
+                      onChange={(e) => setSelectedUniversity(e.target.value)}
                       className="flex-1 px-3 py-2 border border-yellow-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm focus:ring-2 focus:ring-yellow-400/50"
                     >
                       <option value="all" className="text-gray-900">🎓 Tüm Üniversiteler</option>
@@ -946,8 +953,8 @@ export default function EvArkadasiClient() {
                   Üniversite
                 </label>
                 <select
-                  value={selectedType}
-                  onChange={(e) => setSelectedType(e.target.value)}
+                  value={selectedUniversity}
+                  onChange={(e) => setSelectedUniversity(e.target.value)}
                   className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 dark:border-gray-600 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                 >
                   <option value="all">Tüm Üniversiteler</option>
