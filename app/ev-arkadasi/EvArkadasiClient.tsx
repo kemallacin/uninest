@@ -276,6 +276,11 @@ export default function EvArkadasiClient() {
 
         console.log('Toplam ev arkadaşı ilan sayısı:', roommatesData.length);
         console.log('Onay bekleyen ilan sayısı:', roommatesData.filter(item => !item.isApproved).length);
+        
+        // Para birimi debug
+        roommatesData.forEach(roommate => {
+          console.log(`İlan ${roommate.id}: Para birimi = ${roommate.currency}`);
+        });
 
         setRoommates(roommatesData);
       } catch (error) {
@@ -619,6 +624,9 @@ export default function EvArkadasiClient() {
         console.log(`Toplam ${imageUrls.length} resim başarıyla işlendi`);
       }
 
+      console.log('Form verileri:', addForm);
+      console.log('Seçilen para birimi:', addForm.currency);
+      
       const roommateData = {
         name: addForm.name,
         age: addForm.age,
@@ -654,6 +662,9 @@ export default function EvArkadasiClient() {
       if (editItem) {
         // Update existing listing - preserve approval status
         const docRef = doc(db, 'roommates', editItem.id);
+        
+        console.log('Güncellenecek ilan ID:', editItem.id);
+        console.log('Güncellenecek para birimi:', addForm.currency);
         
         // Only update the form fields, preserve other fields
         await updateDoc(docRef, {
