@@ -13,7 +13,7 @@ import TouchButton from '../../components/TouchButton';
 import PullToRefresh from '../../components/PullToRefresh';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useMobileOptimization } from '../../hooks/useMobileOptimization';
-import { Search, Filter, MapPin, Star, MessageCircle, Heart, Share2, X, Plus, Trash2, Edit, Eye, ChevronLeft, ChevronRight, CheckCircle, Clock, Calendar, Phone, Mail } from 'lucide-react';
+import { Search, Filter, MapPin, Star, MessageCircle, Heart, Share2, X, Plus, Trash2, Edit, Eye, ChevronLeft, ChevronRight, CheckCircle, Clock, Calendar, Phone, Mail, Grid3X3, List, ArrowUp, ArrowDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface SecondHandItem {
@@ -67,6 +67,9 @@ const IkinciElClient = () => {
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
   const [priceRangeValue, setPriceRangeValue] = useState(10000); // slider için max değer
   const [activeCondition, setActiveCondition] = useState(''); // durum filtresi
+  const [viewMode, setViewMode] = useState<'grid' | 'scroll'>('grid'); // görünüm modu
+  const [currentPage, setCurrentPage] = useState(1);
+  const [modalPosition, setModalPosition] = useState<{top: number} | null>(null);
 
   const categories = [
     { id: 'all', name: 'Tümü', icon: '🏠' },
@@ -207,8 +210,14 @@ const IkinciElClient = () => {
     // Bu fonksiyon opsiyonel, UX için toast veya animasyon eklenebilir
   };
 
+  const { isMobile } = useMobileOptimization();
+
   // Filtrelenmiş ilanlar
   const filteredItems = items.filter((item) => {
+    // Onay bekleyen filtresi (admin için)
+    if (showPendingOnly && item.isApproved) return false;
+    if (!showPendingOnly && !item.isApproved && !isAdmin) return false; // Normal kullanıcılar onaylanmamış ilanları görmesin
+    
     // Arama
     const searchMatch =
       item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -231,6 +240,17 @@ const IkinciElClient = () => {
     const dateB = b.createdAt?.seconds || 0;
     return dateB - dateA;
   });
+
+  // Pagination logic
+  const itemsPerPage = isMobile ? (viewMode === 'scroll' ? 6 : 9) : 12;
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeCategory, activeCondition, priceRangeValue, showPendingOnly]);
 
   // Onay bekleyen ilan sayısı
   const pendingCount = items.filter(item => !item.isApproved).length;
@@ -270,6 +290,7 @@ const IkinciElClient = () => {
     setSelectedItem(null);
     setEditItem(null);
     setCurrentImageIndex(0);
+    setModalPosition(null); // Modal konumunu sıfırla
   };
 
   const handleİlanVer = () => {
@@ -650,11 +671,64 @@ const IkinciElClient = () => {
     return Math.round(((previousPrice - currentPrice) / previousPrice) * 100);
   };
 
-  const { isMobile } = useMobileOptimization();
-
   const handleRefresh = async () => {
     // Real-time listener zaten aktif olduğu için sadece toast göster
     showToast('Liste yenilendi', 'success');
+  };
+
+  // Modal konumlandırma fonksiyonları
+  const calculateModalPosition = (cardElement: HTMLElement) => {
+    if (!isMobile) return null; // Desktop'ta ortalanmış modal
+    
+    const rect = cardElement.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const cardTop = rect.top;
+    const cardHeight = rect.height;
+    
+    // Kart görünür alanda mı kontrol et
+    if (cardTop < 0 || cardTop > viewportHeight) {
+      // Kart görünür alanda değilse, viewport ortasına yerleştir
+      return { top: viewportHeight * 0.1 };
+    }
+    
+    // Modal yüksekliği tahmini (viewport'un %80'i)
+    const modalHeight = viewportHeight * 0.8;
+    let modalTop = cardTop - 50; // Kartın biraz üstünde başlat
+    
+    // Alt sınır kontrolü
+    if (modalTop + modalHeight > viewportHeight - 50) {
+      modalTop = viewportHeight - modalHeight - 50;
+    }
+    
+    // Üst sınır kontrolü
+    if (modalTop < 50) {
+      modalTop = 50;
+    }
+    
+    return { top: modalTop };
+  };
+
+  const handleDetailClick = (item: SecondHandItem, event: React.MouseEvent) => {
+    const cardElement = event.currentTarget.closest('.item-card') as HTMLElement;
+    if (cardElement) {
+      const position = calculateModalPosition(cardElement);
+      setModalPosition(position);
+    }
+    
+    setSelectedItem(item);
+    setShowDetailsModal(true);
+    setCurrentImageIndex(0);
+  };
+
+  const handleContactClick = (item: SecondHandItem, event: React.MouseEvent) => {
+    const cardElement = event.currentTarget.closest('.item-card') as HTMLElement;
+    if (cardElement) {
+      const position = calculateModalPosition(cardElement);
+      setModalPosition(position);
+    }
+    
+    setSelectedItem(item);
+    setShowContactModal(true);
   };
 
   if (loading) {
@@ -662,9 +736,9 @@ const IkinciElClient = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 ${isMobile ? 'mobile-smooth-scroll' : ''}`}>
       <Header />
-      <PullToRefresh onRefresh={handleRefresh} className="min-h-screen">
+      <PullToRefresh onRefresh={handleRefresh} className={`min-h-screen ${isMobile ? 'mobile-scroll-container' : ''}`}>
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-[#1c0f3f] to-[#2e0f5f] text-white py-16">
           <div className="container mx-auto px-4 text-center">
@@ -857,22 +931,56 @@ const IkinciElClient = () => {
             </div>
           </div>
 
-          {/* Results Count */}
-          <div className="mb-6">
+          {/* Results Count and View Controls */}
+          <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <p className="text-gray-600 dark:text-gray-400">
               {filteredItems.length} sonuç bulundu
             </p>
+            
+            {/* View Mode Toggle - Mobile Only */}
+            {isMobile && (
+              <div className="flex items-center gap-2">
+                <TouchButton
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    viewMode === 'grid'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <Grid3X3 size={16} />
+                  Grid
+                </TouchButton>
+                <TouchButton
+                  onClick={() => setViewMode('scroll')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    viewMode === 'scroll'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <List size={16} />
+                  Kaydır
+                </TouchButton>
+              </div>
+            )}
           </div>
 
-          {/* Items Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => {
+          {/* Items Grid/Scroll */}
+          <div className={`${
+            isMobile && viewMode === 'scroll' 
+              ? 'flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide' 
+              : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+          }`}>
+            {paginatedItems.map((item, index) => {
               const isOwner = user && item.userId === user.uid;
               const images = item.images || [item.image];
               const discount = item.originalPrice ? calculateDiscount(item.originalPrice, item.price) : 0;
               
               return (
-                <div key={item.id} className={`rounded-2xl transition-all duration-300 overflow-hidden relative ${
+                <div key={item.id} className={`item-card rounded-2xl transition-all duration-300 overflow-hidden relative ${
+                  isMobile && viewMode === 'scroll' ? 'min-w-[280px] snap-center mobile-card-touch' : ''
+                } ${
                   item.isPremium 
                     ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105' 
                     : 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl'
@@ -1022,29 +1130,41 @@ const IkinciElClient = () => {
 
                     {/* Actions */}
                     <div className="flex gap-2 mb-3">
-                      <button
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setShowDetailsModal(true);
-                          setCurrentImageIndex(0);
-                        }}
-                        className="flex-1 flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium transition"
-                      >
-                        <Eye size={16} />
-                        Detay
-                      </button>
-                      
-                      {!isOwner && (
-                        <button
-                          onClick={() => {
-                            setSelectedItem(item);
-                            setShowContactModal(true);
-                          }}
-                          className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white py-2 px-4 rounded-lg font-medium transition"
-                        >
-                          <MessageCircle size={16} />
-                          İletişim
-                        </button>
+                      {/* Owner buttons: Edit, Delete, Share */}
+                      {isOwner ? (
+                        <>
+                          <button
+                            onClick={(e) => handleDetailClick(item, e)}
+                            className="flex-1 flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium transition"
+                          >
+                            <Eye size={16} />
+                            Detay
+                          </button>
+                          <button
+                            onClick={() => handleShare(item)}
+                            className="flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg font-medium transition"
+                          >
+                            <Share2 size={16} />
+                          </button>
+                        </>
+                      ) : (
+                        /* Non-owner buttons: Detail, Contact */
+                        <>
+                          <button
+                            onClick={(e) => handleDetailClick(item, e)}
+                            className="flex-1 flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium transition"
+                          >
+                            <Eye size={16} />
+                            Detay
+                          </button>
+                          <button
+                            onClick={(e) => handleContactClick(item, e)}
+                            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white py-2 px-4 rounded-lg font-medium transition"
+                          >
+                            <MessageCircle size={16} />
+                            İletişim
+                          </button>
+                        </>
                       )}
                     </div>
 
@@ -1132,6 +1252,65 @@ const IkinciElClient = () => {
             })}
           </div>
 
+          {/* Row Indicators for Scroll Mode - Mobile Only */}
+          {isMobile && viewMode === 'scroll' && paginatedItems.length > 3 && (
+            <div className="flex justify-center mt-4 gap-1">
+              {Array.from({ length: Math.ceil(paginatedItems.length / 3) }, (_, i) => (
+                <div
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination Controls - Grid Mode */}
+          {viewMode === 'grid' && totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              <TouchButton
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === 1 
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+              >
+                <ArrowUp size={16} />
+                Önceki
+              </TouchButton>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <TouchButton
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {page}
+                  </TouchButton>
+                ))}
+              </div>
+
+              <TouchButton
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === totalPages 
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+              >
+                Sonraki
+                <ArrowDown size={16} />
+              </TouchButton>
+            </div>
+          )}
+
           {/* Empty State */}
           {filteredItems.length === 0 && (
             <div className="text-center py-12">
@@ -1157,7 +1336,18 @@ const IkinciElClient = () => {
         {/* Contact Modal */}
         {showContactModal && selectedItem && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <div 
+              className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl"
+              style={modalPosition && isMobile ? { 
+                position: 'fixed',
+                top: `${modalPosition.top}px`,
+                left: '1rem',
+                right: '1rem',
+                width: 'calc(100% - 2rem)',
+                maxWidth: '28rem',
+                transform: 'none'
+              } : {}}
+            >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">İletişime Geç</h3>
                 <TouchButton
@@ -1229,7 +1419,19 @@ const IkinciElClient = () => {
         {/* Details Modal with Image Gallery */}
         {showDetailsModal && selectedItem && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div 
+              className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              style={modalPosition && isMobile ? { 
+                position: 'fixed',
+                top: `${modalPosition.top}px`,
+                left: '1rem',
+                right: '1rem',
+                width: 'calc(100% - 2rem)',
+                maxWidth: '56rem',
+                maxHeight: '80vh',
+                transform: 'none'
+              } : {}}
+            >
               <div className="relative">
                 {(() => {
                   const images = selectedItem.images || [selectedItem.image];
@@ -1361,7 +1563,7 @@ const IkinciElClient = () => {
       <Footer />
 
       {showImageLightbox && selectedItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999]">
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] p-4">
           <button
             className="absolute top-4 right-4 text-white text-3xl font-bold z-10"
             onClick={() => setShowImageLightbox(false)}
