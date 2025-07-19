@@ -257,12 +257,6 @@ export default function EvArkadasiClient() {
 
   // İlanları yükle
   useEffect(() => {
-    // User olmasa bile ilanları göster
-    // if (!user) {
-    //   setRoommates([]);
-    //   return;
-    // }
-
     console.log('Ev arkadaşı ilanları yükleniyor... Admin:', isAdmin);
 
     const q = query(
@@ -288,7 +282,7 @@ export default function EvArkadasiClient() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, []); // User dependency'sini kaldırdık
 
   // Kullanıcının favorilerini Firestore'dan çek
   useEffect(() => {
