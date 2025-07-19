@@ -46,16 +46,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       // localStorage'dan tema tercihini al
       const savedTheme = localStorage.getItem('theme') as Theme;
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       
+      // Varsayılan olarak AÇIK TEMA kullan
       let initialTheme: Theme = 'light';
       
+      // Sadece kullanıcı manuel olarak tema seçtiyse onun tercihini kullan
       if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
         initialTheme = savedTheme;
         console.log('🎨 ThemeProvider - localStorage\'dan tema yüklendi:', savedTheme);
-      } else if (prefersDark) {
-        initialTheme = 'dark';
-        console.log('🎨 ThemeProvider - Sistem tercihi karanlık tema');
+      } else {
+        // Yeni ziyaretçiler için varsayılan açık tema
+        console.log('🎨 ThemeProvider - Varsayılan açık tema kullanılıyor');
       }
       
       setThemeState(initialTheme);
