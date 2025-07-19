@@ -988,13 +988,13 @@ export default function EvArkadasiClient() {
           <div className={`${
             isMobile 
               ? mobileViewMode === 'scroll' 
-                ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide' 
+                ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide mobile-horizontal-scroll' 
                 : 'flex flex-col gap-4 items-center'
               : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
           } ${isMobile ? 'mobile-content-area' : ''}`}>
                           {filteredRoommates.map((roommate) => (
                 <div key={roommate.id} className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
-                  isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start' : 'w-[280px]') : ''
+                  isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start mobile-card-touch' : 'w-[280px]') : ''
                 } ${
                   roommate.isPremium 
                     ? `bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl ${isMobile ? '' : 'hover:shadow-pink-500/25 transform hover:scale-105'}`

@@ -452,10 +452,19 @@ textarea {
   .mobile-content-area {
     touch-action: auto !important;
     -webkit-overflow-scrolling: touch;
-    overflow-x: hidden;
+    overflow-x: visible;
     overflow-y: visible;
     position: relative;
     min-height: auto;
+  }
+  
+  /* Horizontal scroll specific */
+  .mobile-horizontal-scroll {
+    touch-action: pan-x !important;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
   }
   
   /* Remove all card touch restrictions */
@@ -471,6 +480,12 @@ textarea {
   .mobile-card-touch *,
   .mobile-content-area * {
     touch-action: inherit !important;
+  }
+  
+  /* Horizontal scroll cards */
+  .mobile-horizontal-scroll .mobile-card-touch,
+  .mobile-horizontal-scroll > * {
+    touch-action: pan-x !important;
   }
   
   /* Only restrict button interactions */
