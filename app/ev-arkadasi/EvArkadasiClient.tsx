@@ -147,7 +147,8 @@ export default function EvArkadasiClient() {
   const [selectedType, setSelectedType] = useState('all'); // all, seeking, offering
   const [selectedUniversity, setSelectedUniversity] = useState('all'); // üniversite filtresi için ayrı state
   const [showFilters, setShowFilters] = useState(false);
-  const [mobileViewMode, setMobileViewMode] = useState<'grid' | 'scroll'>('scroll'); // scroll: yan kaydırma, grid: alt alta
+  const [mobileViewMode, setMobileViewMode] = useState<'grid' | 'scroll'>('grid'); // grid: alt alta, scroll: yan kaydırma
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Add form state
   const [addForm, setAddForm] = useState({
@@ -179,6 +180,7 @@ export default function EvArkadasiClient() {
   });
 
   const { isMobile } = useMobileOptimization();
+  const itemsPerPage = isMobile ? 6 : 9; // Mobilde 6, desktop'ta 9 ilan per sayfa
 
   // Memoized filtered roommates
   const filteredRoommates = useMemo(() => {
@@ -234,6 +236,32 @@ export default function EvArkadasiClient() {
       return dateB - dateA;
     });
   }, [roommates, searchTerm, selectedLocation, selectedGender, selectedType, selectedUniversity, isAdmin, user]);
+
+  // Sayfalama ile filtrelenmiş ilanlar
+  const paginatedRoommates = useMemo(() => {
+    if (mobileViewMode === 'scroll') {
+      return filteredRoommates; // Scroll modda tüm ilanlar gösterilir
+    }
+    
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredRoommates.slice(startIndex, endIndex);
+  }, [filteredRoommates, currentPage, itemsPerPage, mobileViewMode]);
+
+  // Toplam sayfa sayısı
+  const totalPages = Math.ceil(filteredRoommates.length / itemsPerPage);
+
+  // Sayfa değiştiğinde üste scroll
+  useEffect(() => {
+    if (mobileViewMode === 'grid') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentPage, mobileViewMode]);
+
+  // View mode değiştiğinde sayfa sıfırla
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [mobileViewMode]);
 
   // Firebase auth state listener ve admin kontrolü
   useEffect(() => {
@@ -896,7 +924,7 @@ export default function EvArkadasiClient() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4">
+        <div className={`container mx-auto ${isMobile ? 'px-1' : 'px-4'}`}>
           {/* Search and Filters - Desktop only */}
           <div className="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
             {/* Search Bar */}
@@ -992,7 +1020,7 @@ export default function EvArkadasiClient() {
                 : 'flex flex-col gap-4 items-center'
               : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
           } ${isMobile ? 'mobile-content-area' : ''}`}>
-                          {filteredRoommates.map((roommate) => (
+                          {paginatedRoommates.map((roommate) => (
                 <div key={roommate.id} className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
                   isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start mobile-card-touch' : 'w-[280px]') : ''
                 } ${
@@ -1272,7 +1300,7 @@ export default function EvArkadasiClient() {
           </div>
 
           {/* Empty State */}
-          {filteredRoommates.length === 0 && !loading && (
+          {paginatedRoommates.length === 0 && !loading && (
             <div className="text-center py-12">
               <Users className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">Henüz ilan yok</h3>
@@ -1289,6 +1317,66 @@ export default function EvArkadasiClient() {
                   İlan Ver
                 </TouchButton>
               )}
+            </div>
+          )}
+
+          {/* Pagination - Sadece grid modda göster */}
+          {mobileViewMode === 'grid' && totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-8 mb-4 px-4">
+              <TouchButton
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  currentPage === 1 
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
+              >
+                <span className="text-sm">←</span>
+                Önceki
+              </TouchButton>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+
+                  return (
+                    <TouchButton
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {pageNum}
+                    </TouchButton>
+                  );
+                })}
+              </div>
+
+              <TouchButton
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  currentPage === totalPages 
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
+              >
+                Sonraki
+                <span className="text-sm">→</span>
+              </TouchButton>
             </div>
           )}
         </div>
