@@ -231,8 +231,8 @@
   }
 }
 
-/* Dark mode optimizations */
-@media (prefers-color-scheme: dark) {
+/* Dark mode optimizations - devre dışı, sadece manuel tema seçimi */
+/* @media (prefers-color-scheme: dark) {
   .lazy-image {
     background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
   }
@@ -240,7 +240,7 @@
   .loading-skeleton {
     background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
   }
-}
+} */
 
 /* Landscape mode optimizations */
 @media (max-width: 768px) and (orientation: landscape) {

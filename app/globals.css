@@ -301,8 +301,8 @@ button, input, select, textarea {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark mode specific styles */
-@media (prefers-color-scheme: dark) {
+/* Dark mode specific styles - devre dışı, sadece manuel tema seçimi */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0f172a;
     --foreground: #f8fafc;
@@ -324,7 +324,7 @@ button, input, select, textarea {
     --input: #334155;
     --ring: #3b82f6;
   }
-}
+} */
 
 body {
   background-color: var(--background);
