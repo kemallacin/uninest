@@ -420,19 +420,21 @@ export default function EvArkadasiClient() {
   }, [user, favorites, showToast]);
 
   const handleShare = useCallback(async (roommate: RoommateItem) => {
+    const cardUrl = `${window.location.origin}/ev-arkadasi#card-${roommate.id}`;
+    
     if (navigator.share) {
       try {
         await navigator.share({
           title: `${roommate.name} - Ev Arkadaşı`,
           text: `${roommate.name} - ${roommate.university} - ${roommate.price} ${roommate.currency}`,
-          url: window.location.href
+          url: cardUrl
         });
       } catch (error) {
         // Silent fail for share errors
       }
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      showToast('Link kopyalandı!', 'success');
+      navigator.clipboard.writeText(cardUrl);
+      showToast('İlan linki kopyalandı!', 'success');
     }
   }, [showToast]);
 
@@ -1062,7 +1064,7 @@ export default function EvArkadasiClient() {
               : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
           } ${isMobile ? 'mobile-content-area' : ''}`}>
                           {paginatedRoommates.map((roommate) => (
-                <div key={roommate.id} data-card className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
+                <div key={roommate.id} id={`card-${roommate.id}`} data-card className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
                   isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start mobile-card-touch' : '') : ''
                 } ${
                   roommate.isPremium 
@@ -1216,7 +1218,57 @@ export default function EvArkadasiClient() {
 
                   {/* Actions - Mobile optimized */}
                   <div className={`flex gap-1.5 md:gap-2 mb-2 md:mb-3 ${isMobile ? '' : ''}`}>
-                    <button
+                    {/* Kendi ilanı ise düzenle/sil, başkasının ilanı ise detay/iletişim */}
+                    {roommate.userId === user?.uid ? (
+                      <>
+                        <TouchButton
+                          onClick={() => {
+                            setEditItem(roommate);
+                            setAddForm({
+                              name: roommate.name,
+                              age: roommate.age,
+                              university: roommate.university,
+                              department: roommate.department,
+                              location: roommate.location,
+                              price: roommate.price,
+                              currency: roommate.currency,
+                              roomType: roommate.roomType,
+                              availableFrom: roommate.availableFrom,
+                              description: roommate.description,
+                              gender: roommate.gender,
+                              type: roommate.type,
+                              smoking: roommate.smoking,
+                              pets: roommate.pets,
+                              phone: roommate.phone,
+                              email: roommate.email,
+                              urgency: roommate.urgency || 'normal',
+                              deposit: roommate.deposit || '',
+                              contactPreferences: typeof roommate.contactPreferences === 'object' ? roommate.contactPreferences : { whatsapp: false, telefon: false, eposta: false },
+                              interests: Array.isArray(roommate.interests) ? roommate.interests : [],
+                              images: []
+                            });
+                            setShowListingModal(true);
+                          }}
+                          className={`flex-1 flex items-center justify-center gap-1 md:gap-2 bg-blue-500 ${isMobile ? '' : 'hover:bg-blue-600'} text-white py-2 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'}`}
+                        >
+                          <Edit size={isMobile ? 14 : 16} />
+                          {isMobile ? 'Düzenle' : 'Düzenle'}
+                        </TouchButton>
+                        <TouchButton
+                          onClick={() => {
+                            if (window.confirm('Bu ilanı silmek istediğinizden emin misiniz?')) {
+                              handleDelete(roommate.id);
+                            }
+                          }}
+                          className={`flex-1 flex items-center justify-center gap-1 md:gap-2 bg-red-500 ${isMobile ? '' : 'hover:bg-red-600'} text-white py-2 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'}`}
+                        >
+                          <Trash2 size={isMobile ? 14 : 16} />
+                          {isMobile ? 'Sil' : 'Sil'}
+                        </TouchButton>
+                      </>
+                    ) : (
+                      <>
+                        <button
                       onClick={(e) => {
                         if (!user) {
                           showToast('Detay görmek için lütfen giriş yapın!', 'error');
@@ -1260,14 +1312,18 @@ export default function EvArkadasiClient() {
                       }}
                                               className={`flex-1 flex items-center justify-center gap-1 md:gap-2 bg-gradient-to-r from-purple-500 to-blue-500 ${isMobile ? '' : 'hover:from-purple-600 hover:to-blue-600'} text-white py-2 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'}`}
                     >
-                      <MessageCircle size={isMobile ? 14 : 16} />
-                      {isMobile ? 'İletişim' : 'İletişim'}
-                    </TouchButton>
+                        <MessageCircle size={isMobile ? 14 : 16} />
+                        {isMobile ? 'İletişim' : 'İletişim'}
+                      </TouchButton>
+                      </>
+                    )}
                   </div>
 
                   {/* Favorite, Share and Report - Mobile optimized */}
                   <div className={`flex gap-1.5 md:gap-2 mb-2 md:mb-3 ${isMobile ? 'justify-center' : ''}`}>
-                    <TouchButton
+                    {/* Favori butonu - sadece başkasının ilanında göster */}
+                    {roommate.userId !== user?.uid && (
+                      <TouchButton
                       onClick={() => {
                         if (!user) {
                           showToast('Favorilere eklemek için lütfen giriş yapın!', 'error');
@@ -1288,9 +1344,10 @@ export default function EvArkadasiClient() {
                           : `bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 ${isMobile ? '' : 'hover:bg-gray-200 dark:hover:bg-gray-600'}`
                       }`}
                     >
-                      <Heart size={isMobile ? 12 : 16} fill={user && favorites.includes(roommate.id) ? 'currentColor' : 'none'} />
-                      {!isMobile && (user && favorites.includes(roommate.id) ? 'Favoride' : 'Favorile')}
-                    </TouchButton>
+                        <Heart size={isMobile ? 12 : 16} fill={user && favorites.includes(roommate.id) ? 'currentColor' : 'none'} />
+                        {!isMobile && (user && favorites.includes(roommate.id) ? 'Favoride' : 'Favorile')}
+                      </TouchButton>
+                    )}
                     <TouchButton
                       onClick={() => {
                         handleShare(roommate);
@@ -1300,9 +1357,12 @@ export default function EvArkadasiClient() {
                       <Share2 size={isMobile ? 12 : 16} />
                       {!isMobile && 'Paylaş'}
                     </TouchButton>
-                    <div className={`${isMobile ? 'flex-1' : ''} flex justify-center`}>
-                      <ReportButton contentType="roommate" contentId={roommate.id} />
-                    </div>
+                    {/* Şikayet butonu - sadece başkasının ilanında göster */}
+                    {roommate.userId !== user?.uid && (
+                      <div className={`${isMobile ? 'flex-1' : ''} flex justify-center`}>
+                        <ReportButton contentType="roommate" contentId={roommate.id} />
+                      </div>
+                    )}
                   </div>
 
                   {/* Admin Actions */}
@@ -1325,25 +1385,7 @@ export default function EvArkadasiClient() {
                     </div>
                   )}
 
-                  {/* Owner Actions */}
-                  {user && roommate.userId === user.uid && (
-                    <div className="mt-3 flex gap-2">
-                      <TouchButton
-                        onClick={() => handleEdit(roommate)}
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition"
-                      >
-                        <Edit size={16} />
-                        Düzenle
-                      </TouchButton>
-                      <TouchButton
-                        onClick={() => handleDelete(roommate.id)}
-                        className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition"
-                      >
-                        <Trash2 size={16} />
-                        Sil
-                      </TouchButton>
-                    </div>
-                  )}
+
                 </div>
               </div>
             ))}
@@ -2002,10 +2044,11 @@ export default function EvArkadasiClient() {
                   İletişime Geç
                 </TouchButton>
                 <TouchButton
-                  onClick={() => {
-                    setShowDetailsModal(false);
-                    setSelectedRoommate(null);
-                  }}
+                                  onClick={() => {
+                  setShowDetailsModal(false);
+                  setSelectedRoommate(null);
+                  setModalPosition(null);
+                }}
                   className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 px-6 rounded-xl font-medium"
                 >
                   Kapat
