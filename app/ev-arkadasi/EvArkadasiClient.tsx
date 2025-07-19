@@ -1199,10 +1199,6 @@ export default function EvArkadasiClient() {
                     </TouchButton>
                     <TouchButton
                       onClick={() => {
-                        if (!user) {
-                          showToast('Paylaşmak için lütfen giriş yapın!', 'error');
-                          return;
-                        }
                         handleShare(roommate);
                       }}
                                               className={`flex items-center justify-center gap-1 md:gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 ${isMobile ? '' : 'hover:bg-blue-200 dark:hover:bg-blue-900/50'} py-1.5 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'flex-1 text-xs' : 'text-sm'}`}
