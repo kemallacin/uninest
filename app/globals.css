@@ -402,18 +402,20 @@ textarea {
   user-select: none;
 }
 
-/* Fix mobile touch scroll issues */
+/* Fix mobile touch scroll issues - NO BOUNCE */
 @media (max-width: 768px) {
   * {
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: auto !important;
     -webkit-transform: translate3d(0, 0, 0);
+    overscroll-behavior: none !important;
+    overscroll-behavior-y: none !important;
   }
   
   body, html {
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: auto !important;
+    overscroll-behavior: none !important;
+    overscroll-behavior-y: none !important;
     position: relative;
   }
   
@@ -430,11 +432,12 @@ textarea {
     background-color: inherit !important;
   }
   
-  /* Smooth scroll for mobile */
+  /* Smooth scroll for mobile - NO BOUNCE */
   .mobile-smooth-scroll {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    scroll-behavior: auto;
+    -webkit-overflow-scrolling: auto;
+    overscroll-behavior: none !important;
+    overscroll-behavior-y: none !important;
   }
   
   /* Prevent zoom on inputs */
@@ -467,47 +470,82 @@ textarea {
     scroll-behavior: smooth;
   }
   
-  /* Remove all card touch restrictions */
+  /* Card touch behavior - allow vertical scroll */
   .mobile-card-touch {
-    touch-action: auto !important;
+    touch-action: pan-y !important;
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0.1);
     position: relative;
   }
   
-  /* Allow normal scroll everywhere */
-  .mobile-card-touch *,
-  .mobile-content-area * {
-    touch-action: inherit !important;
+  /* Horizontal scroll specific areas */
+  .mobile-horizontal-scroll {
+    touch-action: pan-x !important;
   }
   
-  /* Horizontal scroll cards */
   .mobile-horizontal-scroll .mobile-card-touch,
   .mobile-horizontal-scroll > * {
     touch-action: pan-x !important;
   }
   
-  /* Only restrict button interactions */
-  .mobile-card-touch button {
+  /* Button interactions */
+  .mobile-card-touch button,
+  button {
     touch-action: manipulation !important;
   }
   
-  /* Fix overscroll into footer */
-  body {
-    overscroll-behavior-y: contain !important;
-    overflow-x: hidden;
+  /* Fix div gaps and empty spaces */
+  div:empty,
+  .space-y-3,
+  .space-y-4,
+  .gap-3,
+  .gap-4 {
+    touch-action: pan-y !important;
   }
   
-  /* Prevent footer scroll-through */
+  /* Fix overscroll and reverse scroll issues */
+  body {
+    overscroll-behavior: none !important;
+    overscroll-behavior-y: none !important;
+    overscroll-behavior-x: none !important;
+    overflow-x: hidden;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: auto;
+  }
+  
+  /* Main container fixes */
   .mobile-scroll-container {
     position: relative;
     overflow-y: auto;
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: auto;
+    overscroll-behavior: none !important;
+    overscroll-behavior-y: none !important;
+    touch-action: pan-y !important;
     min-height: calc(100vh - 100px);
     max-height: none;
     padding-bottom: 100px;
+  }
+  
+  /* Fix empty spaces causing reverse scroll */
+  .mobile-scroll-container > *,
+  .mobile-content-area > * {
+    touch-action: pan-y !important;
+  }
+  
+  /* Specifically fix gaps between cards */
+  .mobile-content-area {
+    touch-action: pan-y !important;
+    background: transparent;
+    position: relative;
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto;
+  }
+  
+  /* Fix footer area touch behavior */
+  footer {
+    touch-action: none !important;
+    pointer-events: auto;
   }
 } 
