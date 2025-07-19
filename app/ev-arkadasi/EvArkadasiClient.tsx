@@ -211,9 +211,9 @@ export default function EvArkadasiClient() {
       filtered = filtered.filter(roommate => roommate.gender === selectedGender);
     }
 
-    // Type filter
+    // University filter
     if (selectedType !== 'all') {
-      filtered = filtered.filter(roommate => roommate.type === selectedType);
+      filtered = filtered.filter(roommate => roommate.university.includes(selectedType));
     }
 
     // Premium sıralama
@@ -257,10 +257,11 @@ export default function EvArkadasiClient() {
 
   // İlanları yükle
   useEffect(() => {
-    if (!user) {
-      setRoommates([]);
-      return;
-    }
+    // User olmasa bile ilanları göster
+    // if (!user) {
+    //   setRoommates([]);
+    //   return;
+    // }
 
     console.log('Ev arkadaşı ilanları yükleniyor... Admin:', isAdmin);
 
@@ -705,7 +706,7 @@ export default function EvArkadasiClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 ${isMobile ? 'mobile-smooth-scroll' : ''}`}>
       <Header />
       
       <PullToRefresh onRefresh={handleRefresh}>
@@ -725,10 +726,10 @@ export default function EvArkadasiClient() {
             <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-4 mb-4 md:mb-6 px-4">
               <TouchButton
                 onClick={() => setSelectedType('seeking')}
-                className={`flex items-center justify-center px-4 md:px-8 py-3 rounded-full text-sm md:text-lg font-semibold transition-colors ${
+                className={`flex items-center justify-center px-4 md:px-8 py-3 rounded-full text-sm md:text-lg font-semibold transition-colors touch-manipulation ${
                   selectedType === 'seeking' 
                     ? 'bg-purple-600 text-white' 
-                    : 'bg-white/20 text-white hover:bg-white/30'
+                    : `bg-white/20 text-white ${isMobile ? '' : 'hover:bg-white/30'}`
                 }`}
               >
                 <UserPlus className="w-4 h-4 md:w-5 md:h-5 mr-2" />
@@ -736,10 +737,10 @@ export default function EvArkadasiClient() {
               </TouchButton>
               <TouchButton
                 onClick={() => setSelectedType('offering')}
-                className={`flex items-center justify-center px-4 md:px-8 py-3 rounded-full text-sm md:text-lg font-semibold transition-colors ${
+                className={`flex items-center justify-center px-4 md:px-8 py-3 rounded-full text-sm md:text-lg font-semibold transition-colors touch-manipulation ${
                   selectedType === 'offering' 
                     ? 'bg-purple-600 text-white' 
-                    : 'bg-white/20 text-white hover:bg-white/30'
+                    : `bg-white/20 text-white ${isMobile ? '' : 'hover:bg-white/30'}`
                 }`}
               >
                 <Home className="w-4 h-4 md:w-5 md:h-5 mr-2" />
@@ -756,7 +757,7 @@ export default function EvArkadasiClient() {
                     setEditItem(null);
                     setShowListingModal(true);
                   }}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 md:px-12 py-3 md:py-4 rounded-full text-lg md:text-xl font-bold transition-colors shadow-lg w-full md:w-auto"
+                  className={`bg-yellow-500 ${isMobile ? '' : 'hover:bg-yellow-600'} text-white px-6 md:px-12 py-3 md:py-4 rounded-full text-lg md:text-xl font-bold transition-colors shadow-lg w-full md:w-auto touch-manipulation`}
                 >
                   <Plus className="w-5 h-5 md:w-6 md:h-6 mr-2" />
                   İlan Ver
@@ -771,7 +772,7 @@ export default function EvArkadasiClient() {
                     // Redirect to login or show auth modal
                     window.location.href = '/giris';
                   }}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 md:px-12 py-3 md:py-4 rounded-full text-lg md:text-xl font-bold transition-colors shadow-lg w-full md:w-auto"
+                  className={`bg-yellow-500 ${isMobile ? '' : 'hover:bg-yellow-600'} text-white px-6 md:px-12 py-3 md:py-4 rounded-full text-lg md:text-xl font-bold transition-colors shadow-lg w-full md:w-auto touch-manipulation`}
                 >
                   <Plus className="w-5 h-5 md:w-6 md:h-6 mr-2" />
                   İlan Ver
@@ -779,34 +780,22 @@ export default function EvArkadasiClient() {
               )}
             </div>
 
-            {/* Mobile Controls - Search, Filter and View Mode */}
+            {/* Mobile Controls - Filter and View Mode */}
             <div className="md:hidden px-4 space-y-3">
-              {/* Search Bar */}
-              <div className="relative group">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 group-focus-within:text-yellow-400 transition-colors w-4 h-4 z-10" />
-                <input
-                  type="text"
-                  placeholder="Şehir, okul, isim ara..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-white/20 hover:border-white/30 rounded-xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 bg-white/10 hover:bg-white/15 backdrop-blur-sm text-white placeholder-white/70 text-sm transition-all duration-200"
-                />
-              </div>
-
               {/* Quick Controls Row */}
               <div className="flex gap-2">
                 {/* Filter Toggle */}
                 <TouchButton
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-3 py-2 backdrop-blur-sm rounded-lg border text-sm flex-1 font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3 py-2 backdrop-blur-sm rounded-lg border text-sm flex-1 font-medium transition-all duration-200 touch-manipulation ${
                     showFilters 
                       ? 'bg-yellow-500 border-yellow-400 text-white shadow-lg' 
-                      : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                      : `bg-white/10 border-white/20 text-white ${isMobile ? '' : 'hover:bg-white/20'}`
                   }`}
                 >
                   <Filter size={14} />
-                  Filtre
-                  {(selectedLocation || selectedGender || selectedType !== 'all') && (
+                  Filtrele
+                  {(selectedLocation || selectedGender) && (
                     <span className={`text-xs px-1.5 py-0.5 rounded-full ${
                       showFilters ? 'bg-white text-yellow-500' : 'bg-yellow-500 text-white'
                     }`}>●</span>
@@ -817,10 +806,10 @@ export default function EvArkadasiClient() {
                 <div className="flex bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-0.5">
                   <TouchButton
                     onClick={() => setMobileViewMode('grid')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded text-xs font-medium transition-all duration-200 ${
+                    className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded text-xs font-medium transition-all duration-200 touch-manipulation ${
                       mobileViewMode === 'grid' 
                         ? 'bg-yellow-500 text-white shadow-lg scale-105' 
-                        : 'text-white/70 hover:text-white/90'
+                        : `text-white/70 ${isMobile ? '' : 'hover:text-white/90'}`
                     }`}
                   >
                     <div className="grid grid-cols-2 gap-0.5 w-3 h-3">
@@ -833,10 +822,10 @@ export default function EvArkadasiClient() {
                   </TouchButton>
                   <TouchButton
                     onClick={() => setMobileViewMode('scroll')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded text-xs font-medium transition-all duration-200 ${
+                    className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded text-xs font-medium transition-all duration-200 touch-manipulation ${
                       mobileViewMode === 'scroll' 
                         ? 'bg-yellow-500 text-white shadow-lg scale-105' 
-                        : 'text-white/70 hover:text-white/90'
+                        : `text-white/70 ${isMobile ? '' : 'hover:text-white/90'}`
                     }`}
                   >
                     <div className="flex gap-0.5 w-3 h-3 items-center">
@@ -880,9 +869,13 @@ export default function EvArkadasiClient() {
                       onChange={(e) => setSelectedType(e.target.value)}
                       className="flex-1 px-3 py-2 border border-yellow-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm focus:ring-2 focus:ring-yellow-400/50"
                     >
-                      <option value="all" className="text-gray-900">🏠 Tüm İlanlar</option>
-                      <option value="seeking" className="text-gray-900">🔍 Ev Arkadaşı Arıyor</option>
-                      <option value="offering" className="text-gray-900">🏡 Ev Arıyor</option>
+                      <option value="all" className="text-gray-900">🎓 Tüm Üniversiteler</option>
+                      <option value="DAÜ" className="text-gray-900">DAÜ</option>
+                      <option value="GAÜ" className="text-gray-900">GAÜ</option>
+                      <option value="UKÜ" className="text-gray-900">UKÜ</option>
+                      <option value="LAÜ" className="text-gray-900">LAÜ</option>
+                      <option value="YDÜ" className="text-gray-900">YDÜ</option>
+                      <option value="AKÜ" className="text-gray-900">AKÜ</option>
                     </select>
                   </div>
                   <div className="flex justify-between items-center pt-1">
@@ -955,16 +948,20 @@ export default function EvArkadasiClient() {
 
               <div>
                 <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
-                  İlan Tipi
+                  Üniversite
                 </label>
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
                   className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 dark:border-gray-600 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                 >
-                  <option value="all">Tüm İlanlar</option>
-                  <option value="seeking">Ev Arkadaşı Arıyor</option>
-                  <option value="offering">Ev Arıyor</option>
+                  <option value="all">Tüm Üniversiteler</option>
+                  <option value="DAÜ">DAÜ - Doğu Akdeniz Üniversitesi</option>
+                  <option value="GAÜ">GAÜ - Girne Amerikan Üniversitesi</option>
+                  <option value="UKÜ">UKÜ - Uluslararası Kıbrıs Üniversitesi</option>
+                  <option value="LAÜ">LAÜ - Lefke Avrupa Üniversitesi</option>
+                  <option value="YDÜ">YDÜ - Yakın Doğu Üniversitesi</option>
+                  <option value="AKÜ">AKÜ - Akdeniz Karpaz Üniversitesi</option>
                 </select>
               </div>
             </div>
@@ -991,16 +988,16 @@ export default function EvArkadasiClient() {
             isMobile 
               ? mobileViewMode === 'scroll' 
                 ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide' 
-                : 'grid grid-cols-2 gap-3'
+                : 'flex flex-col gap-4 items-center'
               : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
           }`}>
                           {filteredRoommates.map((roommate) => (
-                <div key={roommate.id} className={`rounded-2xl transition-all duration-300 overflow-hidden relative ${
-                  isMobile && mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start' : ''
+                <div key={roommate.id} className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
+                  isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start' : 'w-[280px]') : ''
                 } ${
                   roommate.isPremium 
-                    ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105' 
-                    : 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl'
+                    ? `bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl ${isMobile ? '' : 'hover:shadow-pink-500/25 transform hover:scale-105'}`
+                    : `bg-white dark:bg-gray-800 shadow-lg ${isMobile ? '' : 'hover:shadow-xl'}`
                 }`}>
                 {/* Premium Glow Effect */}
                 {roommate.isPremium && (
@@ -1151,59 +1148,77 @@ export default function EvArkadasiClient() {
                   <div className={`flex gap-1.5 md:gap-2 mb-2 md:mb-3 ${isMobile ? '' : ''}`}>
                     <TouchButton
                       onClick={() => {
+                        if (!user) {
+                          showToast('Detay görmek için lütfen giriş yapın!', 'error');
+                          return;
+                        }
                         setSelectedRoommate(roommate);
                         setShowDetailsModal(true);
                       }}
-                      className={`flex-1 flex items-center justify-center gap-1 md:gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'}`}
+                      className={`flex-1 flex items-center justify-center gap-1 md:gap-2 bg-gray-100 ${isMobile ? '' : 'hover:bg-gray-200'} dark:bg-gray-700 ${isMobile ? '' : 'dark:hover:bg-gray-600'} text-gray-700 dark:text-gray-300 py-2 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'}`}
                     >
                       <Eye size={isMobile ? 14 : 16} />
                       {isMobile ? 'Detay' : 'Detay'}
                     </TouchButton>
-                    {user && roommate.userId !== user.uid && (
-                      <TouchButton
-                        onClick={() => {
-                          setSelectedRoommate(roommate);
-                          setShowContactModal(true);
-                        }}
-                        className={`flex-1 flex items-center justify-center gap-1 md:gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white py-2 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'}`}
-                      >
-                        <MessageCircle size={isMobile ? 14 : 16} />
-                        {isMobile ? 'İletişim' : 'İletişim'}
-                      </TouchButton>
-                    )}
+                    <TouchButton
+                      onClick={() => {
+                        if (!user) {
+                          showToast('İletişim kurmak için lütfen giriş yapın!', 'error');
+                          return;
+                        }
+                        if (roommate.userId === user.uid) {
+                          showToast('Kendi ilanınızla iletişime geçemezsiniz!', 'error');
+                          return;
+                        }
+                        setSelectedRoommate(roommate);
+                        setShowContactModal(true);
+                      }}
+                                              className={`flex-1 flex items-center justify-center gap-1 md:gap-2 bg-gradient-to-r from-purple-500 to-blue-500 ${isMobile ? '' : 'hover:from-purple-600 hover:to-blue-600'} text-white py-2 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'}`}
+                    >
+                      <MessageCircle size={isMobile ? 14 : 16} />
+                      {isMobile ? 'İletişim' : 'İletişim'}
+                    </TouchButton>
                   </div>
 
                   {/* Favorite, Share and Report - Mobile optimized */}
                   <div className={`flex gap-1.5 md:gap-2 mb-2 md:mb-3 ${isMobile ? 'justify-center' : ''}`}>
-                    {user && roommate.userId !== user.uid && (
-                      <TouchButton
-                        onClick={() => {
-                          toggleFavorite(roommate);
-                        }}
-                        className={`${isMobile ? 'flex-1' : 'flex-1'} flex items-center justify-center gap-1 md:gap-2 py-1.5 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'} ${
-                          favorites.includes(roommate.id)
-                            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        <Heart size={isMobile ? 12 : 16} fill={favorites.includes(roommate.id) ? 'currentColor' : 'none'} />
-                        {!isMobile && (favorites.includes(roommate.id) ? 'Favoride' : 'Favorile')}
-                      </TouchButton>
-                    )}
-                    {user && roommate.userId !== user.uid && (
-                      <TouchButton
-                        onClick={() => handleShare(roommate)}
-                        className={`flex items-center justify-center gap-1 md:gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-1.5 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'flex-1 text-xs' : 'text-sm'}`}
-                      >
-                        <Share2 size={isMobile ? 12 : 16} />
-                        {!isMobile && 'Paylaş'}
-                      </TouchButton>
-                    )}
-                    {user && roommate.userId !== user.uid && (
-                      <div className={`${isMobile ? 'flex-1' : ''} flex justify-center`}>
-                        <ReportButton contentType="roommate" contentId={roommate.id} />
-                      </div>
-                    )}
+                    <TouchButton
+                      onClick={() => {
+                        if (!user) {
+                          showToast('Favorilere eklemek için lütfen giriş yapın!', 'error');
+                          return;
+                        }
+                        if (roommate.userId === user.uid) {
+                          showToast('Kendi ilanınızı favorilere ekleyemezsiniz!', 'error');
+                          return;
+                        }
+                        toggleFavorite(roommate);
+                      }}
+                                              className={`${isMobile ? 'flex-1' : 'flex-1'} flex items-center justify-center gap-1 md:gap-2 py-1.5 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'text-xs' : 'text-sm'} ${
+                        user && favorites.includes(roommate.id)
+                          ? `bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 ${isMobile ? '' : 'hover:bg-red-200 dark:hover:bg-red-900/50'}`
+                          : `bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 ${isMobile ? '' : 'hover:bg-gray-200 dark:hover:bg-gray-600'}`
+                      }`}
+                    >
+                      <Heart size={isMobile ? 12 : 16} fill={user && favorites.includes(roommate.id) ? 'currentColor' : 'none'} />
+                      {!isMobile && (user && favorites.includes(roommate.id) ? 'Favoride' : 'Favorile')}
+                    </TouchButton>
+                    <TouchButton
+                      onClick={() => {
+                        if (!user) {
+                          showToast('Paylaşmak için lütfen giriş yapın!', 'error');
+                          return;
+                        }
+                        handleShare(roommate);
+                      }}
+                                              className={`flex items-center justify-center gap-1 md:gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 ${isMobile ? '' : 'hover:bg-blue-200 dark:hover:bg-blue-900/50'} py-1.5 md:py-2 px-2 md:px-4 rounded-lg font-medium transition-colors touch-manipulation ${isMobile ? 'flex-1 text-xs' : 'text-sm'}`}
+                    >
+                      <Share2 size={isMobile ? 12 : 16} />
+                      {!isMobile && 'Paylaş'}
+                    </TouchButton>
+                    <div className={`${isMobile ? 'flex-1' : ''} flex justify-center`}>
+                      <ReportButton contentType="roommate" contentId={roommate.id} />
+                    </div>
                   </div>
 
                   {/* Admin Actions */}

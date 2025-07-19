@@ -391,4 +391,45 @@ textarea {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Mobile touch optimizations */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Fix mobile touch scroll issues */
+@media (max-width: 768px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+  
+  body, html {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Remove hover effects on mobile */
+  .mobile-no-hover:hover {
+    transform: none !important;
+    box-shadow: inherit !important;
+    background-color: inherit !important;
+  }
+  
+  /* Smooth scroll for mobile */
+  .mobile-smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent zoom on inputs */
+  input, select, textarea {
+    font-size: 16px;
+  }
 } 
