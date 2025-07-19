@@ -138,6 +138,7 @@ export default function EvArkadasiClient() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [modalPosition, setModalPosition] = useState<{top: number} | null>(null);
   const [showPendingOnly, setShowPendingOnly] = useState(false);
   const router = useRouter();
   const [showImageLightbox, setShowImageLightbox] = useState(false);
@@ -1061,7 +1062,7 @@ export default function EvArkadasiClient() {
               : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
           } ${isMobile ? 'mobile-content-area' : ''}`}>
                           {paginatedRoommates.map((roommate) => (
-                <div key={roommate.id} className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
+                <div key={roommate.id} data-card className={`rounded-2xl transition-all duration-200 overflow-hidden relative ${
                   isMobile ? (mobileViewMode === 'scroll' ? 'min-w-[280px] snap-start mobile-card-touch' : '') : ''
                 } ${
                   roommate.isPremium 
@@ -1215,8 +1216,8 @@ export default function EvArkadasiClient() {
 
                   {/* Actions - Mobile optimized */}
                   <div className={`flex gap-1.5 md:gap-2 mb-2 md:mb-3 ${isMobile ? '' : ''}`}>
-                    <TouchButton
-                      onClick={() => {
+                    <button
+                      onClick={(e) => {
                         if (!user) {
                           showToast('Detay görmek için lütfen giriş yapın!', 'error');
                           if (isMobile) {
@@ -1224,6 +1225,15 @@ export default function EvArkadasiClient() {
                           }
                           return;
                         }
+                        
+                        // Kartın pozisyonunu hesapla
+                        const card = (e.target as HTMLElement).closest('[data-card]');
+                        if (card) {
+                          const rect = card.getBoundingClientRect();
+                          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                          setModalPosition({ top: rect.top + scrollTop - 50 });
+                        }
+                        
                         setSelectedRoommate(roommate);
                         setShowDetailsModal(true);
                       }}
@@ -1231,7 +1241,7 @@ export default function EvArkadasiClient() {
                     >
                       <Eye size={isMobile ? 14 : 16} />
                       {isMobile ? 'Detay' : 'Detay'}
-                    </TouchButton>
+                    </button>
                     <TouchButton
                       onClick={() => {
                         if (!user) {
@@ -1914,7 +1924,10 @@ export default function EvArkadasiClient() {
 
       {/* Detail Modal */}
       {showDetailsModal && selectedRoommate && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justify-center z-50 p-2 md:p-4 pt-16 md:pt-20">
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justify-center z-50 p-2 md:p-4"
+          style={{ paddingTop: modalPosition ? `${Math.max(modalPosition.top, 80)}px` : '80px' }}
+        >
           <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[80vh] md:max-h-[85vh] overflow-y-auto p-4 md:p-6 shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-800 dark:text-white">İlan Detayları</h3>
@@ -1922,6 +1935,7 @@ export default function EvArkadasiClient() {
                 onClick={() => {
                   setShowDetailsModal(false);
                   setSelectedRoommate(null);
+                  setModalPosition(null);
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
