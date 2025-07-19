@@ -708,100 +708,102 @@ export default function EvArkadasiClient() {
       
       <PullToRefresh onRefresh={handleRefresh}>
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-[#1c0f3f] to-[#2e0f5f] text-white py-16 mb-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Ev Arkadaşı Bul
-            </h1>
-            <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-              Kıbrıs'ta öğrenci ev arkadaşı arayanlar ve evini paylaşmak isteyenler için güvenli platform
-            </p>
-          </div>
-          
-          {/* Type Selection */}
-          <div className="flex flex-wrap justify-center gap-4 mb-6">
-            <TouchButton
-              onClick={() => setSelectedType('seeking')}
-              className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
-                selectedType === 'seeking' 
-                  ? 'bg-purple-600 text-white' 
-                  : 'bg-white/20 text-white hover:bg-white/30'
-              }`}
-            >
-              <UserPlus className="w-5 h-5 mr-2" />
-              Ev Arkadaşı Arıyorum
-            </TouchButton>
-            <TouchButton
-              onClick={() => setSelectedType('offering')}
-              className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
-                selectedType === 'offering' 
-                  ? 'bg-purple-600 text-white' 
-                  : 'bg-white/20 text-white hover:bg-white/30'
-              }`}
-            >
-              <Home className="w-5 h-5 mr-2" />
-              Ev Arkadaşı Oluyorum
-            </TouchButton>
-          </div>
-
-          {/* Add Listing Button */}
-          <div className="flex justify-center">
-            {user && (
+        <div className="bg-gradient-to-r from-[#1c0f3f] to-[#2e0f5f] text-white py-8 md:py-16 mb-6 md:mb-8">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <h1 className="text-2xl md:text-5xl font-bold text-white mb-2 md:mb-4">
+                Ev Arkadaşı Bul
+              </h1>
+              <p className="text-sm md:text-xl text-gray-200 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
+                Kıbrıs'ta öğrenci ev arkadaşı arayanlar ve evini paylaşmak isteyenler için güvenli platform
+              </p>
+            </div>
+            
+            {/* Type Selection - Mobile optimized */}
+            <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-4 mb-4 md:mb-6 px-4">
               <TouchButton
-                onClick={() => {
-                  console.log('İlan Ver butonuna tıklandı');
-                  setEditItem(null);
-                  setShowListingModal(true);
-                }}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-12 py-4 rounded-full text-xl font-bold transition-colors shadow-lg"
+                onClick={() => setSelectedType('seeking')}
+                className={`flex items-center justify-center px-4 md:px-8 py-3 rounded-full text-sm md:text-lg font-semibold transition-colors ${
+                  selectedType === 'seeking' 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
               >
-                <Plus className="w-6 h-6 mr-2" />
-                İlan Ver
+                <UserPlus className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                Ev Arkadaşı Arıyorum
               </TouchButton>
-            )}
-
-            {/* Add Listing Button for non-logged in users */}
-            {!user && (
               <TouchButton
-                onClick={() => {
-                  console.log('Giriş yapmadan İlan Ver butonuna tıklandı');
-                  // Redirect to login or show auth modal
-                  window.location.href = '/giris';
-                }}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-12 py-4 rounded-full text-xl font-bold transition-colors shadow-lg"
+                onClick={() => setSelectedType('offering')}
+                className={`flex items-center justify-center px-4 md:px-8 py-3 rounded-full text-sm md:text-lg font-semibold transition-colors ${
+                  selectedType === 'offering' 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
               >
-                <Plus className="w-6 h-6 mr-2" />
-                İlan Ver
+                <Home className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                Ev Arkadaşı Oluyorum
               </TouchButton>
-            )}
+            </div>
+
+            {/* Add Listing Button - Mobile optimized */}
+            <div className="flex justify-center px-4">
+              {user && (
+                <TouchButton
+                  onClick={() => {
+                    console.log('İlan Ver butonuna tıklandı');
+                    setEditItem(null);
+                    setShowListingModal(true);
+                  }}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 md:px-12 py-3 md:py-4 rounded-full text-lg md:text-xl font-bold transition-colors shadow-lg w-full md:w-auto"
+                >
+                  <Plus className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+                  İlan Ver
+                </TouchButton>
+              )}
+
+              {/* Add Listing Button for non-logged in users */}
+              {!user && (
+                <TouchButton
+                  onClick={() => {
+                    console.log('Giriş yapmadan İlan Ver butonuna tıklandı');
+                    // Redirect to login or show auth modal
+                    window.location.href = '/giris';
+                  }}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 md:px-12 py-3 md:py-4 rounded-full text-lg md:text-xl font-bold transition-colors shadow-lg w-full md:w-auto"
+                >
+                  <Plus className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+                  İlan Ver
+                </TouchButton>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="container mx-auto px-4">
-          {/* Search and Filters */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
+          {/* Search and Filters - Mobile optimized */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 md:p-6 mb-6 md:mb-8">
             {/* Search Bar */}
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+            <div className="relative mb-4 md:mb-6">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 md:w-5 md:h-5" />
               <input
                 type="text"
-                placeholder="İsim, üniversite, bölüm veya konum ara..."
+                placeholder={isMobile ? "İsim, üniversite ara..." : "İsim, üniversite, bölüm veya konum ara..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
+                className="w-full pl-9 md:pl-10 pr-4 py-2.5 md:py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400 text-sm md:text-base"
               />
             </div>
 
-            {/* Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Filters - Mobile first approach */}
+            <div className="space-y-3 md:space-y-0 md:grid md:grid-cols-3 md:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
                   Konum
                 </label>
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 dark:border-gray-600 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                 >
                   <option value="">Tüm Konumlar</option>
                   <option value="Lefkoşa">Lefkoşa</option>
@@ -814,13 +816,13 @@ export default function EvArkadasiClient() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
                   Cinsiyet
                 </label>
                 <select
                   value={selectedGender}
                   onChange={(e) => setSelectedGender(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 dark:border-gray-600 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                 >
                   <option value="">Tüm Cinsiyetler</option>
                   <option value="Erkek">Erkek</option>
@@ -829,13 +831,13 @@ export default function EvArkadasiClient() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
                   İlan Tipi
                 </label>
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 dark:border-gray-600 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                 >
                   <option value="all">Tüm İlanlar</option>
                   <option value="seeking">Ev Arkadaşı Arıyor</option>
@@ -844,23 +846,23 @@ export default function EvArkadasiClient() {
               </div>
             </div>
 
-            {/* Filter Actions */}
-            <div className="flex justify-between items-center mt-6">
+            {/* Filter Actions - Mobile optimized */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-0 mt-4 md:mt-6">
               <TouchButton
                 onClick={clearFilters}
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium text-sm md:text-base order-2 md:order-1"
               >
                 Filtreleri Temizle
               </TouchButton>
               
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 font-medium order-1 md:order-2">
                 {filteredRoommates.length} sonuç bulundu
               </div>
             </div>
           </div>
 
-          {/* Roommate Listings */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Roommate Listings - Mobile optimized */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {filteredRoommates.map((roommate) => (
               <div key={roommate.id} className={`rounded-2xl transition-all duration-300 overflow-hidden relative ${
                 roommate.isPremium 
@@ -898,24 +900,24 @@ export default function EvArkadasiClient() {
                   </div>
                 )}
 
-                <div className={`p-6 relative ${roommate.isPremium ? 'bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-900/20 dark:via-purple-900/10 dark:to-indigo-900/20' : ''}`}>
+                <div className={`p-4 md:p-6 relative ${roommate.isPremium ? 'bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-900/20 dark:via-purple-900/10 dark:to-indigo-900/20' : ''}`}>
                   {/* Premium Corner Decoration */}
                   {roommate.isPremium && (
                     <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-pink-400/20 to-transparent rounded-bl-full"></div>
                   )}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1">{roommate.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">{roommate.university}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{roommate.department}</p>
+                  <div className="flex items-start justify-between mb-2 md:mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-1 truncate">{roommate.name}</h3>
+                      <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300 truncate">{roommate.university}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{roommate.department}</p>
                     </div>
                     <div className="flex flex-col gap-1">
                                           {/* Premium Badge */}
                     {roommate.isPremium && (
-                      <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-xl border border-white/20 backdrop-blur-sm">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        <span className="text-white drop-shadow-sm">👑 PREMIUM</span>
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-2 md:px-4 py-1 md:py-2 rounded-full text-xs font-bold flex items-center gap-1 md:gap-2 shadow-xl border border-white/20 backdrop-blur-sm">
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white rounded-full animate-pulse"></div>
+                        <span className="text-white drop-shadow-sm text-xs">👑 PREMIUM</span>
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white rounded-full animate-pulse"></div>
                       </div>
                     )}
                       {/* Onay Bekliyor Badge */}
