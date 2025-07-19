@@ -1144,6 +1144,9 @@ export default function EvArkadasiClient() {
                       onClick={() => {
                         if (!user) {
                           showToast('Detay görmek için lütfen giriş yapın!', 'error');
+                          if (isMobile) {
+                            alert('Detay görmek için lütfen giriş yapın!');
+                          }
                           return;
                         }
                         setSelectedRoommate(roommate);
@@ -1158,6 +1161,9 @@ export default function EvArkadasiClient() {
                       onClick={() => {
                         if (!user) {
                           showToast('İletişim kurmak için lütfen giriş yapın!', 'error');
+                          if (isMobile) {
+                            alert('İletişim kurmak için lütfen giriş yapın!');
+                          }
                           return;
                         }
                         if (roommate.userId === user.uid) {
@@ -1180,6 +1186,9 @@ export default function EvArkadasiClient() {
                       onClick={() => {
                         if (!user) {
                           showToast('Favorilere eklemek için lütfen giriş yapın!', 'error');
+                          if (isMobile) {
+                            alert('Favorilere eklemek için lütfen giriş yapın!');
+                          }
                           return;
                         }
                         if (roommate.userId === user.uid) {
