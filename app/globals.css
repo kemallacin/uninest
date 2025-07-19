@@ -447,4 +447,46 @@ textarea {
     position: relative;
     z-index: 1;
   }
+  
+  /* Mobile content area touch optimizations */
+  .mobile-content-area {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y pinch-zoom;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  /* Touch action for different scroll directions */
+  .touch-pan-x {
+    touch-action: pan-x pinch-zoom;
+  }
+  
+  .touch-pan-y {
+    touch-action: pan-y pinch-zoom;
+  }
+  
+  /* Prevent momentum scrolling issues */
+  .mobile-content-area * {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  /* Mobile card touch optimizations */
+  .mobile-card-touch {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Prevent text selection during scroll */
+  .mobile-card-touch * {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 } 
