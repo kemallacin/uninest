@@ -1362,7 +1362,9 @@ Benzer ID\'ler: ${similarIds.join(', ') || 'Yok'}`);
   // if (!isAdmin) return <div>Erişim yok</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+      <Header />
+      <div className="container mx-auto px-4 py-8">
       {/* Süper Admin Kontrol Paneli */}
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-lg shadow-lg mb-8">
         <h1 className="text-2xl font-bold mb-4">🔐 Süper Admin Kontrol Paneli</h1>
@@ -1459,43 +1461,43 @@ Benzer ID\'ler: ${similarIds.join(', ') || 'Yok'}`);
 
       {/* İstatistikler */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Kullanıcılar</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Kullanıcılar</h2>
           <p className="text-3xl font-bold text-blue-600">{totalUsers}</p>
-          <p className="text-sm text-gray-500">Admin: {totalAdmins} | Banlı: {users.filter(u => u.isBanned).length}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Admin: {totalAdmins} | Banlı: {users.filter(u => u.isBanned).length}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">İlanlar</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">İlanlar</h2>
           <p className="text-3xl font-bold text-green-600">{totalListings}</p>
-          <p className="text-sm text-gray-500">Onay Bekleyen: {pendingListings}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Onay Bekleyen: {pendingListings}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Etkinlikler</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Etkinlikler</h2>
           <p className="text-3xl font-bold text-purple-600">{totalEvents}</p>
-          <p className="text-sm text-gray-500">Onay Bekleyen: {pendingEvents}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Onay Bekleyen: {pendingEvents}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Notlar</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Notlar</h2>
           <p className="text-3xl font-bold text-yellow-600">{totalNotes}</p>
-          <p className="text-sm text-gray-500">Onay Bekleyen: {pendingNotes}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Onay Bekleyen: {pendingNotes}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Ev Arkadaşı İlanları</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Ev Arkadaşı İlanları</h2>
           <p className="text-3xl font-bold text-indigo-600">{totalRoommates}</p>
-          <p className="text-sm text-gray-500">Onay Bekleyen: {pendingRoommates}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Onay Bekleyen: {pendingRoommates}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-2">Yeni Kullanıcılar</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Yeni Kullanıcılar</h2>
           <p className="text-3xl font-bold text-red-600">{recentUsers}</p>
-          <p className="text-sm text-gray-500">Son 7 gün</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Son 7 gün</p>
         </div>
       </div>
 
               {/* Kullanıcılar Tablosu */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="p-6 border-b">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8 border border-gray-200 dark:border-gray-700">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="mb-4">
-              <h2 className="text-xl font-semibold mb-2">👥 Kullanıcı Yönetimi</h2>
+              <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">👥 Kullanıcı Yönetimi</h2>
               <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
@@ -2464,6 +2466,8 @@ Benzer ID\'ler: ${similarIds.join(', ') || 'Yok'}`);
           </div>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 } 
