@@ -132,7 +132,7 @@ export default function EvArkadasiClient() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showListingModal, setShowListingModal] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [roommates, setRoommates] = useState<RoommateItem[]>([]);
   const [editItem, setEditItem] = useState<RoommateItem | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -254,8 +254,6 @@ export default function EvArkadasiClient() {
       } else {
         setIsAdmin(false);
       }
-      
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -702,7 +700,8 @@ export default function EvArkadasiClient() {
     }
   }, [addForm, user, editItem, showToast, resetModalState]);
 
-  if (loading) {
+  // Sadece form submit sırasında loading göster
+  if (loading && showListingModal) {
     return <PageLoading />;
   }
 
