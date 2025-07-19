@@ -605,38 +605,78 @@ export default function EvArkadasiClient() {
             continue;
           }
           
-          // Dosya boyutu kontrolü (5MB)
-          if (file.size > 5 * 1024 * 1024) {
-            showToast(`Resim ${i + 1} çok büyük (max 5MB)`, 'error');
+          // Dosya boyutu kontrolü (10MB - telefon fotoğrafları için artırıldı)
+          if (file.size > 10 * 1024 * 1024) {
+            showToast(`Resim ${i + 1} çok büyük (max 10MB)`, 'error');
             setLoading(false);
             return;
           }
           
-          // Dosya tipi kontrolü
-          if (!file.type.startsWith('image/')) {
-            showToast(`Dosya ${i + 1} resim formatında değil`, 'error');
+          // Dosya tipi kontrolü - HEIC ve diğer formatları da kabul et
+          const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+          const fileType = file.type.toLowerCase();
+          if (!fileType.startsWith('image/') && !validTypes.includes(fileType) && !file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp|heic|heif)$/)) {
+            showToast(`Resim ${i + 1} desteklenmeyen format. JPG, PNG, GIF, WebP, HEIC destekleniyor.`, 'error');
             setLoading(false);
             return;
           }
           
           try {
             console.log(`Resim ${i + 1} işleniyor...`);
-            const base64 = await new Promise<string>((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                const result = e.target?.result;
-                if (typeof result === 'string') {
-                  resolve(result);
-                } else {
-                  reject(new Error('Resim okunamadı'));
-                }
-              };
-              reader.onerror = () => reject(new Error('Dosya okuma hatası'));
-              reader.readAsDataURL(file);
-            });
             
+            // Resim sıkıştırma fonksiyonu
+            const compressImage = (file: File): Promise<string> => {
+              return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = () => {
+                  // Maksimum boyutlar
+                  const maxWidth = 1200;
+                  const maxHeight = 1200;
+                  
+                  let { width, height } = img;
+                  
+                  // Boyut oranını koru
+                  if (width > height) {
+                    if (width > maxWidth) {
+                      height = (height * maxWidth) / width;
+                      width = maxWidth;
+                    }
+                  } else {
+                    if (height > maxHeight) {
+                      width = (width * maxHeight) / height;
+                      height = maxHeight;
+                    }
+                  }
+                  
+                  canvas.width = width;
+                  canvas.height = height;
+                  
+                  // Resmi çiz ve sıkıştır
+                  ctx?.drawImage(img, 0, 0, width, height);
+                  
+                  // Base64 olarak dışa aktar (0.8 kalite)
+                  const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                  resolve(compressedBase64);
+                };
+                
+                img.onerror = () => reject(new Error('Resim yüklenemedi'));
+                
+                // File'ı image'a yükle
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                  img.src = e.target?.result as string;
+                };
+                reader.onerror = () => reject(new Error('Dosya okunamadı'));
+                reader.readAsDataURL(file);
+              });
+            };
+            
+            const base64 = await compressImage(file);
             imageUrls.push(base64);
-            console.log(`Resim ${i + 1} başarıyla işlendi`);
+            console.log(`Resim ${i + 1} başarıyla sıkıştırıldı ve işlendi`);
             
           } catch (error) {
             console.error(`Resim ${i + 1} işleme hatası:`, error);
@@ -1792,7 +1832,7 @@ export default function EvArkadasiClient() {
                   <input
                     type="file"
                     multiple
-                    accept="image/*"
+                    accept="image/*,.heic,.heif"
                     onChange={(e) => {
                       const files = Array.from(e.target.files || []);
                       if (files.length > 2) {
@@ -1813,7 +1853,7 @@ export default function EvArkadasiClient() {
                         Fotoğraf yüklemek için tıklayın
                       </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        PNG, JPG, JPEG (max 5MB her dosya, maksimum 2 adet)
+                        PNG, JPG, JPEG, HEIC, WebP (max 10MB her dosya, maksimum 2 adet)
                       </p>
                     </div>
                   </label>
