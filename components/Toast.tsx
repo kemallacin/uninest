@@ -22,7 +22,16 @@ export default function Toast({ message, type = 'info', show, onClose }: {
   if (type === 'error') bg = 'bg-red-600';
 
   return (
-    <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999] px-4 md:px-6 py-3 md:py-4 rounded-lg md:rounded-xl shadow-2xl text-white font-medium text-sm md:text-lg transition-all duration-300 ${bg} animate-fade-in max-w-[90vw] text-center`}
+    <div 
+      className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-3 md:py-4 rounded-lg md:rounded-xl shadow-2xl text-white font-medium text-sm md:text-lg transition-all duration-300 ${bg} max-w-[90vw] text-center border-2 border-white/20`}
+      style={{ 
+        zIndex: 999999,
+        position: 'fixed',
+        top: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        pointerEvents: 'none'
+      }}
       role="alert"
     >
       {message}

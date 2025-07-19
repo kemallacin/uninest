@@ -413,6 +413,14 @@ textarea {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
+    position: relative;
+  }
+  
+  /* Prevent scroll into footer */
+  .main-content {
+    min-height: calc(100vh - 200px);
+    padding-bottom: 50px;
   }
   
   /* Remove hover effects on mobile */
@@ -426,10 +434,17 @@ textarea {
   .mobile-smooth-scroll {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   
   /* Prevent zoom on inputs */
   input, select, textarea {
     font-size: 16px;
+  }
+  
+  /* Fix scroll bounce into footer */
+  footer {
+    position: relative;
+    z-index: 1;
   }
 } 
