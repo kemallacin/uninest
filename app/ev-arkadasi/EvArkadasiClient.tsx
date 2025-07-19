@@ -711,7 +711,7 @@ export default function EvArkadasiClient() {
       <Header />
       
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className={isMobile ? 'main-content' : ''}>
+        <div className={isMobile ? 'main-content mobile-scroll-container' : ''}>
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-[#1c0f3f] to-[#2e0f5f] text-white py-6 md:py-16 mb-3 md:mb-8">
           <div className="container mx-auto px-4">

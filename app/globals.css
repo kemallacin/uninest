@@ -452,10 +452,12 @@ textarea {
   .mobile-content-area {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    overscroll-behavior-y: auto; /* Allow normal scroll behavior */
     touch-action: pan-y pinch-zoom;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
     will-change: transform;
+    position: relative;
   }
   
   /* Touch action for different scroll directions */
@@ -475,18 +477,45 @@ textarea {
   
   /* Mobile card touch optimizations */
   .mobile-card-touch {
-    touch-action: manipulation;
+    touch-action: pan-y pinch-zoom; /* Allow vertical scrolling */
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     position: relative;
     z-index: 1;
+    pointer-events: auto;
   }
   
-  /* Prevent text selection during scroll */
+  /* Allow scroll on card content */
   .mobile-card-touch * {
     -webkit-user-select: none;
     user-select: none;
+    pointer-events: none; /* Prevent child elements from blocking scroll */
+  }
+  
+  /* Re-enable pointer events for interactive elements */
+  .mobile-card-touch button,
+  .mobile-card-touch a,
+  .mobile-card-touch [role="button"] {
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+  
+  /* Mobile scroll container optimization */
+  .mobile-scroll-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: auto;
+    min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+    touch-action: pan-y pinch-zoom;
+  }
+  
+  /* Ensure scroll works in grid areas */
+  .mobile-content-area.touch-pan-y {
+    overflow-y: visible;
+    height: auto;
   }
 } 
