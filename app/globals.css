@@ -609,4 +609,34 @@ textarea {
     touch-action: none !important;
     pointer-events: auto;
   }
+
+  /* Modal scroll improvements for mobile */
+  .modal-scroll-container {
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* Form input focus improvements */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Prevent zoom on mobile inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 } 

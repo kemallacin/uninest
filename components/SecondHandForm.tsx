@@ -110,6 +110,8 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
     }
   }, [formData, validateForm]);
 
+
+
   const categories = [
     { value: 'electronics', label: 'Elektronik' },
     { value: 'furniture', label: 'Mobilya' },
@@ -136,7 +138,32 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
   ]
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target
+    
+    // Checkbox handling
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked
+      
+      // Handle nested object fields (like iletisim_tercihleri.whatsapp)
+      if (name.includes('.')) {
+        const [parentKey, childKey] = name.split('.')
+        setFormData(prev => ({
+          ...prev,
+          [parentKey]: {
+            ...prev[parentKey as keyof FormData] as any,
+            [childKey]: checked
+          }
+        }))
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: checked
+        }))
+      }
+      return
+    }
+    
+    // Regular input handling
     const sanitizedValue = sanitizeInput(value, name)
     
     setFormData(prev => ({
@@ -171,10 +198,14 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
       formData.iletisim_tercihleri.telefon ||
       formData.iletisim_tercihleri.eposta;
 
+    // E-posta seçiliyse e-posta alanı da dolu olmalı
+    const emailValid = !formData.iletisim_tercihleri.eposta || 
+                      (formData.iletisim_tercihleri.eposta && formData.eposta.trim() !== '');
+
     // Mevcut hataları kontrol et (validateForm zaten useEffect'te çağrılıyor)
     const noValidationErrors = Object.keys(errors).length === 0;
 
-    return requiredFieldsFilled && hasContactPreference && noValidationErrors;
+    return requiredFieldsFilled && hasContactPreference && emailValid && noValidationErrors;
   }
 
   const handleInputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -188,6 +219,25 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
     setError(null)
 
     try {
+      // İletişim tercihi kontrolü
+      const hasContactPreference = 
+        formData.iletisim_tercihleri.whatsapp ||
+        formData.iletisim_tercihleri.telefon ||
+        formData.iletisim_tercihleri.eposta;
+
+      if (!hasContactPreference) {
+        setError('En az bir iletişim tercihi seçmelisiniz (WhatsApp, Telefon veya E-posta)');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // E-posta seçiliyse e-posta alanı dolu olmalı
+      if (formData.iletisim_tercihleri.eposta && formData.eposta.trim() === '') {
+        setError('E-posta tercihi seçtiyseniz, e-posta adresinizi girmelisiniz');
+        setIsSubmitting(false);
+        return;
+      }
+
       // Form validasyonu
       const validationErrors = validateForm(formData);
       if (Object.keys(validationErrors).length > 0) {
@@ -312,13 +362,16 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto mobile-scroll-container" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center p-6 border-b">
-          <h3 className="text-xl font-semibold text-gray-900">Yeni İlan Ver</h3>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-2 md:p-4 pt-4 md:pt-0" onClick={onClose}>
+      <div 
+        className="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto shadow-xl mt-4 md:mt-0"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6 p-4 md:p-6">
+          <h3 className="text-xl md:text-2xl font-bold text-gray-800">Yeni İlan Ver</h3>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 transition-colors p-2"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -326,7 +379,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="px-4 md:px-6 space-y-6">
           {/* Ürün Bilgileri */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Ürün Bilgileri</h4>
@@ -493,7 +546,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                E-posta
+                E-posta {formData.iletisim_tercihleri.eposta && '*'}
               </label>
               <input
                 type="email"
@@ -506,7 +559,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
                     ? 'border-red-400 focus:ring-red-400'
                     : 'border-gray-300 focus:ring-primary-500'
                 }`}
-                placeholder="ornek@email.com"
+                placeholder={formData.iletisim_tercihleri.eposta ? "ornek@email.com (zorunlu)" : "ornek@email.com (isteğe bağlı)"}
               />
               {hasFieldError('eposta') && isFieldTouched('eposta') && (
                 <p className="mt-1 text-sm text-red-600">{errors.eposta}</p>
@@ -661,7 +714,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
             </div>
           )}
 
-          <div className="flex justify-end space-x-3">
+          <div className="flex justify-end space-x-3 pt-6">
             <button
               type="button"
               onClick={onClose}
