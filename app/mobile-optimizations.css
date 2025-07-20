@@ -1,5 +1,27 @@
 /* Mobile Optimizations */
 
+/* Horizontal scroll container improvements */
+.overflow-x-auto {
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.mobile-horizontal-scroll {
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent interference with SwipeableCard */
+.overflow-x-auto * {
+  pointer-events: auto;
+}
+
+.mobile-horizontal-scroll * {
+  pointer-events: auto;
+}
+
 /* Mobile keyboard optimizations */
 @media (max-width: 768px) {
   /* Ensure proper viewport for mobile keyboards */

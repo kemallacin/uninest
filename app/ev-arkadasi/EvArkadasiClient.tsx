@@ -1056,13 +1056,16 @@ export default function EvArkadasiClient() {
           </div>
 
           {/* Roommate Listings - Mobile optimized with view modes */}
-          <div className={`${
-            isMobile 
-              ? mobileViewMode === 'scroll' 
-                ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide mobile-horizontal-scroll' 
-                : 'grid grid-cols-1 gap-3'
-              : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
-          } ${isMobile ? 'mobile-content-area' : ''}`}>
+          <div 
+            className={`${
+              isMobile 
+                ? mobileViewMode === 'scroll' 
+                  ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide mobile-horizontal-scroll' 
+                  : 'grid grid-cols-1 gap-3'
+                : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
+            } ${isMobile ? 'mobile-content-area' : ''}`}
+            style={isMobile && mobileViewMode === 'scroll' ? { touchAction: 'pan-x pan-y' } : {}}
+          >
                           {paginatedRoommates.map((roommate, index) => (
                 <div key={roommate.id}>
                   {/* Row indicator for scroll mode */}

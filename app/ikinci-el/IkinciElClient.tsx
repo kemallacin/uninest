@@ -1186,11 +1186,14 @@ const IkinciElClient = () => {
               </div>
 
               {/* Items Grid/Scroll */}
-              <div className={`${
-                isMobile && viewMode === 'scroll' 
-                  ? 'flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide' 
-                  : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-              }`}>
+              <div 
+                className={`${
+                  isMobile && viewMode === 'scroll' 
+                    ? 'flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide' 
+                    : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                }`}
+                style={isMobile && viewMode === 'scroll' ? { touchAction: 'pan-x pan-y' } : {}}
+              >
                 {paginatedItems.map((item, index) => {
                   const isOwner = user && item.userId === user.uid;
                   const images = item.images || [item.image];
@@ -1395,30 +1398,30 @@ const IkinciElClient = () => {
                           )}
                         </div>
 
-                        {/* Favorite, Share and Report */}
-                        <div className="flex gap-2 mb-3">
-                          <button
-                            onClick={() => toggleFavorite(item)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition ${
-                              favorites.includes(item.id)
-                                ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                            }`}
-                          >
-                            <Heart size={16} fill={favorites.includes(item.id) ? 'currentColor' : 'none'} />
-                            {favorites.includes(item.id) ? 'Favoride' : 'Favorile'}
-                          </button>
-                          <button
-                            onClick={() => handleShare(item)}
-                            className="flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg font-medium transition"
-                          >
-                            <Share2 size={16} />
-                          </button>
-                          {/* Report Button - sadece ilan sahibi değilse göster */}
-                          {!isOwner && (
+                        {/* Favorite, Share and Report - sadece sahip değilse göster */}
+                        {!isOwner && (
+                          <div className="flex gap-2 mb-3">
+                            <button
+                              onClick={() => toggleFavorite(item)}
+                              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition ${
+                                favorites.includes(item.id)
+                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                              }`}
+                            >
+                              <Heart size={16} fill={favorites.includes(item.id) ? 'currentColor' : 'none'} />
+                              {favorites.includes(item.id) ? 'Favoride' : 'Favorile'}
+                            </button>
+                            <button
+                              onClick={() => handleShare(item)}
+                              className="flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg font-medium transition"
+                            >
+                              <Share2 size={16} />
+                            </button>
+                            {/* Report Button */}
                             <ReportButton contentType="secondhand" contentId={item.id} />
-                          )}
-                        </div>
+                          </div>
+                        )}
 
                         {/* Owner Actions */}
                         {isOwner && (
@@ -1562,7 +1565,7 @@ const IkinciElClient = () => {
 
             {/* Contact Modal */}
             {showContactModal && selectedItem && (
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 1000 }}>
                 <div 
                   className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl"
                   style={modalPosition && isMobile ? { 
@@ -1645,20 +1648,16 @@ const IkinciElClient = () => {
 
             {/* Details Modal with Image Gallery */}
             {showDetailsModal && selectedItem && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div 
-                  className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-                  style={modalPosition && isMobile ? { 
-                    position: 'fixed',
-                    top: `${modalPosition.top}px`,
-                    left: '1rem',
-                    right: '1rem',
-                    width: 'calc(100% - 2rem)',
-                    maxWidth: '56rem',
-                    maxHeight: '80vh',
-                    transform: 'none'
-                  } : {}}
-                >
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" style={{ zIndex: 1000 }}>
+                <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
+                  {/* Modal kapatma butonu */}
+                  <button
+                    onClick={() => setShowDetailsModal(false)}
+                    className="absolute top-4 right-4 z-10 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    aria-label="Kapat"
+                  >
+                    <X size={20} className="text-gray-600 dark:text-gray-400" />
+                  </button>
                   <div className="relative">
                     {(() => {
                       const images = selectedItem.images || [selectedItem.image];
@@ -1792,13 +1791,13 @@ const IkinciElClient = () => {
       </PullToRefresh>
 
       {showImageLightbox && selectedItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4" style={{ zIndex: 1100 }}>
           <button
-            className="absolute top-4 right-4 text-white text-3xl font-bold z-10"
+            className="absolute top-4 right-4 text-white text-2xl font-bold z-10 bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-70 transition-colors"
             onClick={() => setShowImageLightbox(false)}
             aria-label="Kapat"
           >
-            ×
+            <X size={20} />
           </button>
           <button
             className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-3xl z-10"
