@@ -25,7 +25,13 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const currentY = useRef(0)
 
   const handleTouchStart = (e: TouchEvent) => {
-    if (disabled || containerRef.current?.scrollTop !== 0) {
+    if (disabled) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Sadece içerik en üstteyken pull-to-refresh başlat
+    if (container.scrollTop === 0) {
       startY.current = e.touches[0].clientY;
       setIsPulling(true);
     }
