@@ -850,7 +850,7 @@ const IkinciElClient = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 ${isMobile ? 'mobile-smooth-scroll' : ''}`}>
-      <PullToRefresh onRefresh={handleRefresh} disabled={isModalOpen || (isMobile && viewMode==='scroll')}>
+      <PullToRefresh onRefresh={handleRefresh} disabled={isModalOpen}>
         <Header />
         <main className="flex-grow bg-gray-50 dark:bg-gray-900">
           <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">

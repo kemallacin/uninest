@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 
 interface PullToRefreshProps {
   children: React.ReactNode
@@ -19,38 +19,61 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
 }) => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [pullDistance, setPullDistance] = useState(0)
-  const [isPulling, setIsPulling] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-  const startY = useRef(0)
-  const currentY = useRef(0)
+  const gestureState = useRef({
+    startY: 0,
+    startX: 0,
+    isPulling: false,
+    direction: 'initial' as 'initial' | 'vertical' | 'horizontal'
+  }).current
 
-  const handleTouchStart = (e: TouchEvent) => {
-    if (disabled) return;
-
+  const handleTouchStart = useCallback((e: TouchEvent) => {
     const container = containerRef.current;
-    if (!container) return;
-
-    // Sadece içerik en üstteyken pull-to-refresh başlat
-    if (container.scrollTop === 0) {
-      startY.current = e.touches[0].clientY;
-      setIsPulling(true);
+    if (disabled || !container || container.scrollTop !== 0) {
+      return;
     }
-  };
+    gestureState.startY = e.touches[0].clientY;
+    gestureState.startX = e.touches[0].clientX;
+    gestureState.isPulling = true;
+    gestureState.direction = 'initial';
+  }, [disabled, gestureState]);
 
-  const handleTouchMove = (e: TouchEvent) => {
-    if (disabled || !isPulling || isRefreshing) return;
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!gestureState.isPulling || isRefreshing) return;
 
-    currentY.current = e.touches[0].clientY;
-    const distance = Math.max(0, currentY.current - startY.current)
-    
-    if (distance > 0) {
-      e.preventDefault()
-      setPullDistance(distance * 0.5) // Damping factor
+    const currentY = e.touches[0].clientY;
+    const currentX = e.touches[0].clientX;
+    const deltaY = currentY - gestureState.startY;
+    const deltaX = currentX - gestureState.startX;
+
+    if (gestureState.direction === 'initial') {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        gestureState.direction = 'horizontal';
+      } else {
+        gestureState.direction = 'vertical';
+      }
     }
-  }
 
-  const handleTouchEnd = async () => {
-    if (disabled || !isPulling || isRefreshing) return;
+    if (gestureState.direction === 'horizontal') {
+      gestureState.isPulling = false; // Yatay kaydırma, pull işlemini iptal et
+      return;
+    }
+
+    // Yalnızca dikey ve aşağı doğru çekme hareketi ise devam et
+    if (deltaY > 0) {
+      e.preventDefault();
+      const distance = Math.max(0, deltaY);
+      setPullDistance(distance * 0.5); // Damping factor
+    }
+  }, [isRefreshing, gestureState]);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (!gestureState.isPulling || isRefreshing) {
+        // Durumu sıfırla, isPulling zaten false olabilir
+        gestureState.isPulling = false;
+        gestureState.direction = 'initial';
+        return;
+    };
 
     if (pullDistance >= threshold) {
       setIsRefreshing(true)
@@ -63,24 +86,27 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
       }
     }
 
-    setIsPulling(false)
+    gestureState.isPulling = false
+    gestureState.direction = 'initial';
     setPullDistance(0)
-  }
+  }, [isRefreshing, pullDistance, threshold, onRefresh, gestureState]);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container || disabled) return;
 
-    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.addEventListener('touchmove', handleTouchMove, { passive: false });
     container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener('touchcancel', handleTouchEnd);
 
     return () => {
       container.removeEventListener('touchstart', handleTouchStart);
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
+      container.removeEventListener('touchcancel', handleTouchEnd);
     };
-  }, [isPulling, isRefreshing, pullDistance, threshold, disabled]);
+  }, [disabled, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   const showIndicator = pullDistance > 0 || isRefreshing
   const progress = Math.min(pullDistance / threshold, 1)
@@ -123,7 +149,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
       {/* Content */}
       <div 
         ref={containerRef}
-        className="h-full overflow-auto"
+        className="h-full overflow-y-auto"
         style={{
           transform: showIndicator ? `translateY(${pullDistance}px)` : 'none',
           transition: isRefreshing ? 'transform 0.3s ease-out' : 'none'
