@@ -470,32 +470,18 @@ textarea {
     scroll-behavior: smooth;
   }
   
-  /* Card touch behavior - allow vertical scroll */
+  /* Card touch behavior for scroll mode */
   .mobile-card-touch {
-    touch-action: pan-y !important;
+    /* allow both horizontal and vertical panning */
+    touch-action: pan-x pan-y !important;
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0.1);
     position: relative;
-    pointer-events: auto;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
   }
-  
-  /* Force all child elements to not interfere */
-  .mobile-card-touch * {
-    pointer-events: none;
-    touch-action: inherit !important;
-  }
-  
-  /* But allow buttons to work */
-  .mobile-card-touch button,
-  .mobile-card-touch a,
-  .mobile-card-touch input,
-  .mobile-card-touch select {
-    pointer-events: auto;
-    touch-action: manipulation !important;
-  }
+  /* children inherit default behavior; no pointer-events override */
   
   /* Horizontal scroll specific areas */
   .mobile-horizontal-scroll {
