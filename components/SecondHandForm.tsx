@@ -414,7 +414,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
           </TouchButton>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 pb-40">
           {/* Ürün Bilgileri */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Ürün Bilgileri</h4>
