@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { useFormValidation, commonValidationRules } from './useFormValidation'
+import TouchButton from './TouchButton'
 
 interface FormData {
   urun_adi: string
@@ -362,24 +363,29 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-2 md:p-4 pt-4 md:pt-0" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-2 md:p-4 pt-4 md:pt-0 form-modal-container" onClick={onClose}>
       <div 
-        className="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto shadow-xl mt-4 md:mt-0"
+        className="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto shadow-xl mt-4 md:mt-0 form-modal-content"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          touchAction: 'pan-y'
+        }}
       >
         <div className="flex items-center justify-between mb-6 p-4 md:p-6">
           <h3 className="text-xl md:text-2xl font-bold text-gray-800">Yeni İlan Ver</h3>
-          <button 
+          <TouchButton
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors p-2"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </TouchButton>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-4 md:px-6 space-y-6">
+        <form onSubmit={handleSubmit} className="px-4 md:px-6 space-y-6 pb-8">
           {/* Ürün Bilgileri */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Ürün Bilgileri</h4>
@@ -715,20 +721,20 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
           )}
 
           <div className="flex justify-end space-x-3 pt-6">
-            <button
+            <TouchButton
               type="button"
               onClick={onClose}
               className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
             >
               İptal
-            </button>
-            <button
+            </TouchButton>
+            <TouchButton
               type="submit"
               disabled={isSubmitting || !isFormValid()}
               className="px-6 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Yayınlanıyor...' : 'İlanı Yayınla'}
-            </button>
+            </TouchButton>
           </div>
         </form>
       </div>
