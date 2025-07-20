@@ -463,10 +463,9 @@ textarea {
   
   /* Horizontal scroll specific */
   .mobile-horizontal-scroll {
-    touch-action: pan-x !important;
-    -webkit-overflow-scrolling: touch;
     overflow-x: auto;
     overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
   
@@ -532,12 +531,8 @@ textarea {
   
   /* Fix overscroll and reverse scroll issues */
   body {
-    overscroll-behavior: none !important;
-    overscroll-behavior-y: none !important;
-    overscroll-behavior-x: none !important;
     overflow-x: hidden;
-    touch-action: pan-y !important;
-    -webkit-overflow-scrolling: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   /* Main container fixes */
@@ -627,13 +622,4 @@ textarea {
   select {
     font-size: 16px !important;
   }
-} 
-
-/* --- Override restrictive mobile touch rules (allow scroll/drag on cards) --- */
-.mobile-smooth-scroll,
-.mobile-content-area,
-.mobile-scroll-container,
-.mobile-content-area *,
-.mobile-scroll-container > * {
-  touch-action: auto !important;
 } 
