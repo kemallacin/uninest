@@ -336,46 +336,196 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     const files = Array.from(e.dataTransfer.files);
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    const imageFiles = files.filter(file => {
+      // Daha kapsamlı dosya tipi kontrolü - HEIC ve diğer formatları da kabul et
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+      const fileType = file.type.toLowerCase();
+      return fileType.startsWith('image/') || validTypes.includes(fileType) || file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp|heic|heif)$/);
+    });
     
     if (formData.urun_fotograflar.length + imageFiles.length > 4) {
       alert('En fazla 4 fotoğraf yükleyebilirsiniz!');
       return;
     }
     
-    // Dosyaları doğrudan ekle (base64'e çevirme)
-    const newPhotos = imageFiles.map(file => ({
-      file: file,
-      preview: URL.createObjectURL(file)
-    }));
-    
-    setFormData(prev => ({
-      ...prev,
-      urun_fotograflar: [...prev.urun_fotograflar, ...newPhotos]
-    }));
+    // Resim sıkıştırma fonksiyonu
+    const compressImage = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = () => {
+          // Maksimum boyutlar
+          const maxWidth = 1200;
+          const maxHeight = 1200;
+          
+          let { width, height } = img;
+          
+          // Boyut oranını koru
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Resmi çiz ve sıkıştır
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Base64 olarak dışa aktar (0.8 kalite)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          resolve(compressedBase64);
+        };
+        
+        img.onerror = () => reject(new Error('Resim yüklenemedi'));
+        
+        // File'ı image'a yükle
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.src = e.target?.result as string;
+        };
+        reader.onerror = () => reject(new Error('Dosya okunamadı'));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    // Dosyaları sıkıştırarak ekle
+    const processFiles = async () => {
+      const newPhotos: { file: File; preview: string }[] = [];
+      
+      for (const file of imageFiles) {
+        // Dosya boyutu kontrolü (10MB - telefon fotoğrafları için artırıldı)
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`"${file.name}" çok büyük (max 10MB)`);
+          continue;
+        }
+
+        try {
+          const compressedBase64 = await compressImage(file);
+          newPhotos.push({
+            file: file,
+            preview: compressedBase64
+          });
+        } catch (error) {
+          console.error('Resim işleme hatası:', error);
+          alert(`"${file.name}" işlenirken hata oluştu`);
+        }
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        urun_fotograflar: [...prev.urun_fotograflar, ...newPhotos]
+      }));
+    };
+
+    processFiles();
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     
-    const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
-    
+    const imageFiles = Array.from(files).filter(file => {
+      // Daha kapsamlı dosya tipi kontrolü - HEIC ve diğer formatları da kabul et
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+      const fileType = file.type.toLowerCase();
+      return fileType.startsWith('image/') || validTypes.includes(fileType) || file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp|heic|heif)$/);
+    });
+
     if (formData.urun_fotograflar.length + imageFiles.length > 4) {
       alert('En fazla 4 fotoğraf yükleyebilirsiniz!');
       return;
     }
-    
-    // Dosyaları ekle
-    const newPhotos = imageFiles.map(file => ({
-      file: file,
-      preview: URL.createObjectURL(file)
-    }));
-    
-    setFormData(prev => ({
-      ...prev,
-      urun_fotograflar: [...prev.urun_fotograflar, ...newPhotos]
-    }));
+
+    // Resim sıkıştırma fonksiyonu
+    const compressImage = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = () => {
+          // Maksimum boyutlar
+          const maxWidth = 1200;
+          const maxHeight = 1200;
+          
+          let { width, height } = img;
+          
+          // Boyut oranını koru
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Resmi çiz ve sıkıştır
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Base64 olarak dışa aktar (0.8 kalite)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          resolve(compressedBase64);
+        };
+        
+        img.onerror = () => reject(new Error('Resim yüklenemedi'));
+        
+        // File'ı image'a yükle
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.src = e.target?.result as string;
+        };
+        reader.onerror = () => reject(new Error('Dosya okunamadı'));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    // Dosyaları sıkıştırarak ekle
+    const processFiles = async () => {
+      const newPhotos: { file: File; preview: string }[] = [];
+      
+      for (const file of imageFiles) {
+        // Dosya boyutu kontrolü (10MB - telefon fotoğrafları için artırıldı)
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`"${file.name}" çok büyük (max 10MB)`);
+          continue;
+        }
+
+        try {
+          const compressedBase64 = await compressImage(file);
+          newPhotos.push({
+            file: file,
+            preview: compressedBase64
+          });
+        } catch (error) {
+          console.error('Resim işleme hatası:', error);
+          alert(`"${file.name}" işlenirken hata oluştu`);
+        }
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        urun_fotograflar: [...prev.urun_fotograflar, ...newPhotos]
+      }));
+    };
+
+    processFiles();
   }
 
   if (success) {
@@ -728,7 +878,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
                     Fotoğraf yüklemek için tıklayın veya sürükleyin
                   </p>
                   <p className="mt-1 text-xs text-gray-500">
-                    PNG, JPG, GIF (max. 4 adet, her biri max. 10MB)
+                    PNG, JPG, GIF, WebP, HEIC (max. 4 adet, her biri max. 10MB)
                   </p>
                 </div>
               )}
@@ -736,7 +886,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,.heic,.heif"
               multiple
               onChange={handleFileChange}
               className="hidden"
