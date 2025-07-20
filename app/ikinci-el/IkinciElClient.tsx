@@ -125,13 +125,24 @@ const IkinciElClient = () => {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       try {
-        const itemsData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as SecondHandItem[];
+        const itemsData = snapshot.docs.map(doc => {
+          const data = doc.data();
+          console.log(`İlan ${doc.id}:`, {
+            title: data.title,
+            hasImages: !!data.images,
+            imageCount: data.images?.length || 0,
+            imageSizes: data.images?.map((img: string, i: number) => `${i+1}: ${Math.round(img.length/1024)}KB`) || [],
+            isApproved: data.isApproved
+          });
+          return {
+            id: doc.id,
+            ...data
+          };
+        }) as SecondHandItem[];
 
         console.log('Toplam ilan sayısı:', itemsData.length);
         console.log('Onay bekleyen ilan sayısı:', itemsData.filter(item => !item.isApproved).length);
+        console.log('Onaylanmış ilan sayısı:', itemsData.filter(item => item.isApproved).length);
 
         setItems(itemsData);
       } catch (error) {
@@ -231,7 +242,24 @@ const IkinciElClient = () => {
     const categoryMatch = activeCategory === 'all' || (item.category && item.category.toLowerCase() === activeCategory.toLowerCase());
     // Durum (id ile karşılaştır)
     const conditionMatch = !activeCondition || (item.condition && item.condition.toLowerCase() === activeCondition.toLowerCase());
-    return searchMatch && priceMatch && categoryMatch && conditionMatch;
+    
+    const passed = searchMatch && priceMatch && categoryMatch && conditionMatch;
+    
+    // Debug: Filtreleme sonuçlarını logla
+    if (!passed) {
+      console.log(`İlan ${item.id} filtrelendi:`, {
+        title: item.title,
+        searchMatch,
+        priceMatch,
+        categoryMatch,
+        conditionMatch,
+        isApproved: item.isApproved,
+        showPendingOnly,
+        isAdmin
+      });
+    }
+    
+    return passed;
   }).sort((a, b) => {
     // Premium ilanları öne çıkar
     if (a.isPremium && !b.isPremium) return -1;
@@ -480,6 +508,54 @@ const IkinciElClient = () => {
         location: formData.location || '',
         contactPreferences: formData.contactPreferences || {},
       };
+
+      // Veri boyutunu kontrol et (Firestore limit: 1MB)
+      const dataString = JSON.stringify(itemData);
+      const dataSizeKB = Math.round(dataString.length / 1024);
+      console.log(`Veri boyutu: ${dataSizeKB}KB`);
+      
+      if (dataSizeKB > 800) { // 800KB limiti (güvenlik marjı)
+        console.warn('Veri çok büyük, resim kalitesini düşürüyoruz...');
+        
+        // Resim kalitesini düşür
+        const compressedImages = await Promise.all(imageUrls.map(async (base64) => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          
+          return new Promise<string>((resolve) => {
+            img.onload = () => {
+              const maxSize = 800; // Daha küçük boyut
+              let { width, height } = img;
+              
+              if (width > height) {
+                if (width > maxSize) {
+                  height = (height * maxSize) / width;
+                  width = maxSize;
+                }
+              } else {
+                if (height > maxSize) {
+                  width = (width * maxSize) / height;
+                  height = maxSize;
+                }
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              ctx?.drawImage(img, 0, 0, width, height);
+              
+              // Daha düşük kalite
+              const compressed = canvas.toDataURL('image/jpeg', 0.5);
+              resolve(compressed);
+            };
+            img.src = base64;
+          });
+        }));
+        
+        itemData.images = compressedImages;
+        const newSize = Math.round(JSON.stringify(itemData).length / 1024);
+        console.log(`Yeni veri boyutu: ${newSize}KB`);
+      }
 
       console.log('Firestore\'a kaydedilecek veri:', { 
         ...itemData, 
