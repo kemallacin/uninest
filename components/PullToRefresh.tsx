@@ -86,7 +86,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const progress = Math.min(pullDistance / threshold, 1)
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`relative ${className}`}>
       {/* Pull indicator */}
       {showIndicator && (
         <div 

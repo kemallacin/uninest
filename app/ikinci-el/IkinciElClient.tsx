@@ -850,7 +850,7 @@ const IkinciElClient = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 ${isMobile ? 'mobile-smooth-scroll' : ''}`}>
-      <PullToRefresh onRefresh={handleRefresh} disabled={isModalOpen}>
+      <PullToRefresh onRefresh={handleRefresh} disabled={isModalOpen || (isMobile && viewMode==='scroll')}>
         <Header />
         <main className="flex-grow bg-gray-50 dark:bg-gray-900">
           <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
@@ -1189,7 +1189,7 @@ const IkinciElClient = () => {
               <div 
                 className={`${
                   isMobile && viewMode === 'scroll' 
-                    ? 'flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide' 
+                    ? 'flex overflow-x-auto whitespace-nowrap gap-4 pb-4 snap-x snap-mandatory scrollbar-hide' 
                     : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
                 }`}
                 style={isMobile && viewMode === 'scroll' ? { touchAction: 'pan-x pan-y' } : {}}

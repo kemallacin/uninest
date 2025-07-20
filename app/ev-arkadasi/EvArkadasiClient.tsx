@@ -776,11 +776,14 @@ export default function EvArkadasiClient() {
     return <PageLoading />;
   }
 
+  // Genel modal durumu – kaydırmayı devre dışı bırakmak için
+  const isModalOpen = showListingModal || showDetailsModal || showContactModal || showImageLightbox;
+
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 ${isMobile ? 'mobile-smooth-scroll' : ''}`}>
       <Header />
       
-      <PullToRefresh onRefresh={handleRefresh}>
+      <PullToRefresh onRefresh={handleRefresh} disabled={isModalOpen || (isMobile && mobileViewMode==='scroll')}>
         <div className={isMobile ? 'main-content mobile-scroll-container' : ''}>
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-[#1c0f3f] to-[#2e0f5f] text-white py-6 md:py-16 mb-3 md:mb-8">
@@ -1060,7 +1063,7 @@ export default function EvArkadasiClient() {
             className={`${
               isMobile 
                 ? mobileViewMode === 'scroll' 
-                  ? 'flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide mobile-horizontal-scroll' 
+                  ? 'flex gap-4 overflow-x-auto whitespace-nowrap pb-4 snap-x snap-mandatory scrollbar-hide mobile-horizontal-scroll' 
                   : 'grid grid-cols-1 gap-3'
                 : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
             } ${isMobile ? 'mobile-content-area' : ''}`}
