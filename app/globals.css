@@ -467,6 +467,10 @@ textarea {
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    /* Allow both pan directions */
+    touch-action: auto;
+    /* Softer snap so drag is not blocked */
+    scroll-snap-type: x proximity;
   }
   
   /* Card touch behavior for scroll mode */
