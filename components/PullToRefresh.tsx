@@ -7,13 +7,15 @@ interface PullToRefreshProps {
   onRefresh: () => Promise<void>
   threshold?: number
   className?: string
+  disabled?: boolean
 }
 
 const PullToRefresh: React.FC<PullToRefreshProps> = ({
   children,
   onRefresh,
   threshold = 80,
-  className = ''
+  className = '',
+  disabled = false
 }) => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [pullDistance, setPullDistance] = useState(0)
@@ -23,16 +25,16 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const currentY = useRef(0)
 
   const handleTouchStart = (e: TouchEvent) => {
-    if (containerRef.current?.scrollTop === 0) {
-      startY.current = e.touches[0].clientY
-      setIsPulling(true)
+    if (disabled || containerRef.current?.scrollTop !== 0) {
+      startY.current = e.touches[0].clientY;
+      setIsPulling(true);
     }
-  }
+  };
 
   const handleTouchMove = (e: TouchEvent) => {
-    if (!isPulling || isRefreshing) return
+    if (disabled || !isPulling || isRefreshing) return;
 
-    currentY.current = e.touches[0].clientY
+    currentY.current = e.touches[0].clientY;
     const distance = Math.max(0, currentY.current - startY.current)
     
     if (distance > 0) {
@@ -42,7 +44,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
   }
 
   const handleTouchEnd = async () => {
-    if (!isPulling || isRefreshing) return
+    if (disabled || !isPulling || isRefreshing) return;
 
     if (pullDistance >= threshold) {
       setIsRefreshing(true)
@@ -60,19 +62,19 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
   }
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    const container = containerRef.current;
+    if (!container || disabled) return;
 
-    container.addEventListener('touchstart', handleTouchStart, { passive: false })
-    container.addEventListener('touchmove', handleTouchMove, { passive: false })
-    container.addEventListener('touchend', handleTouchEnd)
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd);
 
     return () => {
-      container.removeEventListener('touchstart', handleTouchStart)
-      container.removeEventListener('touchmove', handleTouchMove)
-      container.removeEventListener('touchend', handleTouchEnd)
-    }
-  }, [isPulling, isRefreshing, pullDistance, threshold])
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isPulling, isRefreshing, pullDistance, threshold, disabled]);
 
   const showIndicator = pullDistance > 0 || isRefreshing
   const progress = Math.min(pullDistance / threshold, 1)

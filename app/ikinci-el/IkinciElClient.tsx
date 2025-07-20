@@ -71,6 +71,7 @@ const IkinciElClient = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [modalPosition, setModalPosition] = useState<{top: number} | null>(null);
   const [showFilters, setShowFilters] = useState(false); // mobil filtre toggle
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const categories = [
     { id: 'all', name: 'Tümü', icon: '🏠' },
@@ -285,21 +286,15 @@ const IkinciElClient = () => {
   const pendingItemsCount = items.filter(item => !item.isApproved).length;
 
   const handleModalClose = () => {
-    setShowContactModal(false);
-    setShowDetailsModal(false);
     setShowListingModal(false);
-    setSelectedItem(null);
     setEditItem(null);
-    setCurrentImageIndex(0);
-    setModalPosition(null); // Modal konumunu sıfırla
+    setIsModalOpen(false);
   };
 
   const handleİlanVer = () => {
-    if (!user) {
-      showToast('İlan vermek için giriş yapmanız gerekiyor!', 'error');
-      return;
-    }
     setShowListingModal(true);
+    setEditItem(null);
+    setIsModalOpen(true);
   };
 
   // Silme fonksiyonu
@@ -456,8 +451,9 @@ const IkinciElClient = () => {
       const docRef = await addDoc(collection(db, 'secondhand'), itemData);
       console.log('İlan başarıyla kaydedildi, ID:', docRef.id);
 
-      showToast('İlanınız başarıyla eklendi ve admin onayı bekliyor!', 'success');
+      showToast('İlan başarıyla eklendi ve onaya gönderildi!', 'success');
       handleModalClose();
+      setIsModalOpen(false);
       
     } catch (error: any) {
       console.error('İlan ekleme genel hatası:', error);
@@ -580,8 +576,8 @@ const IkinciElClient = () => {
       await updateDoc(docRef, cleanedItem);
       
       showToast('İlan başarıyla güncellendi!', 'success');
-      setShowListingModal(false);
-      setEditItem(null);
+      handleModalClose();
+      setIsModalOpen(false);
       
     } catch (error: any) {
       console.error('Error updating item:', error);
@@ -738,942 +734,946 @@ const IkinciElClient = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 ${isMobile ? 'mobile-smooth-scroll' : ''}`}>
-      <Header />
-      <PullToRefresh onRefresh={handleRefresh} className={`min-h-screen ${isMobile ? 'mobile-scroll-container' : ''}`}>
-        {/* Hero Section - Mobile First */}
-        <div className="bg-gradient-to-r from-[#1c0f3f] to-[#2e0f5f] text-white">
-          <div className={`container mx-auto ${isMobile ? 'px-3 py-8' : 'px-4 py-16'} text-center`}>
-            <h1 className={`font-bold mb-4 ${isMobile ? 'text-2xl' : 'text-5xl'}`}>
-              🛒 2. El Eşya Pazarı
-            </h1>
-            <p className={`text-gray-200 mb-6 ${isMobile ? 'text-sm leading-relaxed' : 'text-lg mb-8'}`}>
-              İkinci el eşyalarını sat veya ihtiyacın olan eşyaları uygun fiyata bul.{' '}
-              {!isMobile && 'Öğrenciler için güvenli alışveriş platformu.'}
-            </p>
-            
-            {/* Mobile: Quick Action Buttons */}
-            {isMobile ? (
-              <div className="space-y-4 mb-6">
-                {/* İlan Ver Button - Prominent */}
-                <TouchButton
-                  onClick={handleİlanVer}
-                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-4 rounded-xl text-lg font-bold transition-all shadow-lg flex items-center justify-center gap-2"
-                >
-                  <Plus size={20} />
-                  📦 İlan Ver
-                </TouchButton>
+      <PullToRefresh onRefresh={handleRefresh} disabled={isModalOpen}>
+        <Header />
+        <main className="flex-grow bg-gray-50 dark:bg-gray-900">
+          <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
+            {/* Hero Section - Mobile First */}
+            <div className="bg-gradient-to-r from-[#1c0f3f] to-[#2e0f5f] text-white">
+              <div className={`container mx-auto ${isMobile ? 'px-3 py-8' : 'px-4 py-16'} text-center`}>
+                <h1 className={`font-bold mb-4 ${isMobile ? 'text-2xl' : 'text-5xl'}`}>
+                  🛒 2. El Eşya Pazarı
+                </h1>
+                <p className={`text-gray-200 mb-6 ${isMobile ? 'text-sm leading-relaxed' : 'text-lg mb-8'}`}>
+                  İkinci el eşyalarını sat veya ihtiyacın olan eşyaları uygun fiyata bul.{' '}
+                  {!isMobile && 'Öğrenciler için güvenli alışveriş platformu.'}
+                </p>
+                
+                {/* Mobile: Quick Action Buttons */}
+                {isMobile ? (
+                  <div className="space-y-4 mb-6">
+                    {/* İlan Ver Button - Prominent */}
+                    <TouchButton
+                      onClick={handleİlanVer}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-4 rounded-xl text-lg font-bold transition-all shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <Plus size={20} />
+                      📦 İlan Ver
+                    </TouchButton>
 
-                {/* Filter Toggle */}
-                <div className="flex gap-2">
-                  <TouchButton
-                    onClick={() => setShowFilters(!showFilters)}
-                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
-                      showFilters 
-                        ? 'bg-white/20 text-white' 
-                        : 'bg-white/10 text-white/90 hover:bg-white/15'
-                    }`}
-                  >
-                    <Filter size={16} />
-                    <span>Filtrele</span>
-                  </TouchButton>
-
-                  {/* View Mode Toggles */}
-                  <TouchButton
-                    onClick={() => setViewMode('grid')}
-                    className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1 ${
-                      viewMode === 'grid' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'text-white/90 bg-transparent hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    <Grid3X3 size={16} />
-                    <span>Grid</span>
-                  </TouchButton>
-                  <TouchButton
-                    onClick={() => setViewMode('scroll')}
-                    className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1 ${
-                      viewMode === 'scroll' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'text-white/90 bg-transparent hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    <List size={16} />
-                    <span>Kaydır</span>
-                  </TouchButton>
-                </div>
-
-                {/* Collapsible Filters */}
-                {showFilters && (
-                  <div className="space-y-3 bg-purple-500/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30 shadow-lg">
-                    {/* Search */}
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60" size={16} />
-                      <input
-                        type="text"
-                        placeholder="Ürün ara..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-purple-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-white/60 text-sm focus:ring-2 focus:ring-purple-400/50"
-                      />
-                    </div>
-
-                    {/* Category and Condition */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <select
-                        value={activeCategory}
-                        onChange={(e) => setActiveCategory(e.target.value)}
-                        className="px-3 py-3 border border-purple-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm focus:ring-2 focus:ring-purple-400/50"
-                      >
-                        <option value="all" className="text-gray-900">📦 Tümü</option>
-                        <option value="electronics" className="text-gray-900">💻 Elektronik</option>
-                        <option value="furniture" className="text-gray-900">🪑 Mobilya</option>
-                        <option value="books" className="text-gray-900">📚 Kitap</option>
-                        <option value="clothing" className="text-gray-900">👕 Giyim</option>
-                        <option value="sports" className="text-gray-900">⚽ Spor</option>
-                        <option value="other" className="text-gray-900">📦 Diğer</option>
-                      </select>
-                      <select
-                        value={activeCondition}
-                        onChange={(e) => setActiveCondition(e.target.value)}
-                        className="px-3 py-3 border border-purple-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm focus:ring-2 focus:ring-purple-400/50"
-                      >
-                        <option value="" className="text-gray-900">✨ Tüm Durumlar</option>
-                        <option value="new" className="text-gray-900">🆕 Sıfır</option>
-                        <option value="like-new" className="text-gray-900">⭐ Sıfır Gibi</option>
-                        <option value="good" className="text-gray-900">👍 İyi</option>
-                        <option value="fair" className="text-gray-900">👌 Orta</option>
-                        <option value="old" className="text-gray-900">📦 Eski</option>
-                      </select>
-                    </div>
-
-                    {/* Price Range */}
-                    <div>
-                      <label className="block text-white/80 text-xs font-medium mb-2">
-                        💰 Maksimum Fiyat: {priceRangeValue} TL
-                      </label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="10000"
-                        step="100"
-                        value={priceRangeValue}
-                        onChange={(e) => setPriceRangeValue(Number(e.target.value))}
-                        className="w-full accent-purple-400"
-                      />
-                    </div>
-
-                    {/* Filter Actions */}
-                    <div className="flex justify-between items-center pt-2">
+                    {/* Filter Toggle */}
+                    <div className="flex gap-2">
                       <TouchButton
-                        onClick={handleClearFilters}
-                        className="text-white/80 hover:text-white font-medium text-xs bg-white/10 px-3 py-2 rounded-md transition-colors"
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
+                          showFilters 
+                            ? 'bg-white/20 text-white' 
+                            : 'bg-white/10 text-white/90 hover:bg-white/15'
+                        }`}
                       >
-                        🔄 Temizle
+                        <Filter size={16} />
+                        <span>Filtrele</span>
                       </TouchButton>
-                      <div className="text-xs text-white/80 bg-white/10 px-3 py-2 rounded-md">
-                        📊 {filteredItems.length} sonuç
-                      </div>
+
+                      {/* View Mode Toggles */}
+                      <TouchButton
+                        onClick={() => setViewMode('grid')}
+                        className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1 ${
+                          viewMode === 'grid' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'text-white/90 bg-transparent hover:text-white hover:bg-white/10'
+                        }`}
+                      >
+                        <Grid3X3 size={16} />
+                        <span>Grid</span>
+                      </TouchButton>
+                      <TouchButton
+                        onClick={() => setViewMode('scroll')}
+                        className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1 ${
+                          viewMode === 'scroll' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'text-white/90 bg-transparent hover:text-white hover:bg-white/10'
+                        }`}
+                      >
+                        <List size={16} />
+                        <span>Kaydır</span>
+                      </TouchButton>
                     </div>
+
+                    {/* Collapsible Filters */}
+                    {showFilters && (
+                      <div className="space-y-3 bg-purple-500/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30 shadow-lg">
+                        {/* Search */}
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60" size={16} />
+                          <input
+                            type="text"
+                            placeholder="Ürün ara..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 border border-purple-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-white/60 text-sm focus:ring-2 focus:ring-purple-400/50"
+                          />
+                        </div>
+
+                        {/* Category and Condition */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <select
+                            value={activeCategory}
+                            onChange={(e) => setActiveCategory(e.target.value)}
+                            className="px-3 py-3 border border-purple-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm focus:ring-2 focus:ring-purple-400/50"
+                          >
+                            <option value="all" className="text-gray-900">📦 Tümü</option>
+                            <option value="electronics" className="text-gray-900">💻 Elektronik</option>
+                            <option value="furniture" className="text-gray-900">🪑 Mobilya</option>
+                            <option value="books" className="text-gray-900">📚 Kitap</option>
+                            <option value="clothing" className="text-gray-900">👕 Giyim</option>
+                            <option value="sports" className="text-gray-900">⚽ Spor</option>
+                            <option value="other" className="text-gray-900">📦 Diğer</option>
+                          </select>
+                          <select
+                            value={activeCondition}
+                            onChange={(e) => setActiveCondition(e.target.value)}
+                            className="px-3 py-3 border border-purple-400/30 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm focus:ring-2 focus:ring-purple-400/50"
+                          >
+                            <option value="" className="text-gray-900">✨ Tüm Durumlar</option>
+                            <option value="new" className="text-gray-900">🆕 Sıfır</option>
+                            <option value="like-new" className="text-gray-900">⭐ Sıfır Gibi</option>
+                            <option value="good" className="text-gray-900">👍 İyi</option>
+                            <option value="fair" className="text-gray-900">👌 Orta</option>
+                            <option value="old" className="text-gray-900">📦 Eski</option>
+                          </select>
+                        </div>
+
+                        {/* Price Range */}
+                        <div>
+                          <label className="block text-white/80 text-xs font-medium mb-2">
+                            💰 Maksimum Fiyat: {priceRangeValue} TL
+                          </label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="10000"
+                            step="100"
+                            value={priceRangeValue}
+                            onChange={(e) => setPriceRangeValue(Number(e.target.value))}
+                            className="w-full accent-purple-400"
+                          />
+                        </div>
+
+                        {/* Filter Actions */}
+                        <div className="flex justify-between items-center pt-2">
+                          <TouchButton
+                            onClick={handleClearFilters}
+                            className="text-white/80 hover:text-white font-medium text-xs bg-white/10 px-3 py-2 rounded-md transition-colors"
+                          >
+                            🔄 Temizle
+                          </TouchButton>
+                          <div className="text-xs text-white/80 bg-white/10 px-3 py-2 rounded-md">
+                            📊 {filteredItems.length} sonuç
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Desktop: Category Buttons */
+                  <div className="space-y-6">
+                    <div className="flex flex-wrap justify-center gap-4 mb-6">
+                      <TouchButton
+                        onClick={() => setActiveCategory('electronics')}
+                        className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
+                          activeCategory === 'electronics' 
+                            ? 'bg-purple-600 text-white' 
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                        }`}
+                      >
+                        💻 Elektronik
+                      </TouchButton>
+                      <TouchButton
+                        onClick={() => setActiveCategory('furniture')}
+                        className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
+                          activeCategory === 'furniture' 
+                            ? 'bg-purple-600 text-white' 
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                        }`}
+                      >
+                        🪑 Mobilya
+                      </TouchButton>
+                      <TouchButton
+                        onClick={() => setActiveCategory('books')}
+                        className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
+                          activeCategory === 'books' 
+                            ? 'bg-purple-600 text-white' 
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                        }`}
+                      >
+                        📚 Kitap
+                      </TouchButton>
+                      <TouchButton
+                        onClick={() => setActiveCategory('clothing')}
+                        className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
+                          activeCategory === 'clothing' 
+                            ? 'bg-purple-600 text-white' 
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                        }`}
+                      >
+                        👕 Giyim
+                      </TouchButton>
+                    </div>
+
+                    <TouchButton
+                      onClick={handleİlanVer}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-12 py-4 rounded-full text-xl font-bold transition-colors shadow-lg"
+                    >
+                      <Plus className="mr-2" /> İlan Ver
+                    </TouchButton>
                   </div>
                 )}
               </div>
-            ) : (
-              /* Desktop: Category Buttons */
-              <div className="space-y-6">
-                <div className="flex flex-wrap justify-center gap-4 mb-6">
-                  <TouchButton
-                    onClick={() => setActiveCategory('electronics')}
-                    className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
-                      activeCategory === 'electronics' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'bg-white/20 text-white hover:bg-white/30'
-                    }`}
-                  >
-                    💻 Elektronik
-                  </TouchButton>
-                  <TouchButton
-                    onClick={() => setActiveCategory('furniture')}
-                    className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
-                      activeCategory === 'furniture' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'bg-white/20 text-white hover:bg-white/30'
-                    }`}
-                  >
-                    🪑 Mobilya
-                  </TouchButton>
-                  <TouchButton
-                    onClick={() => setActiveCategory('books')}
-                    className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
-                      activeCategory === 'books' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'bg-white/20 text-white hover:bg-white/30'
-                    }`}
-                  >
-                    📚 Kitap
-                  </TouchButton>
-                  <TouchButton
-                    onClick={() => setActiveCategory('clothing')}
-                    className={`px-8 py-3 rounded-full text-lg font-semibold transition-colors ${
-                      activeCategory === 'clothing' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'bg-white/20 text-white hover:bg-white/30'
-                    }`}
-                  >
-                    👕 Giyim
-                  </TouchButton>
+            </div>
+
+            {/* Search and Filter Section - Desktop Only */}
+            <div className={`container mx-auto ${isMobile ? 'px-1' : 'px-4'} py-8`}>
+              {/* Desktop Filters */}
+              <div className="hidden md:block">
+                {/* Ana filtreleme bölümü */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mx-4 mb-6">
+                  {/* Kategori filtreleri */}
+                  <div className="flex flex-wrap gap-3 mb-6">
+                    {categories.map((category) => (
+                      <TouchButton
+                        key={category.id}
+                        onClick={() => setActiveCategory(category.id)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                          activeCategory === category.id
+                            ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        <span className="text-lg">{category.icon}</span>
+                        {category.name}
+                      </TouchButton>
+                    ))}
+                  </div>
+                  
+                  {/* Admin Onay Bekleyen İlanlar Butonu */}
+                  {isAdmin && (
+                    <div className="mb-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+                      <TouchButton
+                        onClick={() => setShowPendingOnly(!showPendingOnly)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                          showPendingOnly
+                            ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
+                            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/50'
+                        }`}
+                      >
+                        <Clock size={16} />
+                        {showPendingOnly ? 'Tüm İlanları Göster' : 'Onay Bekleyen İlanlar'}
+                        {!showPendingOnly && pendingCount > 0 && (
+                          <span className="bg-red-500 text-white rounded-full px-2 py-1 text-xs ml-2">
+                            {pendingCount}
+                          </span>
+                        )}
+                      </TouchButton>
+                    </div>
+                  )}
                 </div>
 
-                <TouchButton
-                  onClick={handleİlanVer}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-12 py-4 rounded-full text-xl font-bold transition-colors shadow-lg"
-                >
-                  <Plus className="mr-2" /> İlan Ver
-                </TouchButton>
+                {/* Search and Filter Bar */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex-1 relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
+                        <input
+                          type="text"
+                          placeholder="Ürün adı, açıklama veya kategori ara..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-6 items-center">
+                      {/* Fiyat Aralığı Slider */}
+                      <div className="w-full md:w-1/2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fiyat Aralığı</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10000"
+                          step="10"
+                          value={priceRangeValue}
+                          onChange={(e) => setPriceRangeValue(Number(e.target.value))}
+                          className="w-full accent-blue-500"
+                        />
+                        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <span>0 TL</span>
+                          <span>10.000 TL</span>
+                        </div>
+                      </div>
+                      {/* Kategori Dropdown */}
+                      <div className="w-full md:w-1/4">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
+                        <select
+                          value={activeCategory}
+                          onChange={(e) => setActiveCategory(e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          <option value="all">Tüm Kategoriler</option>
+                          {categories.filter(c => c.id !== 'all').map(category => (
+                            <option key={category.id} value={category.id}>{category.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      {/* Durum Dropdown */}
+                      <div className="w-full md:w-1/4">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Durum</label>
+                        <select
+                          value={activeCondition}
+                          onChange={(e) => setActiveCondition(e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          <option value="">Tüm Durumlar</option>
+                          <option value="new">Sıfır</option>
+                          <option value="like-new">Sıfır Gibi</option>
+                          <option value="good">İyi</option>
+                          <option value="fair">Orta</option>
+                          <option value="old">Eski</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex flex-row gap-4 justify-end">
+                      <button
+                        onClick={handleClearFilters}
+                        className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                      >
+                        Filtreleri Temizle
+                      </button>
+                      <button
+                        onClick={handleApplyFilters}
+                        className="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold flex items-center gap-2 transition"
+                      >
+                        <Filter size={18} />
+                        Uygula
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* Search and Filter Section - Desktop Only */}
-        <div className={`container mx-auto ${isMobile ? 'px-1' : 'px-4'} py-8`}>
-          {/* Desktop Filters */}
-          <div className="hidden md:block">
-            {/* Ana filtreleme bölümü */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mx-4 mb-6">
-              {/* Kategori filtreleri */}
-              <div className="flex flex-wrap gap-3 mb-6">
-                {categories.map((category) => (
-                  <TouchButton
-                    key={category.id}
-                    onClick={() => setActiveCategory(category.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      activeCategory === category.id
-                        ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    <span className="text-lg">{category.icon}</span>
-                    {category.name}
-                  </TouchButton>
-                ))}
+              {/* Results Count - Mobile optimized */}
+              <div className={`mb-6 ${isMobile ? 'px-3' : ''}`}>
+                <p className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'text-sm text-center bg-gray-100 dark:bg-gray-800 py-2 px-4 rounded-lg' : ''}`}>
+                  📊 {filteredItems.length} sonuç bulundu
+                </p>
               </div>
-              
-              {/* Admin Onay Bekleyen İlanlar Butonu */}
-              {isAdmin && (
-                <div className="mb-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+
+              {/* Items Grid/Scroll */}
+              <div className={`${
+                isMobile && viewMode === 'scroll' 
+                  ? 'flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide' 
+                  : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+              }`}>
+                {paginatedItems.map((item, index) => {
+                  const isOwner = user && item.userId === user.uid;
+                  const images = item.images || [item.image];
+                  const discount = item.originalPrice ? calculateDiscount(item.originalPrice, item.price) : 0;
+                  
+                  return (
+                    <div key={item.id} className={`item-card rounded-2xl transition-all duration-300 overflow-hidden relative ${
+                      isMobile && viewMode === 'scroll' ? 'min-w-[280px] snap-center mobile-card-touch' : ''
+                    } ${
+                      item.isPremium 
+                        ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105' 
+                        : 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl'
+                    }`}>
+                      {/* Premium Glow Effect */}
+                      {item.isPremium && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 via-purple-400/10 to-indigo-400/10 rounded-2xl pointer-events-none"></div>
+                      )}
+                      {/* Image Section - Mobile optimized */}
+                      <div className={`relative ${isMobile ? 'h-32' : 'h-48'} bg-gray-100 dark:bg-gray-700 overflow-hidden`}>
+                        <img
+                          src={images[0] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPlJlc2ltIFlvazwvdGV4dD4KPC9zdmc+'}
+                          alt={item.title}
+                          className={`w-full h-full object-cover transition-transform duration-200 ${isMobile ? '' : 'group-hover:scale-105'}`}
+                          onError={(e) => {
+                            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRkVGMkYyIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iI0Y1NjU2NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiPlJlc2ltIFnDvGtsZW5lbWVkaTwvdGV4dD4KPC9zdmc+';
+                          }}
+                        />
+                        
+                        {/* Premium Badge */}
+                        {item.isPremium && (
+                          <div className="absolute top-3 right-3 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-xl border border-white/20 backdrop-blur-sm">
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                            <span className="text-white drop-shadow-sm">👑 PREMIUM</span>
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                          </div>
+                        )}
+                        
+                        {/* Onay durumu badge */}
+                        {!item.isApproved && !item.isPremium && (
+                          <div className="absolute top-3 left-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                            <Clock size={12} />
+                            Onay Bekliyor
+                          </div>
+                        )}
+                        
+                        {/* Onay durumu badge for Premium */}
+                        {!item.isApproved && item.isPremium && (
+                          <div className="absolute top-12 left-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                            <Clock size={12} />
+                            Onay Bekliyor
+                          </div>
+                        )}
+                        
+                        {/* İndirim etiketi */}
+                        {discount > 0 && (
+                          <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                            %{discount} İndirim
+                          </div>
+                        )}
+                        
+                        {/* Çoklu fotoğraf göstergesi */}
+                        {images.length > 1 && (
+                          <div className="absolute bottom-3 left-3 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full text-xs">
+                            {images.length} Fotoğraf
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content Section - Mobile optimized */}
+                      <div className={`${isMobile ? 'p-3' : 'p-6'} relative ${item.isPremium ? 'bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-900/20 dark:via-purple-900/10 dark:to-indigo-900/20' : ''}`}>
+                        {/* Premium Corner Decoration */}
+                        {item.isPremium && !isMobile && (
+                          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-pink-400/20 to-transparent rounded-bl-full"></div>
+                        )}
+                        {/* Title and Price - Mobile optimized */}
+                        <div className={`flex items-start justify-between ${isMobile ? 'mb-2' : 'mb-3'}`}>
+                          <div className="flex-1 min-w-0">
+                            <h3 className={`font-bold text-gray-800 dark:text-white line-clamp-2 ${isMobile ? 'text-sm leading-tight' : 'text-xl mb-1'}`}>
+                              {item.title}
+                            </h3>
+                            <p className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                              {item.category}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end">
+                            {/* İndirim varsa önceki fiyatı göster */}
+                            {item.previousPrice && item.previousPrice > item.price && (
+                              <div className={`flex items-center gap-1 ${isMobile ? 'mb-0.5' : 'gap-2 mb-1'}`}>
+                                <span className={`text-gray-400 dark:text-gray-500 line-through ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                                  {item.previousPrice} TL
+                                </span>
+                                <span className={`bg-red-500 text-white rounded-full font-bold ${isMobile ? 'text-xs px-1.5 py-0.5' : 'text-xs px-2 py-1'}`}>
+                                  %{calculateDiscount(item.previousPrice, item.price)}
+                                </span>
+                              </div>
+                            )}
+                            <div className={`flex items-center font-bold ${isMobile ? 'text-sm' : 'text-lg'} ${item.isPremium ? 'text-purple-600 dark:text-purple-400' : 'text-blue-600 dark:text-blue-400'}`}>
+                              {item.isPremium && <span className={`text-pink-500 ${isMobile ? 'mr-0.5' : 'mr-1'}`}>💎</span>}
+                              <span>{item.price} TL</span>
+                              {item.isPremium && <span className={`text-pink-500 ${isMobile ? 'ml-0.5' : 'ml-1'}`}>💎</span>}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Condition Badge */}
+                        <div className="mb-3">
+                          <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                            item.condition === 'new' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 
+                            item.condition === 'like-new' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                            item.condition === 'good' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
+                            'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}>
+                            {item.condition === 'new' ? 'Sıfır' :
+                             item.condition === 'like-new' ? 'Sıfır Gibi' :
+                             item.condition === 'good' ? 'İyi' :
+                             item.condition === 'fair' ? 'Orta' : 'Eski'}
+                          </span>
+                        </div>
+
+                        {/* Location and Date */}
+                        <div className="space-y-2 mb-4">
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                            <MapPin size={14} className="mr-2" />
+                            <span>{item.location || 'Konum belirtilmemiş'}</span>
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                            <Calendar size={14} className="mr-2" />
+                            <span>
+                              {item.createdAt?.toDate ? 
+                                item.createdAt.toDate().toLocaleDateString('tr-TR') : 
+                                new Date(item.createdAt).toLocaleDateString('tr-TR')
+                              }
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Description - Mobile optimized */}
+                        <p className={`text-gray-600 dark:text-gray-400 whitespace-pre-line ${isMobile ? 'text-xs mb-2 line-clamp-2' : 'text-sm mb-4'}`}>
+                          {item.description}
+                        </p>
+
+                        {/* Onay durumu (sadece ilan sahibi veya admin görsün) */}
+                        {(isOwner || isAdmin) && (
+                          <div className="mb-4">
+                            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
+                              item.isApproved 
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' 
+                                : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                            }`}>
+                              {item.isApproved ? (
+                                <>
+                                  <CheckCircle size={12} />
+                                  Onaylandı
+                                </>
+                              ) : (
+                                <>
+                                  <Clock size={12} />
+                                  Onay Bekliyor
+                                </>
+                              )}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Actions - Mobile optimized */}
+                        <div className={`flex gap-1 ${isMobile ? 'mb-2' : 'gap-2 mb-3'}`}>
+                          {/* Owner buttons: Edit, Delete, Share */}
+                          {isOwner ? (
+                            <>
+                              <button
+                                onClick={(e) => handleDetailClick(item, e)}
+                                className={`flex-1 flex items-center justify-center gap-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition ${isMobile ? 'py-1.5 px-2 text-xs' : 'py-2 px-4 gap-2'}`}
+                              >
+                                <Eye size={isMobile ? 12 : 16} />
+                                {!isMobile && 'Detay'}
+                              </button>
+                              <button
+                                onClick={() => handleShare(item)}
+                                className={`flex items-center justify-center gap-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 rounded-lg font-medium transition ${isMobile ? 'py-1.5 px-2' : 'py-2 px-4 gap-2'}`}
+                              >
+                                <Share2 size={isMobile ? 12 : 16} />
+                              </button>
+                            </>
+                          ) : (
+                            /* Non-owner buttons: Detail, Contact */
+                            <>
+                              <button
+                                onClick={(e) => handleDetailClick(item, e)}
+                                className={`flex-1 flex items-center justify-center gap-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition ${isMobile ? 'py-1.5 px-2 text-xs' : 'py-2 px-4 gap-2'}`}
+                              >
+                                <Eye size={isMobile ? 12 : 16} />
+                                {isMobile ? 'Detay' : 'Detay'}
+                              </button>
+                              <button
+                                onClick={(e) => handleContactClick(item, e)}
+                                className={`flex-1 flex items-center justify-center gap-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg font-medium transition ${isMobile ? 'py-1.5 px-2 text-xs' : 'py-2 px-4 gap-2'}`}
+                              >
+                                <MessageCircle size={isMobile ? 12 : 16} />
+                                {isMobile ? 'İletişim' : 'İletişim'}
+                              </button>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Favorite, Share and Report */}
+                        <div className="flex gap-2 mb-3">
+                          <button
+                            onClick={() => toggleFavorite(item)}
+                            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition ${
+                              favorites.includes(item.id)
+                                ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            <Heart size={16} fill={favorites.includes(item.id) ? 'currentColor' : 'none'} />
+                            {favorites.includes(item.id) ? 'Favoride' : 'Favorile'}
+                          </button>
+                          <button
+                            onClick={() => handleShare(item)}
+                            className="flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg font-medium transition"
+                          >
+                            <Share2 size={16} />
+                          </button>
+                          {/* Report Button - sadece ilan sahibi değilse göster */}
+                          {!isOwner && (
+                            <ReportButton contentType="secondhand" contentId={item.id} />
+                          )}
+                        </div>
+
+                        {/* Owner Actions */}
+                        {isOwner && (
+                          <div className="flex gap-2 mb-3">
+                            <TouchButton
+                              onClick={() => {
+                                setEditItem(item);
+                                setShowListingModal(true);
+                              }}
+                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Edit size={14} />
+                              Düzenle
+                            </TouchButton>
+                            <TouchButton
+                              onClick={() => handleDelete(item.id)}
+                              className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                            >
+                              <Trash2 size={14} />
+                              Sil
+                            </TouchButton>
+                          </div>
+                        )}
+
+                        {/* Admin Actions */}
+                        {isAdmin && (
+                          <div className="flex gap-2">
+                            {!item.isApproved ? (
+                              <>
+                                <TouchButton
+                                  onClick={() => handleApprove(item.id, true)}
+                                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                                  title="Onayla"
+                                >
+                                  <CheckCircle size={14} />
+                                  Onayla
+                                </TouchButton>
+                                <TouchButton
+                                  onClick={() => handleApprove(item.id, false)}
+                                  className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                                  title="Reddet"
+                                >
+                                  <X size={14} />
+                                  Reddet
+                                </TouchButton>
+                              </>
+                            ) : (
+                              <div className="flex-1 text-center text-green-600 text-sm flex items-center justify-center gap-1">
+                                <CheckCircle size={14} />
+                                Onaylandı
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Row Indicators for Scroll Mode - Mobile Only */}
+              {isMobile && viewMode === 'scroll' && paginatedItems.length > 3 && (
+                <div className="flex justify-center mt-4 gap-1">
+                  {Array.from({ length: Math.ceil(paginatedItems.length / 3) }, (_, i) => (
+                    <div
+                      key={i}
+                      className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination Controls - Grid Mode */}
+              {viewMode === 'grid' && totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8">
                   <TouchButton
-                    onClick={() => setShowPendingOnly(!showPendingOnly)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      showPendingOnly
-                        ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
-                        : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/50'
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === 1 
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
                     }`}
                   >
-                    <Clock size={16} />
-                    {showPendingOnly ? 'Tüm İlanları Göster' : 'Onay Bekleyen İlanlar'}
-                    {!showPendingOnly && pendingCount > 0 && (
-                      <span className="bg-red-500 text-white rounded-full px-2 py-1 text-xs ml-2">
-                        {pendingCount}
-                      </span>
-                    )}
+                    <ArrowUp size={16} />
+                    Önceki
+                  </TouchButton>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                      <TouchButton
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                          currentPage === page
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {page}
+                      </TouchButton>
+                    ))}
+                  </div>
+
+                  <TouchButton
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === totalPages 
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                  >
+                    Sonraki
+                    <ArrowDown size={16} />
+                  </TouchButton>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {filteredItems.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">🛍️</div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Sonuç Bulunamadı</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Arama kriterlerinize uygun ürün bulunamadı.
+                  </p>
+                  <TouchButton
+                    onClick={() => {
+                      setActiveCategory('all');
+                      setSearchTerm('');
+                      setPriceRange('');
+                    }}
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-6 py-2 rounded-lg"
+                  >
+                    Filtreleri Temizle
                   </TouchButton>
                 </div>
               )}
             </div>
 
-            {/* Search and Filter Bar */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
-                    <input
-                      type="text"
-                      placeholder="Ürün adı, açıklama veya kategori ara..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:placeholder-gray-400"
-                    />
+            {/* Contact Modal */}
+            {showContactModal && selectedItem && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div 
+                  className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl"
+                  style={modalPosition && isMobile ? { 
+                    position: 'fixed',
+                    top: `${modalPosition.top}px`,
+                    left: '1rem',
+                    right: '1rem',
+                    width: 'calc(100% - 2rem)',
+                    maxWidth: '28rem',
+                    transform: 'none'
+                  } : {}}
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">İletişime Geç</h3>
+                    <TouchButton
+                      onClick={() => setShowContactModal(false)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    >
+                      <X size={24} />
+                    </TouchButton>
                   </div>
-                </div>
-                <div className="flex flex-col md:flex-row gap-6 items-center">
-                  {/* Fiyat Aralığı Slider */}
-                  <div className="w-full md:w-1/2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fiyat Aralığı</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="10000"
-                      step="10"
-                      value={priceRangeValue}
-                      onChange={(e) => setPriceRangeValue(Number(e.target.value))}
-                      className="w-full accent-blue-500"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <span>0 TL</span>
-                      <span>10.000 TL</span>
+                  <div className="mb-6">
+                    <h4 className="font-medium text-gray-900 dark:text-white text-lg">{selectedItem.title}</h4>
+                    <p className="text-xl font-bold text-green-600 dark:text-green-400 mt-2">{selectedItem.price} TL</p>
+                  </div>
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                      <MapPin size={18} className="text-gray-500 dark:text-gray-400" />
+                      <span className="font-medium">{selectedItem.location}</span>
+                    </div>
+                    
+                    {/* İletişim Seçenekleri */}
+                    <div className="space-y-3">
+                      {selectedItem.phone && (
+                        <a
+                          href={`https://wa.me/${selectedItem.phone.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
+                        >
+                          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                          </svg>
+                          <span className="font-medium text-lg group-hover:scale-105 transition-transform">WhatsApp ile İletişime Geç</span>
+                        </a>
+                      )}
+                      
+                      {selectedItem.phone && (
+                        <a
+                          href={`tel:${selectedItem.phone}`}
+                          className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
+                        >
+                          <Phone size={24} className="group-hover:rotate-12 transition-transform" />
+                          <span className="font-medium text-lg group-hover:scale-105 transition-transform">Telefon ile Ara</span>
+                        </a>
+                      )}
+                      
+                      {selectedItem.email && (
+                        <a
+                          href={`mailto:${selectedItem.email}`}
+                          className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
+                        >
+                          <Mail size={24} className="group-hover:scale-110 transition-transform" />
+                          <span className="font-medium text-lg group-hover:scale-105 transition-transform">E-posta Gönder</span>
+                        </a>
+                      )}
                     </div>
                   </div>
-                  {/* Kategori Dropdown */}
-                  <div className="w-full md:w-1/4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
-                    <select
-                      value={activeCategory}
-                      onChange={(e) => setActiveCategory(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  <div className="mt-6">
+                    <TouchButton
+                      onClick={() => setShowContactModal(false)}
+                      className="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 py-3 px-4 rounded-xl font-medium transition-colors"
                     >
-                      <option value="all">Tüm Kategoriler</option>
-                      {categories.filter(c => c.id !== 'all').map(category => (
-                        <option key={category.id} value={category.id}>{category.name}</option>
-                      ))}
-                    </select>
+                      Kapat
+                    </TouchButton>
                   </div>
-                  {/* Durum Dropdown */}
-                  <div className="w-full md:w-1/4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Durum</label>
-                    <select
-                      value={activeCondition}
-                      onChange={(e) => setActiveCondition(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    >
-                      <option value="">Tüm Durumlar</option>
-                      <option value="new">Sıfır</option>
-                      <option value="like-new">Sıfır Gibi</option>
-                      <option value="good">İyi</option>
-                      <option value="fair">Orta</option>
-                      <option value="old">Eski</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="flex flex-row gap-4 justify-end">
-                  <button
-                    onClick={handleClearFilters}
-                    className="px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-                  >
-                    Filtreleri Temizle
-                  </button>
-                  <button
-                    onClick={handleApplyFilters}
-                    className="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold flex items-center gap-2 transition"
-                  >
-                    <Filter size={18} />
-                    Uygula
-                  </button>
                 </div>
               </div>
-            </div>
-          </div>
+            )}
 
-          {/* Results Count - Mobile optimized */}
-          <div className={`mb-6 ${isMobile ? 'px-3' : ''}`}>
-            <p className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'text-sm text-center bg-gray-100 dark:bg-gray-800 py-2 px-4 rounded-lg' : ''}`}>
-              📊 {filteredItems.length} sonuç bulundu
-            </p>
-          </div>
-
-          {/* Items Grid/Scroll */}
-          <div className={`${
-            isMobile && viewMode === 'scroll' 
-              ? 'flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide' 
-              : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-          }`}>
-            {paginatedItems.map((item, index) => {
-              const isOwner = user && item.userId === user.uid;
-              const images = item.images || [item.image];
-              const discount = item.originalPrice ? calculateDiscount(item.originalPrice, item.price) : 0;
-              
-              return (
-                <div key={item.id} className={`item-card rounded-2xl transition-all duration-300 overflow-hidden relative ${
-                  isMobile && viewMode === 'scroll' ? 'min-w-[280px] snap-center mobile-card-touch' : ''
-                } ${
-                  item.isPremium 
-                    ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/30 dark:via-purple-900/20 dark:to-indigo-900/30 border-2 border-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105' 
-                    : 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl'
-                }`}>
-                  {/* Premium Glow Effect */}
-                  {item.isPremium && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 via-purple-400/10 to-indigo-400/10 rounded-2xl pointer-events-none"></div>
-                  )}
-                  {/* Image Section - Mobile optimized */}
-                  <div className={`relative ${isMobile ? 'h-32' : 'h-48'} bg-gray-100 dark:bg-gray-700 overflow-hidden`}>
-                    <img
-                      src={images[0] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPlJlc2ltIFlvazwvdGV4dD4KPC9zdmc+'}
-                      alt={item.title}
-                      className={`w-full h-full object-cover transition-transform duration-200 ${isMobile ? '' : 'group-hover:scale-105'}`}
-                      onError={(e) => {
-                        e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRkVGMkYyIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iI0Y1NjU2NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiPlJlc2ltIFnDvGtsZW5lbWVkaTwvdGV4dD4KPC9zdmc+';
-                      }}
-                    />
-                    
-                    {/* Premium Badge */}
-                    {item.isPremium && (
-                      <div className="absolute top-3 right-3 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-xl border border-white/20 backdrop-blur-sm">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        <span className="text-white drop-shadow-sm">👑 PREMIUM</span>
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                      </div>
-                    )}
-                    
-                    {/* Onay durumu badge */}
-                    {!item.isApproved && !item.isPremium && (
-                      <div className="absolute top-3 left-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                        <Clock size={12} />
-                        Onay Bekliyor
-                      </div>
-                    )}
-                    
-                    {/* Onay durumu badge for Premium */}
-                    {!item.isApproved && item.isPremium && (
-                      <div className="absolute top-12 left-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                        <Clock size={12} />
-                        Onay Bekliyor
-                      </div>
-                    )}
-                    
-                    {/* İndirim etiketi */}
-                    {discount > 0 && (
-                      <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        %{discount} İndirim
-                      </div>
-                    )}
-                    
-                    {/* Çoklu fotoğraf göstergesi */}
-                    {images.length > 1 && (
-                      <div className="absolute bottom-3 left-3 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full text-xs">
-                        {images.length} Fotoğraf
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content Section - Mobile optimized */}
-                  <div className={`${isMobile ? 'p-3' : 'p-6'} relative ${item.isPremium ? 'bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-900/20 dark:via-purple-900/10 dark:to-indigo-900/20' : ''}`}>
-                    {/* Premium Corner Decoration */}
-                    {item.isPremium && !isMobile && (
-                      <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-pink-400/20 to-transparent rounded-bl-full"></div>
-                    )}
-                    {/* Title and Price - Mobile optimized */}
-                    <div className={`flex items-start justify-between ${isMobile ? 'mb-2' : 'mb-3'}`}>
-                      <div className="flex-1 min-w-0">
-                        <h3 className={`font-bold text-gray-800 dark:text-white line-clamp-2 ${isMobile ? 'text-sm leading-tight' : 'text-xl mb-1'}`}>
-                          {item.title}
-                        </h3>
-                        <p className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                          {item.category}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        {/* İndirim varsa önceki fiyatı göster */}
-                        {item.previousPrice && item.previousPrice > item.price && (
-                          <div className={`flex items-center gap-1 ${isMobile ? 'mb-0.5' : 'gap-2 mb-1'}`}>
-                            <span className={`text-gray-400 dark:text-gray-500 line-through ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                              {item.previousPrice} TL
-                            </span>
-                            <span className={`bg-red-500 text-white rounded-full font-bold ${isMobile ? 'text-xs px-1.5 py-0.5' : 'text-xs px-2 py-1'}`}>
-                              %{calculateDiscount(item.previousPrice, item.price)}
-                            </span>
-                          </div>
-                        )}
-                        <div className={`flex items-center font-bold ${isMobile ? 'text-sm' : 'text-lg'} ${item.isPremium ? 'text-purple-600 dark:text-purple-400' : 'text-blue-600 dark:text-blue-400'}`}>
-                          {item.isPremium && <span className={`text-pink-500 ${isMobile ? 'mr-0.5' : 'mr-1'}`}>💎</span>}
-                          <span>{item.price} TL</span>
-                          {item.isPremium && <span className={`text-pink-500 ${isMobile ? 'ml-0.5' : 'ml-1'}`}>💎</span>}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Condition Badge */}
-                    <div className="mb-3">
-                      <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                        item.condition === 'new' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 
-                        item.condition === 'like-new' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
-                        item.condition === 'good' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
-                        'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                      }`}>
-                        {item.condition === 'new' ? 'Sıfır' :
-                         item.condition === 'like-new' ? 'Sıfır Gibi' :
-                         item.condition === 'good' ? 'İyi' :
-                         item.condition === 'fair' ? 'Orta' : 'Eski'}
-                      </span>
-                    </div>
-
-                    {/* Location and Date */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                        <MapPin size={14} className="mr-2" />
-                        <span>{item.location || 'Konum belirtilmemiş'}</span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                        <Calendar size={14} className="mr-2" />
-                        <span>
-                          {item.createdAt?.toDate ? 
-                            item.createdAt.toDate().toLocaleDateString('tr-TR') : 
-                            new Date(item.createdAt).toLocaleDateString('tr-TR')
-                          }
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Description - Mobile optimized */}
-                    <p className={`text-gray-600 dark:text-gray-400 whitespace-pre-line ${isMobile ? 'text-xs mb-2 line-clamp-2' : 'text-sm mb-4'}`}>
-                      {item.description}
-                    </p>
-
-                    {/* Onay durumu (sadece ilan sahibi veya admin görsün) */}
-                    {(isOwner || isAdmin) && (
-                      <div className="mb-4">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                          item.isApproved 
-                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' 
-                            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
-                        }`}>
-                          {item.isApproved ? (
+            {/* Details Modal with Image Gallery */}
+            {showDetailsModal && selectedItem && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div 
+                  className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+                  style={modalPosition && isMobile ? { 
+                    position: 'fixed',
+                    top: `${modalPosition.top}px`,
+                    left: '1rem',
+                    right: '1rem',
+                    width: 'calc(100% - 2rem)',
+                    maxWidth: '56rem',
+                    maxHeight: '80vh',
+                    transform: 'none'
+                  } : {}}
+                >
+                  <div className="relative">
+                    {(() => {
+                      const images = selectedItem.images || [selectedItem.image];
+                      const currentImage = images[currentImageIndex] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDYwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI2MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjMwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPlJlc2ltIFlvazwvdGV4dD4KPC9zdmc+';
+                      
+                      return (
+                        <div className="relative">
+                          <img
+                            src={currentImage}
+                            alt={selectedItem.title}
+                            className="w-full h-64 md:h-96 object-cover cursor-zoom-in"
+                            onClick={() => { setShowImageLightbox(true); setLightboxImageIndex(currentImageIndex); }}
+                          />
+                          
+                          {/* Fotoğraf navigasyon butonları */}
+                          {images.length > 1 && (
                             <>
-                              <CheckCircle size={12} />
-                              Onaylandı
-                            </>
-                          ) : (
-                            <>
-                              <Clock size={12} />
-                              Onay Bekliyor
+                              <TouchButton
+                                onClick={prevImage}
+                                className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
+                              >
+                                <ChevronLeft size={24} />
+                              </TouchButton>
+                              <TouchButton
+                                onClick={nextImage}
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
+                              >
+                                <ChevronRight size={24} />
+                              </TouchButton>
+                              
+                              {/* Fotoğraf sayacı */}
+                              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                                {currentImageIndex + 1} / {images.length}
+                              </div>
                             </>
                           )}
+                        </div>
+                      );
+                    })()}
+                    
+                    <TouchButton
+                      onClick={() => setShowDetailsModal(false)}
+                      className="absolute top-4 right-4 p-2 bg-black/80 hover:bg-black text-white rounded-full shadow-lg border-2 border-white z-20 transition-colors"
+                    >
+                      <X size={28} />
+                    </TouchButton>
+                  </div>
+                  
+                  <div className="p-6">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{selectedItem.title}</h2>
+                    <div className="flex items-center gap-4 mb-4">
+                      <span className="text-2xl font-bold text-green-600 dark:text-green-400">{selectedItem.price} TL</span>
+                      {selectedItem.originalPrice && (
+                        <span className="text-lg text-gray-400 dark:text-gray-500 line-through">{selectedItem.originalPrice} TL</span>
+                      )}
+                      {/* İndirim oranı */}
+                      {selectedItem.originalPrice && selectedItem.price < selectedItem.originalPrice && (
+                        <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-sm font-semibold">
+                          %{calculateDiscount(selectedItem.originalPrice, selectedItem.price)} indirim
                         </span>
+                      )}
+                      <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+                        {selectedItem.condition}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-4 mb-4 text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-1">
+                        <MapPin size={16} />
+                        <span>{selectedItem.location}</span>
                       </div>
-                    )}
-
-                    {/* Actions - Mobile optimized */}
-                    <div className={`flex gap-1 ${isMobile ? 'mb-2' : 'gap-2 mb-3'}`}>
-                      {/* Owner buttons: Edit, Delete, Share */}
-                      {isOwner ? (
-                        <>
-                          <button
-                            onClick={(e) => handleDetailClick(item, e)}
-                            className={`flex-1 flex items-center justify-center gap-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition ${isMobile ? 'py-1.5 px-2 text-xs' : 'py-2 px-4 gap-2'}`}
-                          >
-                            <Eye size={isMobile ? 12 : 16} />
-                            {!isMobile && 'Detay'}
-                          </button>
-                          <button
-                            onClick={() => handleShare(item)}
-                            className={`flex items-center justify-center gap-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 rounded-lg font-medium transition ${isMobile ? 'py-1.5 px-2' : 'py-2 px-4 gap-2'}`}
-                          >
-                            <Share2 size={isMobile ? 12 : 16} />
-                          </button>
-                        </>
-                      ) : (
-                        /* Non-owner buttons: Detail, Contact */
-                        <>
-                          <button
-                            onClick={(e) => handleDetailClick(item, e)}
-                            className={`flex-1 flex items-center justify-center gap-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition ${isMobile ? 'py-1.5 px-2 text-xs' : 'py-2 px-4 gap-2'}`}
-                          >
-                            <Eye size={isMobile ? 12 : 16} />
-                            {isMobile ? 'Detay' : 'Detay'}
-                          </button>
-                          <button
-                            onClick={(e) => handleContactClick(item, e)}
-                            className={`flex-1 flex items-center justify-center gap-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg font-medium transition ${isMobile ? 'py-1.5 px-2 text-xs' : 'py-2 px-4 gap-2'}`}
-                          >
-                            <MessageCircle size={isMobile ? 12 : 16} />
-                            {isMobile ? 'İletişim' : 'İletişim'}
-                          </button>
-                        </>
+                      <div className="flex items-center gap-1">
+                        <span>📅</span>
+                        <span>{new Date(selectedItem.createdAt?.toDate?.() || selectedItem.createdAt).toLocaleDateString('tr-TR')}</span>
+                      </div>
+                      {/* Paylaşan kullanıcı ve saat */}
+                      {(selectedItem.userName || selectedItem.userEmail) && (
+                        <div className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                          <span className="font-semibold text-gray-700 dark:text-gray-300">Paylaşan:</span>
+                          <span className="text-gray-800 dark:text-gray-200">{selectedItem.userName || '-'}</span>
+                          <span className="text-gray-400 dark:text-gray-500">/</span>
+                          <span className="text-gray-600 dark:text-gray-400">{selectedItem.userEmail || '-'}</span>
+                          {selectedItem.createdAt && (
+                            <span className="ml-2 text-gray-500 dark:text-gray-400">{new Date(selectedItem.createdAt?.toDate?.() || selectedItem.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+                          )}
+                        </div>
                       )}
                     </div>
-
-                    {/* Favorite, Share and Report */}
-                    <div className="flex gap-2 mb-3">
-                      <button
-                        onClick={() => toggleFavorite(item)}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition ${
-                          favorites.includes(item.id)
-                            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
+                    <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed whitespace-pre-line">{selectedItem.description}</p>
+                    
+                    {/* Aksiyon butonları */}
+                    <div className="flex gap-2">
+                      <TouchButton
+                        onClick={() => {
+                          setShowDetailsModal(false);
+                          setShowContactModal(true);
+                        }}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium"
                       >
-                        <Heart size={16} fill={favorites.includes(item.id) ? 'currentColor' : 'none'} />
-                        {favorites.includes(item.id) ? 'Favoride' : 'Favorile'}
-                      </button>
-                      <button
-                        onClick={() => handleShare(item)}
-                        className="flex items-center justify-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg font-medium transition"
+                        İletişime Geç
+                      </TouchButton>
+                      <TouchButton
+                        onClick={() => handleShare(selectedItem)}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2"
                       >
                         <Share2 size={16} />
-                      </button>
-                      {/* Report Button - sadece ilan sahibi değilse göster */}
-                      {!isOwner && (
-                        <ReportButton contentType="secondhand" contentId={item.id} />
-                      )}
+                        Paylaş
+                      </TouchButton>
+                      <TouchButton
+                        onClick={() => setShowDetailsModal(false)}
+                        className="flex-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 py-3 px-6 rounded-lg font-medium"
+                      >
+                        Kapat
+                      </TouchButton>
                     </div>
-
-                    {/* Owner Actions */}
-                    {isOwner && (
-                      <div className="flex gap-2 mb-3">
-                        <TouchButton
-                          onClick={() => {
-                            setEditItem(item);
-                            setShowListingModal(true);
-                          }}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
-                        >
-                          <Edit size={14} />
-                          Düzenle
-                        </TouchButton>
-                        <TouchButton
-                          onClick={() => handleDelete(item.id)}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
-                        >
-                          <Trash2 size={14} />
-                          Sil
-                        </TouchButton>
-                      </div>
-                    )}
-
-                    {/* Admin Actions */}
-                    {isAdmin && (
-                      <div className="flex gap-2">
-                        {!item.isApproved ? (
-                          <>
-                            <TouchButton
-                              onClick={() => handleApprove(item.id, true)}
-                              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
-                              title="Onayla"
-                            >
-                              <CheckCircle size={14} />
-                              Onayla
-                            </TouchButton>
-                            <TouchButton
-                              onClick={() => handleApprove(item.id, false)}
-                              className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
-                              title="Reddet"
-                            >
-                              <X size={14} />
-                              Reddet
-                            </TouchButton>
-                          </>
-                        ) : (
-                          <div className="flex-1 text-center text-green-600 text-sm flex items-center justify-center gap-1">
-                            <CheckCircle size={14} />
-                            Onaylandı
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            )}
+
+            {/* Add/Edit Listing Modal */}
+            {showListingModal && (
+              <SecondHandForm
+                onClose={handleModalClose}
+                onSubmit={editItem ? (data) => handleEditItem(editItem.id, data) : handleAddItem}
+                initialValues={editItem}
+              />
+            )}
           </div>
-
-          {/* Row Indicators for Scroll Mode - Mobile Only */}
-          {isMobile && viewMode === 'scroll' && paginatedItems.length > 3 && (
-            <div className="flex justify-center mt-4 gap-1">
-              {Array.from({ length: Math.ceil(paginatedItems.length / 3) }, (_, i) => (
-                <div
-                  key={i}
-                  className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Pagination Controls - Grid Mode */}
-          {viewMode === 'grid' && totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-8">
-              <TouchButton
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === 1 
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
-              >
-                <ArrowUp size={16} />
-                Önceki
-              </TouchButton>
-
-              <div className="flex items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <TouchButton
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    {page}
-                  </TouchButton>
-                ))}
-              </div>
-
-              <TouchButton
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === totalPages 
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
-              >
-                Sonraki
-                <ArrowDown size={16} />
-              </TouchButton>
-            </div>
-          )}
-
-          {/* Empty State */}
-          {filteredItems.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">🛍️</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Sonuç Bulunamadı</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Arama kriterlerinize uygun ürün bulunamadı.
-              </p>
-              <TouchButton
-                onClick={() => {
-                  setActiveCategory('all');
-                  setSearchTerm('');
-                  setPriceRange('');
-                }}
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-6 py-2 rounded-lg"
-              >
-                Filtreleri Temizle
-              </TouchButton>
-            </div>
-          )}
-        </div>
-
-        {/* Contact Modal */}
-        {showContactModal && selectedItem && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div 
-              className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl"
-              style={modalPosition && isMobile ? { 
-                position: 'fixed',
-                top: `${modalPosition.top}px`,
-                left: '1rem',
-                right: '1rem',
-                width: 'calc(100% - 2rem)',
-                maxWidth: '28rem',
-                transform: 'none'
-              } : {}}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">İletişime Geç</h3>
-                <TouchButton
-                  onClick={() => setShowContactModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                >
-                  <X size={24} />
-                </TouchButton>
-              </div>
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 dark:text-white text-lg">{selectedItem.title}</h4>
-                <p className="text-xl font-bold text-green-600 dark:text-green-400 mt-2">{selectedItem.price} TL</p>
-              </div>
-              <div className="space-y-6">
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                  <MapPin size={18} className="text-gray-500 dark:text-gray-400" />
-                  <span className="font-medium">{selectedItem.location}</span>
-                </div>
-                
-                {/* İletişim Seçenekleri */}
-                <div className="space-y-3">
-                  {selectedItem.phone && (
-                    <a
-                      href={`https://wa.me/${selectedItem.phone.replace(/[^0-9]/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
-                    >
-                      <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                      </svg>
-                      <span className="font-medium text-lg group-hover:scale-105 transition-transform">WhatsApp ile İletişime Geç</span>
-                    </a>
-                  )}
-                  
-                  {selectedItem.phone && (
-                    <a
-                      href={`tel:${selectedItem.phone}`}
-                      className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
-                    >
-                      <Phone size={24} className="group-hover:rotate-12 transition-transform" />
-                      <span className="font-medium text-lg group-hover:scale-105 transition-transform">Telefon ile Ara</span>
-                    </a>
-                  )}
-                  
-                  {selectedItem.email && (
-                    <a
-                      href={`mailto:${selectedItem.email}`}
-                      className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
-                    >
-                      <Mail size={24} className="group-hover:scale-110 transition-transform" />
-                      <span className="font-medium text-lg group-hover:scale-105 transition-transform">E-posta Gönder</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-              <div className="mt-6">
-                <TouchButton
-                  onClick={() => setShowContactModal(false)}
-                  className="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 py-3 px-4 rounded-xl font-medium transition-colors"
-                >
-                  Kapat
-                </TouchButton>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Details Modal with Image Gallery */}
-        {showDetailsModal && selectedItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div 
-              className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-              style={modalPosition && isMobile ? { 
-                position: 'fixed',
-                top: `${modalPosition.top}px`,
-                left: '1rem',
-                right: '1rem',
-                width: 'calc(100% - 2rem)',
-                maxWidth: '56rem',
-                maxHeight: '80vh',
-                transform: 'none'
-              } : {}}
-            >
-              <div className="relative">
-                {(() => {
-                  const images = selectedItem.images || [selectedItem.image];
-                  const currentImage = images[currentImageIndex] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDYwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI2MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjMwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZmlsbD0iIzlDQTNBRiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPlJlc2ltIFlvazwvdGV4dD4KPC9zdmc+';
-                  
-                  return (
-                    <div className="relative">
-                      <img
-                        src={currentImage}
-                        alt={selectedItem.title}
-                        className="w-full h-64 md:h-96 object-cover cursor-zoom-in"
-                        onClick={() => { setShowImageLightbox(true); setLightboxImageIndex(currentImageIndex); }}
-                      />
-                      
-                      {/* Fotoğraf navigasyon butonları */}
-                      {images.length > 1 && (
-                        <>
-                          <TouchButton
-                            onClick={prevImage}
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
-                          >
-                            <ChevronLeft size={24} />
-                          </TouchButton>
-                          <TouchButton
-                            onClick={nextImage}
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
-                          >
-                            <ChevronRight size={24} />
-                          </TouchButton>
-                          
-                          {/* Fotoğraf sayacı */}
-                          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-                            {currentImageIndex + 1} / {images.length}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })()}
-                
-                <TouchButton
-                  onClick={() => setShowDetailsModal(false)}
-                  className="absolute top-4 right-4 p-2 bg-black/80 hover:bg-black text-white rounded-full shadow-lg border-2 border-white z-20 transition-colors"
-                >
-                  <X size={28} />
-                </TouchButton>
-              </div>
-              
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{selectedItem.title}</h2>
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">{selectedItem.price} TL</span>
-                  {selectedItem.originalPrice && (
-                    <span className="text-lg text-gray-400 dark:text-gray-500 line-through">{selectedItem.originalPrice} TL</span>
-                  )}
-                  {/* İndirim oranı */}
-                  {selectedItem.originalPrice && selectedItem.price < selectedItem.originalPrice && (
-                    <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-sm font-semibold">
-                      %{calculateDiscount(selectedItem.originalPrice, selectedItem.price)} indirim
-                    </span>
-                  )}
-                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
-                    {selectedItem.condition}
-                  </span>
-                </div>
-                <div className="flex flex-wrap items-center gap-4 mb-4 text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <MapPin size={16} />
-                    <span>{selectedItem.location}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span>📅</span>
-                    <span>{new Date(selectedItem.createdAt?.toDate?.() || selectedItem.createdAt).toLocaleDateString('tr-TR')}</span>
-                  </div>
-                  {/* Paylaşan kullanıcı ve saat */}
-                  {(selectedItem.userName || selectedItem.userEmail) && (
-                    <div className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                      <span className="font-semibold text-gray-700 dark:text-gray-300">Paylaşan:</span>
-                      <span className="text-gray-800 dark:text-gray-200">{selectedItem.userName || '-'}</span>
-                      <span className="text-gray-400 dark:text-gray-500">/</span>
-                      <span className="text-gray-600 dark:text-gray-400">{selectedItem.userEmail || '-'}</span>
-                      {selectedItem.createdAt && (
-                        <span className="ml-2 text-gray-500 dark:text-gray-400">{new Date(selectedItem.createdAt?.toDate?.() || selectedItem.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed whitespace-pre-line">{selectedItem.description}</p>
-                
-                {/* Aksiyon butonları */}
-                <div className="flex gap-2">
-                  <TouchButton
-                    onClick={() => {
-                      setShowDetailsModal(false);
-                      setShowContactModal(true);
-                    }}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium"
-                  >
-                    İletişime Geç
-                  </TouchButton>
-                  <TouchButton
-                    onClick={() => handleShare(selectedItem)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2"
-                  >
-                    <Share2 size={16} />
-                    Paylaş
-                  </TouchButton>
-                  <TouchButton
-                    onClick={() => setShowDetailsModal(false)}
-                    className="flex-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 py-3 px-6 rounded-lg font-medium"
-                  >
-                    Kapat
-                  </TouchButton>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Add/Edit Listing Modal */}
-        {showListingModal && (
-          <SecondHandForm
-            onClose={handleModalClose}
-            onSubmit={editItem ? (data) => handleEditItem(editItem.id, data) : handleAddItem}
-            initialValues={editItem}
-          />
-        )}
+        </main>
+        <Footer />
       </PullToRefresh>
-      <Footer />
 
       {showImageLightbox && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] p-4">
