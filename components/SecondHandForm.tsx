@@ -380,10 +380,23 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-2 md:p-4 pt-4 md:pt-0" onClick={onClose}>
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-[9999] p-2 md:p-4 pt-4 md:pt-0" 
+      onClick={onClose}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
+    >
       <div 
         className="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto p-4 md:p-6 shadow-xl mt-4 md:mt-0"
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+        style={{
+          touchAction: 'pan-y',
+          overscrollBehavior: 'none'
+        }}
       >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-gray-800">Yeni İlan Ver</h3>
