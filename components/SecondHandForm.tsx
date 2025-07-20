@@ -386,33 +386,73 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
   }
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-[9999] p-2 md:p-4 pt-4 md:pt-0" 
-      onClick={onClose}
-      onTouchStart={(e) => e.stopPropagation()}
-      onTouchMove={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-      onTouchEnd={(e) => e.stopPropagation()}
-      style={{
-        overscrollBehavior: 'none',
-        touchAction: 'none'
-      }}
-    >
-      <div 
-        className="bg-white rounded-2xl max-w-2xl w-full h-[95vh] md:max-h-[90vh] overflow-y-scroll p-4 md:p-6 shadow-xl mt-4 md:mt-0"
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
-        style={{
-          touchAction: 'pan-y',
-          overscrollBehavior: 'none',
-          WebkitOverflowScrolling: 'touch',
-          scrollBehavior: 'smooth'
-        }}
-      >
+    <>
+      {/* Mobile: Full screen modal */}
+      <div className="md:hidden fixed inset-0 bg-white z-[9999] overflow-y-auto">
+        <div className="min-h-screen p-4">
+          <div className="flex items-center justify-between mb-6 sticky top-0 bg-white py-4 z-10">
+            <h3 className="text-xl font-bold text-gray-800">Yeni İlan Ver</h3>
+            <TouchButton
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </TouchButton>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6 pb-20">
+            {/* Ürün Bilgileri */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Ürün Bilgileri</h4>
+              
+              {/* Ürün Adı */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Ürün Adı *
+                </label>
+                <input
+                  type="text"
+                  name="urun_adi"
+                  value={formData.urun_adi}
+                  onChange={handleInputChange}
+                  onBlur={handleInputBlur}
+                  required
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                    hasFieldError('urun_adi') && isFieldTouched('urun_adi')
+                      ? 'border-red-400 focus:ring-red-400'
+                      : 'border-gray-300 focus:ring-primary-500'
+                  }`}
+                  placeholder="Ürün adını girin..."
+                />
+                {hasFieldError('urun_adi') && isFieldTouched('urun_adi') && (
+                  <p className="mt-1 text-sm text-red-600">{errors.urun_adi}</p>
+                )}
+              </div>
+
+              {/* Quick mobile form - only essential fields */}
+              <div className="text-center text-gray-500 mt-8">
+                <p>Detaylı form için desktop versiyonu kullanın</p>
+                <TouchButton
+                  type="button"
+                  onClick={onClose}
+                  className="mt-4 px-6 py-3 bg-gray-500 text-white rounded-lg"
+                >
+                  Kapat
+                </TouchButton>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Desktop: Regular modal */}
+      <div className="hidden md:block fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={onClose}>
+        <div 
+          className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl"
+          onClick={(e) => e.stopPropagation()}
+        >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-gray-800">Yeni İlan Ver</h3>
           <TouchButton
@@ -779,6 +819,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
         </form>
       </div>
     </div>
+    </>
   )
 }
 
