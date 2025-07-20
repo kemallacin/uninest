@@ -628,3 +628,12 @@ textarea {
     font-size: 16px !important;
   }
 } 
+
+/* --- Override restrictive mobile touch rules (allow scroll/drag on cards) --- */
+.mobile-smooth-scroll,
+.mobile-content-area,
+.mobile-scroll-container,
+.mobile-content-area *,
+.mobile-scroll-container > * {
+  touch-action: auto !important;
+} 
