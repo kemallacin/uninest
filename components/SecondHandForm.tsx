@@ -380,20 +380,13 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-2 md:p-4 pt-4 md:pt-0 form-modal-container" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-50 p-2 md:p-4 pt-4 md:pt-0" onClick={onClose}>
       <div 
-        className="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto shadow-xl mt-4 md:mt-0 form-modal-content"
+        className="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto p-4 md:p-6 shadow-xl mt-4 md:mt-0"
         onClick={(e) => e.stopPropagation()}
-        style={{
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'none',
-          overscrollBehaviorY: 'none',
-          touchAction: 'pan-y',
-          overflowAnchor: 'none'
-        }}
       >
-        <div className="flex items-center justify-between mb-6 p-4 md:p-6">
-          <h3 className="text-xl md:text-2xl font-bold text-gray-800">Yeni İlan Ver</h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-gray-800">Yeni İlan Ver</h3>
           <TouchButton
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors p-2"
@@ -404,7 +397,7 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
           </TouchButton>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-4 md:px-6 space-y-6 pb-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Ürün Bilgileri */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-gray-900 border-b pb-2">Ürün Bilgileri</h4>
