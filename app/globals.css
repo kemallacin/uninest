@@ -634,16 +634,31 @@ textarea {
       width: 100vw !important;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior: contain !important;
+      overscroll-behavior: none !important;
+      overscroll-behavior-y: none !important;
       touch-action: pan-y !important;
       transform: translateZ(0) !important;
       backface-visibility: hidden !important;
+      /* Prevent pull-to-refresh */
+      overscroll-behavior-block: none !important;
+      overflow-anchor: none !important;
     }
     
     .form-modal-content {
       min-height: 100vh !important;
       display: flex !important;
       flex-direction: column !important;
+      overscroll-behavior: none !important;
+      overscroll-behavior-y: none !important;
+      /* Prevent pull-to-refresh on content */
+      touch-action: pan-y !important;
+      overflow-anchor: none !important;
+    }
+
+    /* Prevent pull-to-refresh globally in modal */
+    .form-modal-container * {
+      overscroll-behavior: none !important;
+      overscroll-behavior-y: none !important;
     }
   }
 

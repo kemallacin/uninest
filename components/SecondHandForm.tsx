@@ -111,6 +111,23 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
     }
   }, [formData, validateForm]);
 
+  // Prevent pull-to-refresh when modal is open
+  useEffect(() => {
+    // Disable pull-to-refresh on mobile
+    document.body.style.overscrollBehavior = 'none';
+    document.body.style.overscrollBehaviorY = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehaviorY = 'none';
+    
+    return () => {
+      // Restore original behavior
+      document.body.style.overscrollBehavior = '';
+      document.body.style.overscrollBehaviorY = '';
+      document.documentElement.style.overscrollBehavior = '';
+      document.documentElement.style.overscrollBehaviorY = '';
+    };
+  }, []);
+
 
 
   const categories = [
@@ -369,8 +386,10 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
         onClick={(e) => e.stopPropagation()}
         style={{
           WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          touchAction: 'pan-y'
+          overscrollBehavior: 'none',
+          overscrollBehaviorY: 'none',
+          touchAction: 'pan-y',
+          overflowAnchor: 'none'
         }}
       >
         <div className="flex items-center justify-between mb-6 p-4 md:p-6">
