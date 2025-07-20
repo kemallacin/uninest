@@ -113,18 +113,24 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
 
   // Prevent pull-to-refresh when modal is open
   useEffect(() => {
-    // Disable pull-to-refresh on mobile
+    // Disable pull-to-refresh completely
     document.body.style.overscrollBehavior = 'none';
     document.body.style.overscrollBehaviorY = 'none';
+    document.body.style.touchAction = 'none';
+    document.body.style.overflow = 'hidden';
     document.documentElement.style.overscrollBehavior = 'none';
     document.documentElement.style.overscrollBehaviorY = 'none';
+    document.documentElement.style.touchAction = 'none';
     
     return () => {
       // Restore original behavior
       document.body.style.overscrollBehavior = '';
       document.body.style.overscrollBehaviorY = '';
+      document.body.style.touchAction = '';
+      document.body.style.overflow = '';
       document.documentElement.style.overscrollBehavior = '';
       document.documentElement.style.overscrollBehaviorY = '';
+      document.documentElement.style.touchAction = '';
     };
   }, []);
 
@@ -384,18 +390,27 @@ const SecondHandForm: React.FC<SecondHandFormProps> = ({ onClose, onSubmit, init
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start md:items-center justify-center z-[9999] p-2 md:p-4 pt-4 md:pt-0" 
       onClick={onClose}
       onTouchStart={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
+      onTouchMove={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
       onTouchEnd={(e) => e.stopPropagation()}
+      style={{
+        overscrollBehavior: 'none',
+        touchAction: 'none'
+      }}
     >
       <div 
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto p-4 md:p-6 shadow-xl mt-4 md:mt-0"
+        className="bg-white rounded-2xl max-w-2xl w-full h-[95vh] md:max-h-[90vh] overflow-y-scroll p-4 md:p-6 shadow-xl mt-4 md:mt-0"
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
         onTouchEnd={(e) => e.stopPropagation()}
         style={{
           touchAction: 'pan-y',
-          overscrollBehavior: 'none'
+          overscrollBehavior: 'none',
+          WebkitOverflowScrolling: 'touch',
+          scrollBehavior: 'smooth'
         }}
       >
         <div className="flex items-center justify-between mb-6">
