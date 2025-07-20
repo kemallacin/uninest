@@ -604,9 +604,9 @@ textarea {
     -webkit-overflow-scrolling: auto;
   }
   
-  /* Fix footer area touch behavior */
+  /* Footer should allow normal scrolling */
   footer {
-    touch-action: none !important;
+    touch-action: auto !important;
     pointer-events: auto;
   }
 
